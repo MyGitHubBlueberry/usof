@@ -29,8 +29,8 @@ api.interceptors.response.use(
 
     const normalised = {
       status,
-      message: data.message ?? error.message ?? 'An unexpected error occurred.',
-      errors: Array.isArray(data.errors) ? data.errors : [],
+      message: data.error ?? data.message ?? error.message ?? 'An unexpected error occurred.',
+      errors: Array.isArray(data.errors) ? data.errors : Array.isArray(data.details) ? data.details : [],
       raw: error,
     };
 

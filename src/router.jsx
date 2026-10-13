@@ -1,7 +1,8 @@
 import { lazy } from 'react'
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import { ROUTES } from './constants/routes'
 import RootLayout from './components/layouts/RootLayout.jsx'
+import AuthLayout from './components/layouts/AuthLayout.jsx'
 
 const Home = lazy(() => import('./pages/Home'))
 const PostDetails = lazy(() => import('./pages/PostDetails'))
@@ -32,12 +33,17 @@ export const router = createBrowserRouter([
       { path: ROUTES.LEADERBOARD, element: <Leaderboard /> },
       { path: ROUTES.NOTIFICATIONS, element: <Notifications /> },
       { path: ROUTES.ADMIN, element: <Admin /> },
+      { path: '*', element: <NotFound /> },
+    ],
+  },
+  {
+    element: <AuthLayout />,
+    children: [
       { path: ROUTES.LOGIN, element: <Login /> },
       { path: ROUTES.REGISTER, element: <Register /> },
       { path: ROUTES.CONFIRM_EMAIL, element: <EmailConfirm /> },
       { path: ROUTES.PASSWORD_RESET, element: <PasswordResetRequest /> },
       { path: ROUTES.PASSWORD_RESET_CONFIRM, element: <PasswordResetConfirm /> },
-      { path: '*', element: <NotFound /> },
     ],
   },
 ])
