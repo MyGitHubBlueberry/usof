@@ -5,6 +5,9 @@ import RootLayout from './components/layouts/RootLayout.jsx'
 import AuthLayout from './components/layouts/AuthLayout.jsx'
 
 const Home = lazy(() => import('./pages/Home'))
+const Favorites = lazy(() => import('./pages/Favorites'))
+const Subscriptions = lazy(() => import('./pages/Subscriptions'))
+const UserPosts = lazy(() => import('./pages/UserPosts'))
 const PostDetails = lazy(() => import('./pages/PostDetails'))
 const PostCreate = lazy(() => import('./pages/PostCreate'))
 const PostEdit = lazy(() => import('./pages/PostEdit'))
@@ -26,15 +29,13 @@ export const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, element: <Home /> },
-      { path: ROUTES.FAVORITES, element: <Home /> },
-      { path: ROUTES.SUBSCRIPTIONS, element: <Home /> },
+      { path: ROUTES.FAVORITES, element: <Favorites /> },
+      { path: ROUTES.SUBSCRIPTIONS, element: <Subscriptions /> },
+      { path: ROUTES.USER_POSTS, element: <UserPosts /> },
       { path: ROUTES.POST, element: <PostDetails /> },
       { path: ROUTES.POST_NEW, element: <PostCreate /> },
       { path: ROUTES.POST_EDIT, element: <PostEdit /> },
-      { path: ROUTES.PROFILE_ME, element: <Profile /> },
       { path: ROUTES.PROFILE, element: <Profile /> },
-      { path: ROUTES.USER_POSTS, element: <Profile /> },
-      { path: ROUTES.PROFILE_POSTS, element: <Profile /> },
       { path: ROUTES.LEADERBOARD, element: <Leaderboard /> },
       { path: ROUTES.NOTIFICATIONS, element: <Notifications /> },
       { path: ROUTES.ADMIN, element: <Admin /> },

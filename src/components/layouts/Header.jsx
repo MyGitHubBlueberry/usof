@@ -75,8 +75,8 @@ export default function Header() {
   const displayName = user?.login || user?.full_name || 'User'
   const initial = (user?.login?.[0] || user?.full_name?.[0] || 'U').toUpperCase()
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
-  const profileRoute = user?.id ? toProfile(user.id) : ROUTES.PROFILE_ME
-  const myPostsRoute = user?.id ? toUserPosts(user.id) : ROUTES.PROFILE_POSTS
+  const profileRoute = user?.id ? toProfile(user.id) : ROUTES.LOGIN
+  const myPostsRoute = user?.id ? toUserPosts(user.id) : ROUTES.LOGIN
 
   return (
     <header className={s.header}>
