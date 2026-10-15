@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginThunk } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
+import Logo from '../components/ui/Logo'
 import s from '../components/layouts/auth.module.css'
 
 export default function Login() {
@@ -43,10 +44,7 @@ export default function Login() {
 
   return (
     <div className={s.card}>
-      <Link to={ROUTES.HOME} className={s.logo}>
-        <div className={s.logoMark}>U</div>
-        <span className={s.logoText}>USOF</span>
-      </Link>
+      <Logo className={s.logo} />
 
       <h1 className={s.heading}>Welcome back</h1>
       <p className={s.sub}>

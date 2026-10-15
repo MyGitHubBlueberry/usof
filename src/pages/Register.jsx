@@ -3,9 +3,10 @@ import { Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerThunk } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
+import Logo from '../components/ui/Logo'
 import s from '../components/layouts/auth.module.css'
 
-const MIN_PASSWORD = 6
+const MIN_PASSWORD = 8
 
 function validate(form) {
   const e = {}
@@ -93,10 +94,7 @@ export default function Register() {
 
   return (
     <div className={s.card}>
-      <Link to={ROUTES.HOME} className={s.logo}>
-        <div className={s.logoMark}>U</div>
-        <span className={s.logoText}>USOF</span>
-      </Link>
+      <Logo className={s.logo} />
 
       <h1 className={s.heading}>Create an account</h1>
       <p className={s.sub}>
