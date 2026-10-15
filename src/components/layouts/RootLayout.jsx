@@ -2,12 +2,13 @@ import { Outlet } from "react-router-dom"
 import { Suspense } from "react"
 import Header from "./Header"
 import Footer from "./Footer"
+import s from "./RootLayout.module.css"
 
 export default function RootLayout() {
   return (
     <>
       <Header />
-      <main>
+      <main className={s.main}>
         <Suspense fallback={<div>Loading...</div>}>
           <Outlet />
         </Suspense>

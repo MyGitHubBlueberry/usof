@@ -1,0 +1,280 @@
+.header {
+  height: 60px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.left,
+.center,
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.left {
+  flex: 1;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.center {
+  flex: 0 0 auto;
+}
+
+.right {
+  flex: 1;
+  justify-content: flex-end;
+  gap: 10px;
+  position: relative;
+}
+
+.menuBtn,
+.userBtn,
+.loginBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.userBtn {
+  padding: 4px 10px;
+}
+
+.menuBtn:hover,
+.menuBtn[aria-expanded="true"],
+.userBtn:hover,
+.userBtn[aria-expanded="true"],
+.loginBtn:hover {
+  background: var(--code-bg);
+  border-color: var(--text);
+  color: var(--text-h);
+}
+
+.menuBtnText {
+  display: inline;
+}
+
+@media (max-width: 640px) {
+  .menuBtnText {
+    display: none;
+  }
+}
+
+.icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 210px;
+  padding: 6px 0;
+  z-index: 200;
+  animation: fadeIn 0.12s ease-out;
+}
+
+.leftDropdown {
+  left: 0;
+}
+
+.rightDropdown {
+  right: 0;
+  min-width: 230px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px;
+  font-size: 14px;
+  color: var(--text-h);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s;
+}
+
+.itemIcon {
+  color: var(--text);
+  transition: color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdownItem:hover {
+  background: var(--code-bg);
+}
+
+.dropdownItem:hover .itemIcon {
+  color: var(--accent);
+}
+
+.menuBtn .itemIcon,
+.userBtn .itemIcon {
+  color: var(--text);
+  transition: color 0.15s;
+}
+
+.menuBtn:hover .itemIcon,
+.menuBtn[aria-expanded="true"] .itemIcon,
+.userBtn:hover .itemIcon,
+.userBtn[aria-expanded="true"] .itemIcon {
+  color: var(--accent);
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+.userInfoLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s;
+}
+
+.userInfoLink:hover {
+  background: var(--code-bg);
+}
+
+.userInfo {
+  padding: 10px 16px 8px;
+}
+
+.userNameFull {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  line-height: 1.2;
+}
+
+.userLogin {
+  font-size: 12px;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.userBadge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  margin-top: 6px;
+  border: 1px solid var(--accent-border);
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+@media (max-width: 640px) {
+  .userName {
+    display: none;
+  }
+}
+
+.chevron {
+  font-size: 10px;
+  color: var(--text);
+}
+
+.guestGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.registerBtn {
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.registerBtn:hover {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.registerBtn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+  .registerBtn {
+    display: none;
+  }
+}
