@@ -47,6 +47,11 @@
   text-decoration: underline;
 }
 
+.forgotWrapper {
+  text-align: right;
+  margin-top: -8px;
+}
+
 .form {
   display: flex;
   flex-direction: column;

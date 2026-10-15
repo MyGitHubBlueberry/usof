@@ -93,7 +93,7 @@ export default function Login() {
           )}
         </div>
 
-        <div style={{ textAlign: 'right', marginTop: '-8px' }}>
+        <div className={s.forgotWrapper}>
           <Link to={ROUTES.PASSWORD_RESET} className={s.link}>
             Forgot password?
           </Link>

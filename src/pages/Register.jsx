@@ -77,16 +77,18 @@ export default function Register() {
   if (submitted) {
     return (
       <div className={s.card}>
-        <div className={s.success}>
-          <div className={s.successIcon}>📬</div>
-          <div className={s.successTitle}>Check your inbox!</div>
-          <p className={s.successMsg}>
+        <Logo className={s.logo} />
+        <div className={s.wrapper}>
+          <div className={s.icon}>📬</div>
+          <div className={s.title}>Check your inbox!</div>
+          <p className={s.msg}>
             We sent a verification link to <strong>{form.email}</strong>.
             <br />Click it to activate your account.
           </p>
         </div>
-        <p className={s.sub} style={{ textAlign: 'center', marginTop: '24px' }}>
-          Already verified? <Link to={ROUTES.LOGIN} state={{ from: location.state?.from }}>Sign in</Link>
+        <p className={`${s.sub} ${s.footerLinks}`}>
+          Already verified?{' '}
+          <Link to={ROUTES.LOGIN} state={{ from: location.state?.from }}>Sign in</Link>
         </p>
       </div>
     )
