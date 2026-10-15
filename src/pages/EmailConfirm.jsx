@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { authService } from '../services/auth.service'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
+import { IconCheckCircle, IconXCircle } from '../components/ui/Icons'
 import s from '../components/layouts/auth.module.css'
 
 export default function EmailConfirm() {
@@ -31,7 +32,11 @@ export default function EmailConfirm() {
       action: null,
     },
     success: {
-      icon: <div className={s.icon}>✅</div>,
+      icon: (
+        <div className={s.icon}>
+          <IconCheckCircle size={44} />
+        </div>
+      ),
       title: 'Email confirmed!',
       msg: 'Your account is now active. You can sign in.',
       action: (
@@ -41,7 +46,11 @@ export default function EmailConfirm() {
       ),
     },
     error: {
-      icon: <div className={s.icon}>❌</div>,
+      icon: (
+        <div className={`${s.icon} ${s.iconError}`}>
+          <IconXCircle size={44} />
+        </div>
+      ),
       title: 'Confirmation failed',
       msg: message,
       action: (

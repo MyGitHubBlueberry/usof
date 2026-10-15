@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { authService } from '../services/auth.service'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
+import { IconMail } from '../components/ui/Icons'
 import s from '../components/layouts/auth.module.css'
 
 export default function PasswordResetRequest() {
@@ -41,7 +42,9 @@ export default function PasswordResetRequest() {
       <div className={s.card}>
         <Logo className={s.logo} />
         <div className={s.wrapper}>
-          <div className={s.icon}>📬</div>
+          <div className={s.icon}>
+            <IconMail size={44} />
+          </div>
           <div className={s.title}>Check your inbox</div>
           <p className={s.msg}>
             If an account is associated with <strong>{email}</strong>, we've sent a link to reset your password.

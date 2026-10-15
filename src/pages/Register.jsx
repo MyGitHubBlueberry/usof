@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { registerThunk } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
+import { IconMail } from '../components/ui/Icons'
 import s from '../components/layouts/auth.module.css'
 
 const MIN_PASSWORD = 8
@@ -79,7 +80,9 @@ export default function Register() {
       <div className={s.card}>
         <Logo className={s.logo} />
         <div className={s.wrapper}>
-          <div className={s.icon}>📬</div>
+          <div className={s.icon}>
+            <IconMail size={44} />
+          </div>
           <div className={s.title}>Check your inbox!</div>
           <p className={s.msg}>
             We sent a verification link to <strong>{form.email}</strong>.

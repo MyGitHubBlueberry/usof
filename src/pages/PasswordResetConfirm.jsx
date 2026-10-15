@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { authService } from '../services/auth.service'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
+import { IconCheckCircle } from '../components/ui/Icons'
 import s from '../components/layouts/auth.module.css'
 
 const MIN_PASSWORD = 8
@@ -62,7 +63,9 @@ export default function PasswordResetConfirm() {
       <div className={s.card}>
         <Logo className={s.logo} />
         <div className={s.wrapper}>
-          <div className={s.icon}>✅</div>
+          <div className={s.icon}>
+            <IconCheckCircle size={44} />
+          </div>
           <div className={s.title}>Password updated!</div>
           <p className={s.msg}>
             Your password has been changed successfully. You can now sign in with your new password.
