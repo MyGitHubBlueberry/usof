@@ -113,18 +113,25 @@
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
-  border: none;
+  border: 1px solid var(--accent);
+  border-radius: 0;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-sizing: border-box;
 }
 
 .submit:hover:not(:disabled) {
-  opacity: 0.88;
-  transform: scale(1.01);
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .submit:disabled {
@@ -187,8 +194,15 @@
 }
 
 .icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+
+.iconError {
+  color: #ef4444;
 }
 
 .title {

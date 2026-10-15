@@ -35,10 +35,20 @@ export const logoutThunk = createAsyncThunk(
   }
 );
 
+const loadSavedUser = () => {
+  try {
+    const raw = localStorage.getItem('user')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    localStorage.removeItem('user')
+    return null
+  }
+}
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null,
+    user: loadSavedUser(),
     token: localStorage.getItem('token') || null,
     loading: false,
     error: null
@@ -47,6 +57,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = state.token = null;
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   },
   extraReducers: (builder) => {
@@ -60,6 +71,9 @@ const authSlice = createSlice({
         state.user = action.payload.user
         state.token = action.payload.token
         localStorage.setItem('token', action.payload.token)
+        if (action.payload.user) {
+          localStorage.setItem('user', JSON.stringify(action.payload.user))
+        }
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false
