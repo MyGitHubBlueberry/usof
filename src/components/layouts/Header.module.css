@@ -64,7 +64,7 @@
 .userBtn:hover,
 .userBtn[aria-expanded="true"],
 .loginBtn:hover {
-  background: var(--code-bg);
+  /* background: var(--code-bg); */
   border-color: var(--text);
   color: var(--text-h);
 }

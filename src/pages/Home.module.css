@@ -1,0 +1,76 @@
+.feedContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.feedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.feedTitle {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.postList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.statusBadge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.emptyFeed,
+.loadingFeed {
+  padding: 56px 16px;
+  text-align: center;
+  color: var(--text);
+  border: 1px dashed var(--border);
+  font-size: 14px;
+}
+
+.paginationWrapper {
+  margin-top: auto;
+  padding: 32px 0 12px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .feedContainer {
+    padding: 16px 12px;
+  }
+
+  .paginationWrapper {
+    padding: 24px 0 8px;
+  }
+}

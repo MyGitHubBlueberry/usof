@@ -1,7 +1,73 @@
+.appShell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.contentArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.centerColumn {
+  flex: 2.5;
+  max-width: 1080px;
+  min-width: 0;
+  height: 100%;
+  border-inline: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--bg);
+  position: relative;
+}
+
 .main {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
+}
+
+.leftSidebar,
+.rightSidebar {
+  flex: 1;
+  max-width: 420px;
+  min-width: 220px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1240px) {
+  .leftSidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .rightSidebar {
+    display: none;
+  }
+
+  .centerColumn {
+    width: 100%;
+    border-inline: none;
+  }
 }

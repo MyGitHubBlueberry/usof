@@ -1,0 +1,128 @@
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-h);
+}
+
+.icon {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.actionLink:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+.body {
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.empty,
+.loading {
+  padding: 24px 14px;
+  font-size: 13px;
+  color: var(--text);
+  text-align: center;
+}
+
+/* Shared Widget List & Row Styles */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item,
+.itemBlock {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.itemBlock {
+  display: block;
+}
+
+.item:last-child,
+.itemBlock:last-child {
+  border-bottom: none;
+}
+
+.item:hover,
+.itemBlock:hover {
+  background: var(--code-bg);
+}
+
+.itemTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-h);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text);
+}
