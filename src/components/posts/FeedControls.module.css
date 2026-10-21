@@ -32,8 +32,12 @@
   opacity: 0.6;
 }
 
+.searchInput:hover {
+  border-color: var(--text);
+}
+
 .searchInput:focus {
-  border-color: var(--accent);
+  border-color: var(--text);
 }
 
 .searchInput::-webkit-search-cancel-button {
@@ -57,8 +61,8 @@
 }
 
 .clearAllBtn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--text);
+  color: var(--text-h);
 }
 
 .toggleFiltersBtn {
@@ -80,9 +84,10 @@
 }
 
 .toggleFiltersBtn:hover,
-.toggleFiltersBtn.open {
-  border-color: var(--accent);
-  color: var(--accent);
+.toggleFiltersBtn.open,
+.toggleFiltersBtn[aria-expanded="true"] {
+  border-color: var(--text);
+  color: var(--text-h);
 }
 
 .toggleBtnText {
@@ -173,23 +178,27 @@
 }
 
 .dropdownTrigger:hover,
-.dropdownTrigger.open {
-  border-color: var(--accent);
+.dropdownTrigger.open,
+.dropdownTrigger[aria-expanded="true"] {
+  border-color: var(--text);
+  color: var(--text-h);
 }
 
 .itemIcon {
   color: var(--text);
   transition: color 0.15s;
   flex-shrink: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .dropdownTrigger:hover .itemIcon,
 .dropdownTrigger.open .itemIcon,
+.dropdownTrigger[aria-expanded="true"] .itemIcon,
 .toggleFiltersBtn:hover .itemIcon,
-.toggleFiltersBtn.open .itemIcon {
+.toggleFiltersBtn.open .itemIcon,
+.toggleFiltersBtn[aria-expanded="true"] .itemIcon {
   color: var(--accent);
 }
 
@@ -236,8 +245,6 @@
 
 .dropdownOption.selectedOption {
   background: var(--active-bg);
-  color: var(--accent);
-  font-weight: 600;
 }
 
 .dropdownEmpty {
@@ -264,7 +271,6 @@
 
 .checkItem.checked {
   background: var(--active-bg);
-  color: var(--accent);
 }
 
 .hiddenCheck {
@@ -345,16 +351,56 @@
   box-sizing: border-box;
   transition: border-color 0.15s;
   width: 100%;
+  cursor: pointer;
 }
 
+.dateInput:hover,
 .dateInput:focus {
-  border-color: var(--accent);
+  border-color: var(--text);
+}
+
+.clearDatesBtn {
+  height: 28px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.clearDatesBtn:hover {
+  border-color: var(--text);
+  color: var(--text-h);
 }
 
 .dateInput::-webkit-calendar-picker-indicator {
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: pointer;
-  filter: var(--date-picker-filter, none);
+  filter: invert(0.7);
+}
+
+.dateInput:hover::-webkit-calendar-picker-indicator,
+.dateInput:focus::-webkit-calendar-picker-indicator,
+.dateInput::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  filter: invert(56%) sepia(80%) saturate(2400%) hue-rotate(240deg) brightness(105%) contrast(105%);
+}
+
+:global([data-theme="light"]) .dateInput::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+}
+
+:global([data-theme="light"]) .dateInput:hover::-webkit-calendar-picker-indicator,
+:global([data-theme="light"]) .dateInput:focus::-webkit-calendar-picker-indicator,
+:global([data-theme="light"]) .dateInput::-webkit-calendar-picker-indicator:hover {
+  filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(265deg) brightness(95%) contrast(105%);
 }
 
 .tagsRow {

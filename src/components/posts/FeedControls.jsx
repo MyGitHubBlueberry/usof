@@ -165,6 +165,14 @@ export default function FeedControls({ params, onChange }) {
   function handleDateFrom(e) { onChange({ dateFrom: e.target.value, page: '1' }) }
   function handleDateTo(e) { onChange({ dateTo: e.target.value, page: '1' }) }
 
+  function openDatePicker(e) {
+    try {
+      e.target.showPicker?.()
+    } catch {
+      // Ignored if showPicker is unsupported or already open
+    }
+  }
+
   function toggleCategory(title) {
     const next = selectedCats.includes(title)
       ? selectedCats.filter((c) => c !== title)
@@ -184,10 +192,6 @@ export default function FeedControls({ params, onChange }) {
       sort: 'date', order: 'desc',
       dateFrom: '', dateTo: '', page: '1',
     })
-  }
-
-  function clearDates() {
-    onChange({ dateFrom: '', dateTo: '', page: '1' })
   }
 
   const activeCategoryTags = selectedCats.map((cat) => ({
@@ -226,7 +230,7 @@ export default function FeedControls({ params, onChange }) {
           aria-expanded={isExpanded}
           title={isExpanded ? 'Hide filters' : 'Show filters'}
         >
-          <IconFilter size={14} />
+          <IconFilter size={14} className={s.itemIcon} />
           <span className={s.toggleBtnText}>Filters</span>
           {activeFiltersCount > 0 && (
             <span className={s.filterBadge}>{activeFiltersCount}</span>
@@ -340,6 +344,7 @@ export default function FeedControls({ params, onChange }) {
             className={s.dateInput}
             value={params.dateFrom || ''}
             onChange={handleDateFrom}
+            onClick={openDatePicker}
             min={dateRange.min || undefined}
             max={params.dateTo || dateRange.max || undefined}
             aria-label="From date"
@@ -353,16 +358,12 @@ export default function FeedControls({ params, onChange }) {
             className={s.dateInput}
             value={params.dateTo || ''}
             onChange={handleDateTo}
+            onClick={openDatePicker}
             min={params.dateFrom || dateRange.min || undefined}
             max={dateRange.max || undefined}
             aria-label="To date"
           />
         </div>
-        {(params.dateFrom || params.dateTo) && (
-          <button type="button" className={s.clearDatesBtn} onClick={clearDates}>
-            Clear dates
-          </button>
-        )}
       </div>
     )
   }
