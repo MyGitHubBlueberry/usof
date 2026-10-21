@@ -1,101 +1,157 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { postsService } from '../services/posts.service'
 import PostCard from '../components/posts/PostCard'
+import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
 import s from './Home.module.css'
 
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const categoryParam = searchParams.get('category') || ''
-  const pageParam = parseInt(searchParams.get('page') || '1', 10)
+  const search = searchParams.get('search') || ''
+  const categories = searchParams.get('categories') || ''
+  const status = searchParams.get('status') || ''
+  const sort = searchParams.get('sort') || 'date'
+  const order = searchParams.get('order') || 'desc'
+  const dateFrom = searchParams.get('dateFrom') || ''
+  const dateTo = searchParams.get('dateTo') || ''
+  const page = searchParams.get('page') || '1'
+  const pageParam = parseInt(page, 10)
+
+  const params = useMemo(
+    () => ({ search, categories, status, sort, order, dateFrom, dateTo, page }),
+    [search, categories, status, sort, order, dateFrom, dateTo, page]
+  )
 
   const [posts, setPosts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loadedKey, setLoadedKey] = useState(null)
+  const [error, setError] = useState(null) // null | 'rate_limit' | 'generic'
+  const [retryCount, setRetryCount] = useState(0)
 
-  const currentKey = `${categoryParam}:${pageParam}`
-  const loading = loadedKey !== currentKey
+  const currentKey = `${search}|${categories}|${status}|${sort}|${order}|${dateFrom}|${dateTo}|${pageParam}|${retryCount}`
+  const isLoading = loadedKey !== currentKey
 
   useEffect(() => {
     let isMounted = true
 
-    const params = {
-      page: pageParam,
-      limit: 5,
-    }
-    if (categoryParam) {
-      params.categories = categoryParam
-    }
+    const query = { page: pageParam, limit: 5 }
+    if (search) query.search = search
+    if (categories) query.categories = categories
+    if (status) query.status = status
+    if (sort) query.sort = sort
+    if (order) query.order = order
+    if (dateFrom) query.dateFrom = dateFrom
+    if (dateTo) query.dateTo = dateTo
 
     postsService
-      .getAll(params)
+      .getAll(query)
       .then((res) => {
         if (!isMounted) return
         setPosts(res.data?.data || [])
         setTotalPages(res.data?.pagination?.totalPages || 1)
+        setError(null)
         setLoadedKey(currentKey)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!isMounted) return
         setPosts([])
         setTotalPages(1)
+        const errStatus = err?.status ?? err?.response?.status ?? err?.raw?.response?.status
+        setError(errStatus === 429 ? 'rate_limit' : 'generic')
         setLoadedKey(currentKey)
       })
 
-    return () => {
-      isMounted = false
-    }
-  }, [categoryParam, pageParam, currentKey])
+    return () => { isMounted = false }
+  }, [
+    currentKey,
+    pageParam,
+    search,
+    categories,
+    status,
+    sort,
+    order,
+    dateFrom,
+    dateTo,
+  ])
+
+  const handleControlChange = (patch) => {
+    const next = new URLSearchParams(searchParams)
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v === '' || v == null) next.delete(k)
+      else next.set(k, v)
+    })
+    setSearchParams(next)
+  }
 
   const handlePageChange = (newPage) => {
-    const nextParams = new URLSearchParams(searchParams)
-    nextParams.set('page', String(newPage))
-    setSearchParams(nextParams)
+    const next = new URLSearchParams(searchParams)
+    next.set('page', String(newPage))
+    setSearchParams(next)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleClearCategory = () => {
-    const nextParams = new URLSearchParams(searchParams)
-    nextParams.delete('category')
-    nextParams.set('page', '1')
-    setSearchParams(nextParams)
+  const handleRetry = () => setRetryCount((c) => c + 1)
+
+  function renderFeedBody() {
+    if (isLoading) {
+      return (
+        <div className={s.feedState}>
+          <div className={s.spinner} aria-hidden="true" />
+          <span className={s.loadingText}>Loading posts…</span>
+        </div>
+      )
+    }
+
+    if (error === 'rate_limit') {
+      return (
+        <div className={s.feedState}>
+          <p className={s.errorTitle}>Too many requests</p>
+          <p className={s.errorMsg}>
+            The server is rate-limiting your requests. Wait a moment, then try again.
+          </p>
+          <button type="button" className={s.retryBtn} onClick={handleRetry}>
+            Retry
+          </button>
+        </div>
+      )
+    }
+
+    if (error === 'generic') {
+      return (
+        <div className={s.feedState}>
+          <p className={s.errorTitle}>Something went wrong</p>
+          <p className={s.errorMsg}>
+            Could not load posts. Check your connection and try again.
+          </p>
+          <button type="button" className={s.retryBtn} onClick={handleRetry}>
+            Retry
+          </button>
+        </div>
+      )
+    }
+
+    if (posts.length === 0) {
+      return <div className={s.feedState}>No posts found matching your filters.</div>
+    }
+
+    return (
+      <div className={s.postList}>
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
+      </div>
+    )
   }
 
   return (
     <div className={s.feedContainer}>
-      <div className={s.feedHeader}>
-        <h1 className={s.feedTitle}>
-          {categoryParam ? `Category: ${categoryParam}` : 'All Posts'}
-        </h1>
-        {categoryParam && (
-          <button
-            type="button"
-            className={s.statusBadge}
-            onClick={handleClearCategory}
-            title="Clear category filter"
-          >
-            Clear filter &times;
-          </button>
-        )}
-      </div>
+      <FeedControls params={params} onChange={handleControlChange} />
 
-      {loading ? (
-        <div className={s.loadingFeed}>Loading posts...</div>
-      ) : posts.length === 0 ? (
-        <div className={s.emptyFeed}>
-          No posts found{categoryParam ? ` in "${categoryParam}"` : ''}.
-        </div>
-      ) : (
-        <div className={s.postList}>
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </div>
-      )}
+      {renderFeedBody()}
 
-      {!loading && posts.length > 0 && (
+      {!isLoading && !error && posts.length > 0 && (
         <div className={s.paginationWrapper}>
           <Pagination
             currentPage={pageParam}

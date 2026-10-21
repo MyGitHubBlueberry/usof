@@ -3,8 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { ROUTES } from './constants/routes'
 import RootLayout from './components/layouts/RootLayout.jsx'
 import AuthLayout from './components/layouts/AuthLayout.jsx'
-
-const Home = lazy(() => import('./pages/Home'))
+import Home from './pages/Home'
 const Favorites = lazy(() => import('./pages/Favorites'))
 const Subscriptions = lazy(() => import('./pages/Subscriptions'))
 const UserPosts = lazy(() => import('./pages/UserPosts'))

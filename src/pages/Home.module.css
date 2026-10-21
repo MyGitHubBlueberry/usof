@@ -8,21 +8,6 @@
   text-align: left;
 }
 
-.feedHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.feedTitle {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text-h);
-  margin: 0;
-}
 
 .postList {
   display: flex;
@@ -30,31 +15,79 @@
   gap: 14px;
 }
 
-.statusBadge {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.15s, border-color 0.15s;
-}
 
-.statusBadge:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.emptyFeed,
-.loadingFeed {
-  padding: 56px 16px;
+.feedState {
+  flex: 1;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
   text-align: center;
-  color: var(--text);
   border: 1px dashed var(--border);
+  color: var(--text);
   font-size: 14px;
+  box-sizing: border-box;
+  gap: 12px;
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.errorTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+.retryBtn {
+  margin-top: 6px;
+  height: 34px;
+  padding: 0 20px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.retryBtn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.retryBtn:active {
+  transform: scale(0.98);
 }
 
 .paginationWrapper {

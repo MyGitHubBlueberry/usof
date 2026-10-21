@@ -37,7 +37,7 @@ export default function RootLayout() {
 
         <div className={s.centerColumn}>
           <main className={s.main}>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className={s.pageFallback}>Loading…</div>}>
               <Outlet />
             </Suspense>
             <Footer />
