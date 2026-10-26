@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { categoriesService } from '../../services/categories.service'
 import { postsService } from '../../services/posts.service'
 import { useDebouncedCallback } from '../../hooks/useDebounce'
 import { IconChevron, IconFilter } from '../ui/Icons.jsx'
+import { SelectDropdown } from '../ui/SelectDropdown.jsx'
+import { MultiSelectDropdown } from '../ui/MultiSelectDropdown.jsx'
 import s from './FeedControls.module.css'
 
 const BASE_STATUS_OPTIONS = [
@@ -18,6 +20,11 @@ const SORT_OPTIONS = [
   { value: 'likes', label: 'Likes' },
 ]
 
+const SEARCH_TARGET_OPTIONS = [
+  { value: 'posts', label: 'Posts' },
+  { value: 'user', label: 'Username' },
+]
+
 function getOrderOptions(sort) {
   return sort === 'likes'
     ? [
@@ -30,85 +37,61 @@ function getOrderOptions(sort) {
     ]
 }
 
-function SelectDropdown({ value, options, onChange, ariaLabel }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false)
-      }
-    }
-    if (open) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [open])
-
-  const selected = options.find((o) => o.value === value) || options[0]
-
-  return (
-    <div className={s.dropdownWrap} ref={ref}>
-      <button
-        type="button"
-        className={`${s.dropdownTrigger} ${open ? s.open : ''}`}
-        onClick={() => setOpen((prev) => !prev)}
-        aria-expanded={open}
-        aria-label={ariaLabel}
-      >
-        <span className={s.triggerText}>{selected?.label}</span>
-        <IconChevron up={open} className={s.itemIcon} />
-      </button>
-
-      {open && (
-        <div className={s.dropdownMenu} role="listbox">
-          {options.map((o) => {
-            const isSelected = o.value === value
-            return (
-              <button
-                key={o.value}
-                type="button"
-                className={`${s.dropdownOption} ${isSelected ? s.selectedOption : ''}`}
-                onClick={() => {
-                  onChange(o.value)
-                  setOpen(false)
-                }}
-                role="option"
-                aria-selected={isSelected}
-              >
-                {o.label}
-              </button>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
-
-export default function FeedControls({ params, onChange }) {
+export default function FeedControls({
+  params,
+  onChange,
+  onReset = null,
+  placeholder = 'Search posts…',
+  showFiltersToggle = true,
+  showReset = true,
+  showSearchType = false,
+  rightAction = null,
+  customFilterRow = null,
+  showActiveTags = true,
+  searchAriaLabel = 'Search posts',
+  activeFiltersCount: customActiveCount,
+  isDirty: customIsDirty,
+}) {
   const user = useSelector((state) => state.auth.user)
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
 
   const [categories, setCategories] = useState([])
   const [dateRange, setDateRange] = useState({ min: '', max: '' })
-  const [catOpen, setCatOpen] = useState(false)
-  const catRef = useRef(null)
 
   // default to expanded on desktop (>640px), collapsed on mobile
   const [isExpanded, setIsExpanded] = useState(() => (
     typeof window !== 'undefined' ? window.innerWidth > 640 : true
   ))
 
-  const [searchInput, setSearchInput] = useState(params.search || '')
+  const [searchMode, setSearchMode] = useState(() => (
+    params.author && !params.search ? 'user' : 'posts'
+  ))
+  const [searchInput, setSearchInput] = useState(() => (
+    params.author && !params.search ? (params.author || '') : (params.search || '')
+  ))
   const [prevSearchParam, setPrevSearchParam] = useState(params.search || '')
+  const [prevAuthorParam, setPrevAuthorParam] = useState(params.author || '')
 
-  const [debouncedSearch, cancelSearch] = useDebouncedCallback((value) => {
-    onChange({ search: value, page: '1' })
+  const [debouncedUpdate, cancelUpdate] = useDebouncedCallback((patch) => {
+    onChange(patch)
   }, 400)
 
-  if ((params.search || '') !== prevSearchParam) {
-    setPrevSearchParam(params.search || '')
-    setSearchInput(params.search || '')
+  const curSearch = params.search || ''
+  const curAuthor = params.author || ''
+
+  if (curSearch !== prevSearchParam || curAuthor !== prevAuthorParam) {
+    setPrevSearchParam(curSearch)
+    setPrevAuthorParam(curAuthor)
+
+    if (curAuthor && !curSearch) {
+      setSearchMode('user')
+      setSearchInput(curAuthor)
+    } else if (curSearch) {
+      setSearchMode('posts')
+      setSearchInput(curSearch)
+    } else {
+      setSearchInput('')
+    }
   }
 
   const selectedCats = params.categories
@@ -145,20 +128,27 @@ export default function FeedControls({ params, onChange }) {
       .catch(() => { })
   }, [])
 
-  useEffect(() => {
-    function handleClick(e) {
-      if (catRef.current && !catRef.current.contains(e.target)) {
-        setCatOpen(false)
-      }
-    }
-    if (catOpen) document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [catOpen])
-
   function handleSearch(e) {
     const value = e.target.value
     setSearchInput(value)
-    debouncedSearch(value)
+    if (showSearchType && searchMode === 'user') {
+      debouncedUpdate({ author: value, search: '', page: '1' })
+    } else {
+      debouncedUpdate({ search: value, author: '', page: '1' })
+    }
+  }
+
+  function handleSearchModeChange(mode) {
+    if (mode === searchMode) return
+    setSearchMode(mode)
+    cancelUpdate()
+    if (searchInput.trim()) {
+      if (mode === 'user') {
+        onChange({ search: '', author: searchInput.trim(), page: '1' })
+      } else {
+        onChange({ author: '', search: searchInput.trim(), page: '1' })
+      }
+    }
   }
 
   function handleSearchKey(e) { if (e.key === 'Escape') e.target.blur() }
@@ -173,25 +163,23 @@ export default function FeedControls({ params, onChange }) {
     }
   }
 
-  function toggleCategory(title) {
-    const next = selectedCats.includes(title)
-      ? selectedCats.filter((c) => c !== title)
-      : [...selectedCats, title]
-    onChange({ categories: next.join(','), page: '1' })
-  }
-
   function removeCategory(title) {
     const next = selectedCats.filter((c) => c !== title)
     onChange({ categories: next.join(','), page: '1' })
   }
 
   function clearAll() {
-    cancelSearch()
-    onChange({
-      search: '', categories: '', status: '',
-      sort: 'date', order: 'desc',
-      dateFrom: '', dateTo: '', page: '1',
-    })
+    cancelUpdate()
+    setSearchInput('')
+    if (onReset) {
+      onReset()
+    } else {
+      onChange({
+        search: '', author: '', categories: '', status: '',
+        sort: 'date', order: 'desc',
+        dateFrom: '', dateTo: '', page: '1',
+      })
+    }
   }
 
   const activeCategoryTags = selectedCats.map((cat) => ({
@@ -200,45 +188,81 @@ export default function FeedControls({ params, onChange }) {
     onRemove: () => removeCategory(cat),
   }))
 
-  const activeFiltersCount =
+  const isSortChanged =
+    (params.sort && params.sort !== 'date') ||
+    (params.order && params.order !== 'desc')
+
+  const defaultActiveFiltersCount =
     selectedCats.length +
     (params.status ? 1 : 0) +
-    (params.sort !== 'date' || params.order !== 'desc' ? 1 : 0) +
+    (isSortChanged ? 1 : 0) +
     (params.dateFrom || params.dateTo ? 1 : 0)
 
-  const hasDirtyFilters =
-    params.search ||
-    activeFiltersCount > 0
+  const resolvedActiveCount = customActiveCount !== undefined
+    ? customActiveCount
+    : defaultActiveFiltersCount
+
+  const defaultIsDirty =
+    Boolean(searchInput && searchInput.trim()) ||
+    Boolean(params.search && params.search.trim()) ||
+    Boolean(params.author && params.author.trim()) ||
+    defaultActiveFiltersCount > 0
+
+  const resolvedIsDirty = customIsDirty !== undefined
+    ? (customIsDirty || Boolean(searchInput && searchInput.trim()))
+    : defaultIsDirty
 
   function renderSearchBar() {
+    const computedPlaceholder = showSearchType
+      ? (searchMode === 'user' ? 'Search by username or email…' : 'Search posts…')
+      : placeholder
+
+    const computedAriaLabel = showSearchType
+      ? (searchMode === 'user' ? 'Search by username or email' : searchAriaLabel)
+      : searchAriaLabel
+
     return (
       <div className={s.searchRow}>
+        {showSearchType && (
+          <SelectDropdown
+            className={s.searchTypeWrap}
+            value={searchMode}
+            options={SEARCH_TARGET_OPTIONS}
+            onChange={handleSearchModeChange}
+            ariaLabel="Search target"
+          />
+        )}
+
         <input
           type="search"
           className={s.searchInput}
-          placeholder="Search posts…"
+          placeholder={computedPlaceholder}
           value={searchInput}
           onChange={handleSearch}
           onKeyDown={handleSearchKey}
-          aria-label="Search posts"
+          aria-label={computedAriaLabel}
         />
 
-        <button
-          type="button"
-          className={`${s.toggleFiltersBtn} ${isExpanded ? s.open : ''}`}
-          onClick={() => setIsExpanded((v) => !v)}
-          aria-expanded={isExpanded}
-          title={isExpanded ? 'Hide filters' : 'Show filters'}
-        >
-          <IconFilter size={14} className={s.itemIcon} />
-          <span className={s.toggleBtnText}>Filters</span>
-          {activeFiltersCount > 0 && (
-            <span className={s.filterBadge}>{activeFiltersCount}</span>
-          )}
-          <IconChevron up={isExpanded} className={s.itemIcon} />
-        </button>
+        {showFiltersToggle && (
+          <button
+            type="button"
+            className={`${s.toggleFiltersBtn} ${isExpanded ? s.open : ''}`}
+            onClick={() => setIsExpanded((v) => !v)}
+            aria-expanded={isExpanded}
+            title={isExpanded ? 'Hide filters' : 'Show filters'}
+          >
+            <IconFilter size={14} className={s.itemIcon} />
+            <span className={s.toggleBtnText}>Filters</span>
+            {resolvedActiveCount > 0 && (
+              <span className={s.filterBadge}>{resolvedActiveCount}</span>
+            )}
+            <IconChevron up={isExpanded} className={s.itemIcon} />
+          </button>
+        )}
 
-        {hasDirtyFilters && (
+        {rightAction}
+
+        {showReset && resolvedIsDirty && (
           <button
             type="button"
             className={s.clearAllBtn}
@@ -254,53 +278,28 @@ export default function FeedControls({ params, onChange }) {
 
   function renderFilterColumn() {
     const triggerLabel =
-      selectedCats.length === 0 ? 'All categories' :
-        selectedCats.length === 1 ? selectedCats[0] :
-          `${selectedCats.length} categories`
+      selectedCats.length === 0
+        ? 'All categories'
+        : selectedCats.length === 1
+          ? selectedCats[0]
+          : `${selectedCats.length} categories`
+
+    const categoryOptions = categories.map((cat) => ({
+      value: cat.title,
+      label: cat.title,
+    }))
 
     return (
       <div className={s.col}>
         <span className={s.colLabel}>Filter</span>
 
-        <div className={s.dropdownWrap} ref={catRef}>
-          <button
-            type="button"
-            className={`${s.dropdownTrigger} ${catOpen ? s.open : ''}`}
-            onClick={() => setCatOpen((v) => !v)}
-            aria-expanded={catOpen}
-            aria-haspopup="listbox"
-          >
-            <span className={s.triggerText}>{triggerLabel}</span>
-            <IconChevron up={catOpen} className={s.itemIcon} />
-          </button>
-
-          {catOpen && (
-            <div className={s.dropdownMenu} role="listbox" aria-multiselectable="true">
-              {categories.length === 0 ? (
-                <div className={s.dropdownEmpty}>No categories</div>
-              ) : (
-                categories.map((cat) => {
-                  const checked = selectedCats.includes(cat.title)
-                  return (
-                    <label
-                      key={cat.id}
-                      className={`${s.checkItem} ${checked ? s.checked : ''}`}
-                    >
-                      <input
-                        type="checkbox"
-                        className={s.hiddenCheck}
-                        checked={checked}
-                        onChange={() => toggleCategory(cat.title)}
-                      />
-                      <span className={s.checkBox} />
-                      <span className={s.checkLabel}>{cat.title}</span>
-                    </label>
-                  )
-                })
-              )}
-            </div>
-          )}
-        </div>
+        <MultiSelectDropdown
+          selectedValues={selectedCats}
+          options={categoryOptions}
+          onChange={(nextCats) => onChange({ categories: nextCats.join(','), page: '1' })}
+          triggerLabel={triggerLabel}
+          emptyLabel="No categories"
+        />
 
         <SelectDropdown
           value={params.status || ''}
@@ -391,14 +390,17 @@ export default function FeedControls({ params, onChange }) {
   return (
     <div className={s.controls}>
       {renderSearchBar()}
-      {isExpanded && (
-        <div className={s.filterRow}>
-          {renderFilterColumn()}
-          {renderSortColumn()}
-          {renderDateRangeColumn()}
-        </div>
-      )}
-      {renderActiveCategoryTags()}
+      {customFilterRow
+        ? (showFiltersToggle ? (isExpanded && customFilterRow) : customFilterRow)
+        : (showFiltersToggle && isExpanded && (
+          <div className={s.filterRow}>
+            {renderFilterColumn()}
+            {renderSortColumn()}
+            {renderDateRangeColumn()}
+          </div>
+        ))
+      }
+      {showActiveTags && renderActiveCategoryTags()}
     </div>
   )
 }

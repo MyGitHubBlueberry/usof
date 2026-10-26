@@ -32,6 +32,12 @@
   position: relative;
 }
 
+.fullSpan {
+  flex: 1;
+  max-width: 100%;
+  border-inline: none;
+}
+
 .main {
   flex: 1;
   min-height: 0;

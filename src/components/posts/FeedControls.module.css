@@ -13,8 +13,14 @@
   gap: 8px;
 }
 
+.searchTypeWrap {
+  width: 124px;
+  flex-shrink: 0;
+}
+
 .searchInput {
   flex: 1;
+  min-width: 0;
   height: 36px;
   padding: 0 12px;
   background: var(--code-bg);
@@ -30,6 +36,7 @@
 .searchInput::placeholder {
   color: var(--text);
   opacity: 0.6;
+  text-overflow: ellipsis;
 }
 
 .searchInput:hover {
@@ -154,33 +161,56 @@
   border-color: var(--accent);
 }
 
-.dropdownWrap {
+.authorInputWrap {
   position: relative;
+  width: 100%;
 }
 
-.dropdownTrigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+.authorInput {
   width: 100%;
   height: 32px;
-  padding: 0 10px;
+  min-height: 32px;
+  padding: 0 24px 0 10px;
   background: var(--code-bg);
   border: 1px solid var(--border);
   color: var(--text-h);
   font-size: 13px;
   font-family: inherit;
-  cursor: pointer;
+  outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s;
-  text-align: left;
 }
 
-.dropdownTrigger:hover,
-.dropdownTrigger.open,
-.dropdownTrigger[aria-expanded="true"] {
+.authorInput:hover {
   border-color: var(--text);
+}
+
+.authorInput:focus {
+  border-color: var(--accent);
+}
+
+.authorInput::placeholder {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.authorClearBtn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.authorClearBtn:hover {
+  opacity: 1;
   color: var(--text-h);
 }
 
@@ -191,137 +221,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.dropdownTrigger:hover .itemIcon,
-.dropdownTrigger.open .itemIcon,
-.dropdownTrigger[aria-expanded="true"] .itemIcon,
-.toggleFiltersBtn:hover .itemIcon,
-.toggleFiltersBtn.open .itemIcon,
-.toggleFiltersBtn[aria-expanded="true"] .itemIcon {
-  color: var(--accent);
-}
-
-.triggerText {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dropdownMenu {
-  position: absolute;
-  top: calc(100% + 2px);
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  max-height: 220px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-}
-
-.dropdownOption {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  color: var(--text-h);
-  font-size: 13px;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.1s, color 0.1s;
-  box-sizing: border-box;
-}
-
-.dropdownOption:hover {
-  background: var(--code-bg);
-}
-
-.dropdownOption.selectedOption {
-  background: var(--active-bg);
-}
-
-.dropdownEmpty {
-  padding: 12px;
-  font-size: 13px;
-  color: var(--text);
-  text-align: center;
-}
-
-.checkItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text-h);
-  transition: background 0.1s;
-}
-
-.checkItem:hover {
-  background: var(--code-bg);
-}
-
-.checkItem.checked {
-  background: var(--active-bg);
-}
-
-.hiddenCheck {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-  width: 0;
-  height: 0;
-}
-
-.checkBox {
-  flex-shrink: 0;
-  width: 13px;
-  height: 13px;
-  border: 1px solid var(--border);
-  background: transparent;
-  display: inline-block;
-  transition: background 0.12s, border-color 0.12s;
-}
-
-.checked .checkBox {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.checkLabel {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.clearCatsBtn {
-  margin: 4px 8px 6px;
-  padding: 4px 8px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 11px;
-  font-weight: 600;
-  font-family: inherit;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  align-self: flex-start;
-}
-
-.clearCatsBtn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 .dateGroup {
@@ -448,6 +347,10 @@
 }
 
 @media (max-width: 560px) {
+  .searchTypeWrap {
+    width: 104px;
+  }
+
   .filterRow {
     grid-template-columns: 1fr;
   }

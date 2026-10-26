@@ -16,6 +16,7 @@ export default function RootLayout() {
   const location = useLocation()
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const isHome = location.pathname === ROUTES.HOME
+  const isFullSpan = location.pathname.startsWith(ROUTES.ADMIN)
 
   return (
     <div className={s.appShell}>
@@ -35,7 +36,7 @@ export default function RootLayout() {
           </aside>
         )}
 
-        <div className={s.centerColumn}>
+        <div className={`${s.centerColumn} ${isFullSpan ? s.fullSpan : ''}`}>
           <main className={s.main}>
             <Suspense fallback={<div className={s.pageFallback}>Loading…</div>}>
               <Outlet />

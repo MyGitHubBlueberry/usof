@@ -10,6 +10,7 @@ export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const search = searchParams.get('search') || ''
+  const author = searchParams.get('author') || ''
   const categories = searchParams.get('categories') || ''
   const status = searchParams.get('status') || ''
   const sort = searchParams.get('sort') || 'date'
@@ -20,8 +21,8 @@ export default function Home() {
   const pageParam = parseInt(page, 10)
 
   const params = useMemo(
-    () => ({ search, categories, status, sort, order, dateFrom, dateTo, page }),
-    [search, categories, status, sort, order, dateFrom, dateTo, page]
+    () => ({ search, author, categories, status, sort, order, dateFrom, dateTo, page }),
+    [search, author, categories, status, sort, order, dateFrom, dateTo, page]
   )
 
   const [posts, setPosts] = useState([])
@@ -30,7 +31,7 @@ export default function Home() {
   const [error, setError] = useState(null) // null | 'rate_limit' | 'generic'
   const [retryCount, setRetryCount] = useState(0)
 
-  const currentKey = `${search}|${categories}|${status}|${sort}|${order}|${dateFrom}|${dateTo}|${pageParam}|${retryCount}`
+  const currentKey = `${search}|${author}|${categories}|${status}|${sort}|${order}|${dateFrom}|${dateTo}|${pageParam}|${retryCount}`
   const isLoading = loadedKey !== currentKey
 
   useEffect(() => {
@@ -38,9 +39,10 @@ export default function Home() {
 
     const query = { page: pageParam, limit: 5 }
     if (search) query.search = search
+    if (author) query.author = author
     if (categories) query.categories = categories
     if (status) query.status = status
-    if (sort) query.sort = sort
+    if (sort) query.sortBy = sort === 'date' ? 'publish_date' : sort
     if (order) query.order = order
     if (dateFrom) query.dateFrom = dateFrom
     if (dateTo) query.dateTo = dateTo
@@ -68,6 +70,7 @@ export default function Home() {
     currentKey,
     pageParam,
     search,
+    author,
     categories,
     status,
     sort,
@@ -147,7 +150,7 @@ export default function Home() {
 
   return (
     <div className={s.feedContainer}>
-      <FeedControls params={params} onChange={handleControlChange} />
+      <FeedControls params={params} onChange={handleControlChange} showSearchType={true} />
 
       {renderFeedBody()}
 

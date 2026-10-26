@@ -1,0 +1,110 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--active-bg);
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detailLabel {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.detailValue {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.message {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.actions * {
+  flex: 1
+}
+
+.btnConfirm,
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  border: 1px solid;
+}
+
+.btnConfirm:active,
+.btnGhost:active {
+  transform: scale(0.98);
+}
+
+.btnConfirm:disabled,
+.btnGhost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnPrimary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btnDanger {
+  background: #e53e3e;
+  border-color: #e53e3e;
+  color: #fff;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: transparent;
+  color: #e53e3e;
+  border-color: #e53e3e;
+}
+
+.btnGhost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btnGhost:hover:not(:disabled) {
+  color: var(--text-h);
+  border-color: var(--text);
+}
