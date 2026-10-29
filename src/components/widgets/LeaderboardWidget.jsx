@@ -38,7 +38,12 @@ export default function LeaderboardWidget() {
                   <span className={`${s.rank} ${isTop3 ? s.rankTop : ''}`}>
                     {idx + 1}
                   </span>
-                  <Avatar src={u.profile_picture_path} name={u.login || u.full_name} size="small" />
+                  <Avatar
+                    userId={u.id}
+                    avatarPath={u.profile_picture_path}
+                    name={u.login || u.full_name}
+                    size="small"
+                  />
                   <span className={s.name}>{u.login || u.full_name}</span>
                 </div>
                 <span className={s.rating}>

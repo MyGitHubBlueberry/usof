@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { loginThunk } from '../redux/slices/authSlice'
+import { loginThunk, clearError } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
 import s from '../components/layouts/auth.module.css'
@@ -11,6 +11,10 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const { loading, error } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    dispatch(clearError())
+  }, [dispatch])
 
   const from = location.state?.from?.pathname ?? ROUTES.HOME
 

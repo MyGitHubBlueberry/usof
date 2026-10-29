@@ -152,7 +152,12 @@ export default function Header() {
               aria-label="User profile menu"
               onClick={() => setUserOpen((prev) => !prev)}
             >
-              <Avatar src={user?.avatar} name={displayName} size="medium" />
+              <Avatar
+                userId={user?.id}
+                avatarPath={user?.profile_picture_path}
+                name={displayName}
+                size="medium"
+              />
               <span className={s.userName}>{displayName}</span>
               <IconChevron up={userOpen} className={s.itemIcon} />
             </button>

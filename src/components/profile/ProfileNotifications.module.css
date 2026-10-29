@@ -1,0 +1,91 @@
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.markAllBtn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.markAllBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+
+.item + .item {
+  margin-top: 8px;
+}
+
+.itemRead {
+  opacity: 0.6;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.itemRead .dot {
+  background: var(--border);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.message {
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.time {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.readBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.readBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

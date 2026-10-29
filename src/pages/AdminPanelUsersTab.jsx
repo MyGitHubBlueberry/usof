@@ -409,7 +409,8 @@ export default function UsersTab() {
       <tr key={user.id} className={user.is_banned ? s.bannedRow : ''}>
         <td>
           <Avatar
-            src={user.profile_picture_path || user.avatar}
+            userId={user.id}
+            avatarPath={user.profile_picture_path}
             name={user.login || user.full_name}
             size="medium"
           />

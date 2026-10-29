@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerThunk } from '../redux/slices/authSlice'
+import { registerThunk, clearError } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
 import { IconMail } from '../components/ui/Icons'
@@ -33,6 +33,10 @@ export default function Register() {
   const dispatch = useDispatch()
   const location = useLocation()
   const { loading, error } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    dispatch(clearError())
+  }, [dispatch])
 
   const [form, setForm] = useState({
     login: '',

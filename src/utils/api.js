@@ -21,16 +21,32 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+function extractErrorMessage(data, errs) {
+  if (errs.length === 1 && errs[0]?.message) {
+    return errs[0].message;
+  }
+
+  if (errs.length > 1) {
+    return errs
+      .map((e) => (e?.field ? `${e.field}: ${e.message}` : e?.message))
+      .filter(Boolean)
+      .join('; ');
+  }
+
+  return data.error ?? data.message;
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status ?? 0;
     const data = error.response?.data ?? {};
+    const errs = Array.isArray(data.errors) ? data.errors : Array.isArray(data.details) ? data.details : [];
 
     const normalised = {
       status,
-      message: data.error ?? data.message ?? error.message ?? 'An unexpected error occurred.',
-      errors: Array.isArray(data.errors) ? data.errors : Array.isArray(data.details) ? data.details : [],
+      message: extractErrorMessage(data, errs) || error.message || 'An unexpected error occurred.',
+      errors: errs,
       raw: error,
     };
 

@@ -13,6 +13,6 @@ export const usersService = {
   getBanHistory: (id) => api.get(API.USERS.BAN_HISTORY(id)),
   uploadAvatar: (formData) => apiUpload('PATCH', API.USERS.AVATAR, formData),
   deleteAvatar: () => api.delete(API.USERS.AVATAR),
-  getAvatar: (id) => api.get(API.USERS.AVATAR_BY_ID(id)),
+  getAvatar: (id) => api.get(API.USERS.AVATAR_BY_ID(id), { responseType: 'blob' }),
   deleteAvatarById: (id) => api.delete(API.USERS.AVATAR_BY_ID(id)),
 }

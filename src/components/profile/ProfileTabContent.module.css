@@ -1,0 +1,27 @@
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.state {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  color: var(--text);
+  font-size: 14px;
+  box-sizing: border-box;
+}

@@ -1,0 +1,273 @@
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.main {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+  padding-right: 64px;
+}
+
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatarEditBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.avatarEditBtn:hover:not(:disabled) {
+  background: transparent;
+  color: var(--accent);
+}
+
+.avatarEditBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.avatarRemoveOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.avatarWrap:hover .avatarRemoveOverlay,
+.avatarWrap:focus-within .avatarRemoveOverlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.avatarRemoveOverlay:disabled {
+  cursor: not-allowed;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.login {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fullName {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editNameBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.editNameBtn:hover {
+  color: var(--accent);
+}
+
+.nameEditRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nameInput {
+  font-size: 16px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--text-h);
+  font-family: inherit;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.nameActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.nameActionBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.nameActionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nameError {
+  font-size: 12px;
+  color: #e53e3e;
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.stat {
+  font-weight: 500;
+}
+
+.bellBtn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.bellBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.bellBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 50%;
+  background: #e53e3e;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dangerZone {
+  padding: 0 24px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deleteAccountBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+.deleteAccountBtn:hover {
+  background: #e53e3e;
+  color: #fff;
+}
+
+.deleteAccountBtn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+  .main {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-right: 24px;
+  }
+
+  .nameRow,
+  .stats {
+    justify-content: center;
+  }
+
+  .bellBtn {
+    top: 12px;
+    right: 12px;
+  }
+
+  .dangerZone {
+    justify-content: center;
+  }
+}
