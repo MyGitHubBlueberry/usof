@@ -6,6 +6,7 @@ import ActionModal from '../components/ui/ActionModal'
 import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
 import { SelectDropdown } from '../components/ui/SelectDropdown'
+import Avatar from '../components/ui/Avatar'
 import s from './Admin.module.css'
 
 //todo: hide user avatar, then rating, then full name, then email when adapting view
@@ -407,17 +408,11 @@ export default function UsersTab() {
     return (
       <tr key={user.id} className={user.is_banned ? s.bannedRow : ''}>
         <td>
-          {user.profile_picture_path || user.avatar ? (
-            <img
-              src={user.profile_picture_path || user.avatar}
-              alt={user.login}
-              className={s.avatar}
-            />
-          ) : (
-            <div className={s.avatarPlaceholder}>
-              {(user.login?.[0] ?? user.full_name?.[0] ?? '?').toUpperCase()}
-            </div>
-          )}
+          <Avatar
+            src={user.profile_picture_path || user.avatar}
+            name={user.login || user.full_name}
+            size="medium"
+          />
         </td>
         <td className={s.loginCell}>{user.login}</td>
         <td className={s.dimCell}>{user.full_name ?? '—'}</td>

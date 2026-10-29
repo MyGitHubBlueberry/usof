@@ -5,6 +5,7 @@ import { ROUTES, toProfile, toUserPosts } from '../../constants/routes'
 import { selectIsAuthenticated, logoutThunk } from '../../redux/slices/authSlice'
 import { useTheme } from '../../hooks/useTheme'
 import Logo from '../ui/Logo'
+import Avatar from '../ui/Avatar'
 import {
   IconMenu,
   IconChevron,
@@ -73,7 +74,6 @@ export default function Header() {
   }
 
   const displayName = user?.login || user?.full_name || 'User'
-  const initial = (user?.login?.[0] || user?.full_name?.[0] || 'U').toUpperCase()
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
   const profileRoute = user?.id ? toProfile(user.id) : ROUTES.LOGIN
   const myPostsRoute = user?.id ? toUserPosts(user.id) : ROUTES.LOGIN
@@ -103,7 +103,7 @@ export default function Header() {
               <IconTrophy className={s.itemIcon} />
               <span>Leaderboard</span>
             </Link>
-            <Link to={ROUTES.NOTIFICATIONS} className={s.dropdownItem} onClick={closeMenus}>
+            <Link to={profileRoute} className={s.dropdownItem} onClick={closeMenus}>
               <IconBell className={s.itemIcon} />
               <span>Notifications</span>
             </Link>
@@ -152,11 +152,7 @@ export default function Header() {
               aria-label="User profile menu"
               onClick={() => setUserOpen((prev) => !prev)}
             >
-              {user?.avatar ? (
-                <img src={user.avatar} alt={displayName} className={s.avatar} />
-              ) : (
-                <div className={s.avatar}>{initial}</div>
-              )}
+              <Avatar src={user?.avatar} name={displayName} size="medium" />
               <span className={s.userName}>{displayName}</span>
               <IconChevron up={userOpen} className={s.itemIcon} />
             </button>
@@ -191,12 +187,12 @@ export default function Header() {
                   <span>My Posts</span>
                 </Link>
 
-                <Link to={ROUTES.FAVORITES} className={s.dropdownItem} onClick={closeMenus}>
+                <Link to={profileRoute} className={s.dropdownItem} onClick={closeMenus}>
                   <IconStar className={s.itemIcon} />
                   <span>Favorite Posts</span>
                 </Link>
 
-                <Link to={ROUTES.SUBSCRIPTIONS} className={s.dropdownItem} onClick={closeMenus}>
+                <Link to={profileRoute} className={s.dropdownItem} onClick={closeMenus}>
                   <IconRss className={s.itemIcon} />
                   <span>Subscriptions</span>
                 </Link>

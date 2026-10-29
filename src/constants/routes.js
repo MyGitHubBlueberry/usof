@@ -1,7 +1,5 @@
 export const ROUTES = {
   HOME: '/',
-  FAVORITES: '/favorites',
-  SUBSCRIPTIONS: '/subscriptions',
   LOGIN: '/login',
   REGISTER: '/register',
   POST: '/posts/:id',
@@ -10,7 +8,6 @@ export const ROUTES = {
   PROFILE: '/users/:id',
   USER_POSTS: '/users/:id/posts',
   LEADERBOARD: '/leaderboard',
-  NOTIFICATIONS: '/notifications',
   ADMIN: '/admin',
   CONFIRM_EMAIL: '/confirm-email/:token',
   PASSWORD_RESET: '/password-reset',

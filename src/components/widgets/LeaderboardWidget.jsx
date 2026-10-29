@@ -3,6 +3,7 @@ import { leaderboardService } from '../../services/leaderboard.service'
 import { ROUTES, toProfile } from '../../constants/routes'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { IconTrophy } from '../ui/Icons'
+import Avatar from '../ui/Avatar'
 import SidebarWidget from './SidebarWidget'
 import sw from './SidebarWidget.module.css'
 import s from './LeaderboardWidget.module.css'
@@ -28,7 +29,6 @@ export default function LeaderboardWidget() {
     >
       <ul className={sw.list}>
         {topUsers.map((u, idx) => {
-          const initial = (u.login?.[0] || u.full_name?.[0] || 'U').toUpperCase()
           const isTop3 = idx < 3
 
           return (
@@ -38,7 +38,7 @@ export default function LeaderboardWidget() {
                   <span className={`${s.rank} ${isTop3 ? s.rankTop : ''}`}>
                     {idx + 1}
                   </span>
-                  <span className={s.avatar}>{initial}</span>
+                  <Avatar src={u.profile_picture_path} name={u.login || u.full_name} size="small" />
                   <span className={s.name}>{u.login || u.full_name}</span>
                 </div>
                 <span className={s.rating}>

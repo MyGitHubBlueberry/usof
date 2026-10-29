@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { notificationsService } from '../../services/notifications.service'
-import { ROUTES } from '../../constants/routes'
+import { toProfile } from '../../constants/routes'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { IconBell } from '../ui/Icons'
@@ -9,6 +10,8 @@ import sw from './SidebarWidget.module.css'
 import s from './NotificationsWidget.module.css'
 
 export default function NotificationsWidget() {
+  const user = useSelector((state) => state.auth.user)
+  const profileRoute = toProfile(user?.id)
   const { data: notifications, loading } = useAsyncData(
     () => notificationsService.getAll({ limit: 4 }),
     [],
@@ -19,7 +22,7 @@ export default function NotificationsWidget() {
     <SidebarWidget
       title="Notifications"
       icon={<IconBell size={14} />}
-      actionLink={ROUTES.NOTIFICATIONS}
+      actionLink={profileRoute}
       actionText="All"
       loading={loading}
       empty={!loading && notifications.length === 0}
@@ -28,7 +31,7 @@ export default function NotificationsWidget() {
       <ul className={sw.list}>
         {notifications.map((n) => (
           <li key={n.id}>
-            <Link to={ROUTES.NOTIFICATIONS} className={`${sw.item} ${s.item}`}>
+            <Link to={profileRoute} className={`${sw.item} ${s.item}`}>
               <span className={`${s.dot} ${n.is_read ? s.dotRead : ''}`} />
               <div className={s.content}>
                 <span className={s.message}>{n.message}</span>
