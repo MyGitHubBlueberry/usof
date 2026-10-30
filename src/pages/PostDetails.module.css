@@ -1,0 +1,22 @@
+.postPage {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 24px 20px;
+  gap: 20px;
+}
+
+.stateMsg {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  color: var(--text);
+  font-size: 14px;
+  text-align: center;
+}

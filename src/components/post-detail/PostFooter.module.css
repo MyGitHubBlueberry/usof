@@ -1,0 +1,133 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.authorMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.authorName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.authorName:hover {
+  color: var(--accent);
+}
+
+.date {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reactBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.reactBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.reactBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reactBtnActive {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.reactBtnActiveDown {
+  border-color: #e53e3e;
+  color: #e53e3e;
+}
+
+.ratingCount {
+  min-width: 24px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.statusActive {
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.statusResolved {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.adminControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDropdown {
+  min-width: 150px;
+}
+
+.savingHint {
+  font-size: 12px;
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

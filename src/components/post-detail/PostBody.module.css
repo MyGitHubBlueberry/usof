@@ -1,0 +1,154 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.content {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-h);
+  position: relative;
+  overflow-wrap: break-word;
+}
+
+.content :global(h1),
+.content :global(h2),
+.content :global(h3) {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+  color: var(--text-h);
+}
+
+.content :global(p) {
+  margin: 0 0 12px;
+}
+
+.content :global(ul),
+.content :global(ol) {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.content :global(li) {
+  margin-bottom: 4px;
+}
+
+.content :global(a) {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.content :global(code) {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 2px 5px;
+  background: var(--code-bg);
+}
+
+.content :global(pre) {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  background: var(--code-bg);
+  overflow-x: auto;
+  margin: 0 0 12px;
+}
+
+.content :global(pre code) {
+  padding: 0;
+  background: none;
+}
+
+.content :global(blockquote) {
+  margin: 0 0 12px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  color: var(--text);
+}
+
+.content :global(img) {
+  max-width: 100%;
+}
+
+.collapsed {
+  max-height: 320px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+}
+
+.showMoreBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.showMoreBtn:hover {
+  text-decoration: underline;
+}
+
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.imageAttachment {
+  display: block;
+  width: 120px;
+  height: 120px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.imageThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fileAttachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  text-decoration: none;
+  font-size: 13px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.fileAttachment:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fileName {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.downloadIcon {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .imageAttachment {
+    width: 90px;
+    height: 90px;
+  }
+}
