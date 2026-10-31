@@ -12,66 +12,6 @@
   overflow-wrap: break-word;
 }
 
-.content :global(h1),
-.content :global(h2),
-.content :global(h3) {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 16px 0 8px;
-  color: var(--text-h);
-}
-
-.content :global(p) {
-  margin: 0 0 12px;
-}
-
-.content :global(ul),
-.content :global(ol) {
-  margin: 0 0 12px;
-  padding-left: 22px;
-}
-
-.content :global(li) {
-  margin-bottom: 4px;
-}
-
-.content :global(a) {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
-.content :global(code) {
-  font-family: var(--mono);
-  font-size: 13px;
-  padding: 2px 5px;
-  background: var(--code-bg);
-}
-
-.content :global(pre) {
-  font-family: var(--mono);
-  font-size: 13px;
-  padding: 12px 14px;
-  background: var(--code-bg);
-  overflow-x: auto;
-  margin: 0 0 12px;
-}
-
-.content :global(pre code) {
-  padding: 0;
-  background: none;
-}
-
-.content :global(blockquote) {
-  margin: 0 0 12px;
-  padding-left: 14px;
-  border-left: 2px solid var(--border);
-  color: var(--text);
-}
-
-.content :global(img) {
-  max-width: 100%;
-}
-
 .collapsed {
   max-height: 320px;
   overflow: hidden;

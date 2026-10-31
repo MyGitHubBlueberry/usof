@@ -211,9 +211,14 @@
 
 .replyBox {
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
   margin-top: 4px;
+}
+
+.replyActions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .replyTextarea {
@@ -229,10 +234,11 @@
   resize: vertical;
 }
 
-/* .editBox is a column flex container, so the shared .replyTextarea's
-   flex: 1 stretches it on the cross (height) axis, which fights the
-   native resize handle. Opt it out there so dragging the handle sticks. */
-.editBox .replyTextarea {
+/* .editBox and .replyBox are column flex containers, so the shared
+   .replyTextarea's flex: 1 stretches it on the main (height) axis, which
+   fights the native resize handle. Opt it out there so dragging sticks. */
+.editBox .replyTextarea,
+.replyBox .replyTextarea {
   flex: none;
 }
 

@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { postsService } from '../../services/posts.service'
 import { usersService } from '../../services/users.service'
 import { useFlash } from '../../hooks/useFlash'
+import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import { ROUTES } from '../../constants/routes'
 import Avatar from '../ui/Avatar'
 import Pagination from '../ui/Pagination'
 import CommentItem from './CommentItem'
+import MarkdownToolbar from '../post-create/MarkdownToolbar'
 import { IconSend } from '../ui/Icons'
 import s from './CommentsSection.module.css'
 
@@ -63,6 +65,10 @@ export default function CommentsSection({
 
   const [newComment, setNewComment] = useState('')
   const [posting, setPosting] = useState(false)
+  const { textareaRef: newCommentRef, applyFormat: applyNewCommentFormat } = useMarkdownFormatting(
+    newComment,
+    setNewComment
+  )
 
   const revertingRef = useRef(false)
 
@@ -186,15 +192,19 @@ export default function CommentsSection({
             />
             <div className={s.composerBody}>
               <span className={s.composerName}>{currentUser.login}</span>
-              <textarea
-                className={s.textarea}
-                placeholder="Share your thoughts..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={posting}
-                rows={3}
-              />
+              <div className={s.inputGroup}>
+                <MarkdownToolbar onFormat={applyNewCommentFormat} />
+                <textarea
+                  ref={newCommentRef}
+                  className={s.textarea}
+                  placeholder="Share your thoughts..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={posting}
+                  rows={3}
+                />
+              </div>
               <div className={s.composerActions}>
                 <button
                   type="button"

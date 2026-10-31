@@ -49,6 +49,11 @@ const USER_ORDER_OPTIONS = [
   { value: 'desc', label: 'Descending (Z–A)' },
 ]
 
+const BAN_DURATION_UNIT_OPTIONS = [
+  { value: 'hours', label: 'Hours' },
+  { value: 'days', label: 'Days' },
+]
+
 const ROLE_LEVELS = {
   user: 1,
   admin: 2,
@@ -78,6 +83,7 @@ export default function UsersTab() {
   const [banTargetUser, setBanTargetUser] = useState(null)
   const [banReason, setBanReason] = useState('')
   const [banDuration, setBanDuration] = useState('')
+  const [banDurationUnit, setBanDurationUnit] = useState('days')
   const [banLoading, setBanLoading] = useState(false)
   const [promoteTargetUser, setPromoteTargetUser] = useState(null)
   const [demoteTargetUser, setDemoteTargetUser] = useState(null)
@@ -208,12 +214,14 @@ export default function UsersTab() {
     setBanTargetUser(user)
     setBanReason('')
     setBanDuration('')
+    setBanDurationUnit('days')
   }
 
   const closeBanModal = () => {
     setBanTargetUser(null)
     setBanReason('')
     setBanDuration('')
+    setBanDurationUnit('days')
   }
 
   const handleBanSubmit = async () => {
@@ -230,7 +238,11 @@ export default function UsersTab() {
       }
       if (banDuration && Number(banDuration) > 0) {
         const expDate = new Date()
-        expDate.setDate(expDate.getDate() + parseInt(banDuration, 10))
+        if (banDurationUnit === 'hours') {
+          expDate.setHours(expDate.getHours() + parseInt(banDuration, 10))
+        } else {
+          expDate.setDate(expDate.getDate() + parseInt(banDuration, 10))
+        }
         payload.expires_at = expDate.toISOString()
       }
       await usersService.ban(banTargetUser.id, payload)
@@ -465,15 +477,24 @@ export default function UsersTab() {
         </label>
 
         <label className={s.formLabel}>
-          Duration in days
-          <input
-            className={s.input}
-            type="number"
-            placeholder="Leave blank for permanent ban"
-            value={banDuration}
-            onChange={(e) => setBanDuration(e.target.value)}
-            min={1}
-          />
+          Duration
+          <div className={s.durationRow}>
+            <input
+              className={`${s.input} ${s.durationInput}`}
+              type="number"
+              placeholder="Leave blank for permanent ban"
+              value={banDuration}
+              onChange={(e) => setBanDuration(e.target.value)}
+              min={1}
+            />
+            <SelectDropdown
+              className={s.durationUnit}
+              value={banDurationUnit}
+              options={BAN_DURATION_UNIT_OPTIONS}
+              onChange={setBanDurationUnit}
+              ariaLabel="Ban duration unit"
+            />
+          </div>
         </label>
       </ActionModal>
     )

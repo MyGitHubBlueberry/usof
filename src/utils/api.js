@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { store } from '../redux/store';
-import { logout } from '../redux/slices/authSlice';
+import { logout, setBanned, clearBanned } from '../redux/slices/authSlice';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -37,7 +37,12 @@ function extractErrorMessage(data, errs) {
 }
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (store.getState().auth.banned) {
+      store.dispatch(clearBanned());
+    }
+    return response;
+  },
   (error) => {
     const status = error.response?.status ?? 0;
     const data = error.response?.data ?? {};
@@ -50,7 +55,9 @@ api.interceptors.response.use(
       raw: error,
     };
 
-    if (status === 401 && !error.config?.url?.includes('/auth/login')) {
+    if (status === 403 && data.banned) {
+      store.dispatch(setBanned({ reason: data.reason, expiresAt: data.expiresAt ?? null }));
+    } else if (status === 401 && !error.config?.url?.includes('/auth/login')) {
       store.dispatch(logout());
     }
 

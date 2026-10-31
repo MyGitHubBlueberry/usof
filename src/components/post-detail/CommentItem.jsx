@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
+import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
 import ActionModal from '../ui/ActionModal'
 import Rating from '../ui/Rating'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
+import ExpandableContent from '../ui/ExpandableContent'
+import MarkdownToolbar from '../post-create/MarkdownToolbar'
 import {
   IconCornerDownRight,
   IconCheck,
@@ -45,14 +48,19 @@ export default function CommentItem({
   const [replying, setReplying] = useState(false)
   const [replyText, setReplyText] = useState('')
   const [replyPosting, setReplyPosting] = useState(false)
-  const [collapsed, setCollapsed] = useState(true)
-  const [canCollapse, setCanCollapse] = useState(false)
-  const contentRef = useRef(null)
+  const { textareaRef: replyTextareaRef, applyFormat: applyReplyFormat } = useMarkdownFormatting(
+    replyText,
+    setReplyText
+  )
 
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(comment.content)
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState(null)
+  const { textareaRef: editTextareaRef, applyFormat: applyEditFormat } = useMarkdownFormatting(
+    editText,
+    setEditText
+  )
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -72,12 +80,6 @@ export default function CommentItem({
       isMounted = false
     }
   }, [comment.id])
-
-  useEffect(() => {
-    const el = contentRef.current
-    if (!el || comment.status === 'inactive') return
-    setCanCollapse(el.scrollHeight - el.clientHeight > 1)
-  }, [comment.content, comment.status])
 
   const isTombstone = comment.status === 'inactive'
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
@@ -259,7 +261,9 @@ export default function CommentItem({
   function commentEdit() {
     return (
       <div className={s.editBox}>
+        <MarkdownToolbar onFormat={applyEditFormat} />
         <textarea
+          ref={editTextareaRef}
           className={s.replyTextarea}
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
@@ -295,16 +299,16 @@ export default function CommentItem({
 
   function commentContent() {
     return (
-      <>
-        <p ref={contentRef} className={`${s.content} ${collapsed ? s.clamped : ''}`}>
-          {comment.content}
-        </p>
-        {canCollapse && (
-          <button type="button" className={s.showMoreBtn} onClick={() => setCollapsed((v) => !v)}>
-            {collapsed ? 'Show more' : 'Show less'}
-          </button>
-        )}
-      </>
+      <ExpandableContent
+        lineClamp={6}
+        watchKey={comment.content}
+        className={s.content}
+        collapsedClassName={s.clamped}
+        toggleClassName={s.showMoreBtn}
+        showChevron={false}
+      >
+        {comment.content}
+      </ExpandableContent>
     )
   }
 
@@ -341,7 +345,9 @@ export default function CommentItem({
   function replyBox() {
     return (
       <div className={s.replyBox}>
+        <MarkdownToolbar onFormat={applyReplyFormat} />
         <textarea
+          ref={replyTextareaRef}
           className={s.replyTextarea}
           placeholder="Write a reply..."
           value={replyText}
@@ -351,15 +357,17 @@ export default function CommentItem({
           rows={2}
           autoFocus
         />
-        <button
-          type="button"
-          className={s.sendBtn}
-          onClick={handleReplySubmit}
-          disabled={replyPosting || !replyText.trim()}
-        >
-          <IconSend size={13} />
-          <span>Reply</span>
-        </button>
+        <div className={s.replyActions}>
+          <button
+            type="button"
+            className={s.sendBtn}
+            onClick={handleReplySubmit}
+            disabled={replyPosting || !replyText.trim()}
+          >
+            <IconSend size={13} />
+            <span>Reply</span>
+          </button>
+        </div>
       </div>
     )
   }

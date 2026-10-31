@@ -51,11 +51,13 @@ const authSlice = createSlice({
     user: loadSavedUser(),
     token: localStorage.getItem('token') || null,
     loading: false,
-    error: null
+    error: null,
+    banned: null
   },
   reducers: {
     logout: (state) => {
       state.user = state.token = null;
+      state.banned = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     },
@@ -66,6 +68,12 @@ const authSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    setBanned: (state, action) => {
+      state.banned = action.payload;
+    },
+    clearBanned: (state) => {
+      state.banned = null;
     }
   },
   extraReducers: (builder) => {
@@ -101,6 +109,6 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout, updateUser, clearError } = authSlice.actions;
+export const { logout, updateUser, clearError, setBanned, clearBanned } = authSlice.actions;
 export const selectIsAuthenticated = (state) => !!state.auth.token;
 export default authSlice.reducer;

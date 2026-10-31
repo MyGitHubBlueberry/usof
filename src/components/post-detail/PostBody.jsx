@@ -1,46 +1,19 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { API } from '../../constants/api'
 import {
-  IconFile,
-  IconFilePdf,
-  IconFileArchive,
-  IconFileCode,
-  IconFileSpreadsheet,
-  IconDownload,
-  IconChevron,
-  IconImageOff,
-} from '../ui/Icons'
+  IMAGE_EXTENSIONS,
+  getExtension,
+  getDisplayName,
+  getFileIcon,
+  getAttachmentUrl,
+} from '../../utils/attachments'
+import { MARKDOWN_PLUGINS, MARKDOWN_COMPONENTS } from '../../utils/markdown'
+import { IconDownload, IconImageOff } from '../ui/Icons'
+import ExpandableContent from '../ui/ExpandableContent'
 import Lightbox from '../ui/Lightbox'
 import s from './PostBody.module.css'
 
-const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg']
-const PDF_EXTENSIONS = ['.pdf']
-const ARCHIVE_EXTENSIONS = ['.zip', '.rar', '.7z', '.tar', '.gz']
-const CODE_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.py', '.java', '.c', '.cpp', '.json', '.html', '.css', '.sql', '.sh']
-const SPREADSHEET_EXTENSIONS = ['.xls', '.xlsx', '.csv']
 const COLLAPSED_HEIGHT = 320
-
-function getExtension(filename) {
-  const idx = filename.lastIndexOf('.')
-  return idx === -1 ? '' : filename.slice(idx).toLowerCase()
-}
-
-function getDisplayName(filename) {
-  return filename.split('/').pop()
-}
-
-function renderFileIcon(extension, size) {
-  if (PDF_EXTENSIONS.includes(extension)) return <IconFilePdf size={size} />
-  if (ARCHIVE_EXTENSIONS.includes(extension)) return <IconFileArchive size={size} />
-  if (CODE_EXTENSIONS.includes(extension)) return <IconFileCode size={size} />
-  if (SPREADSHEET_EXTENSIONS.includes(extension)) return <IconFileSpreadsheet size={size} />
-  return <IconFile size={size} />
-}
-
-function getAttachmentUrl(postId, filename) {
-  return `${import.meta.env.VITE_API_URL}${API.POSTS.ATTACHMENT(postId, filename)}`
-}
 
 function ImageAttachment({ url, filename, onClick }) {
   const [broken, setBroken] = useState(false)
@@ -79,7 +52,7 @@ function AttachmentItem({ postId, filename, onImageClick }) {
 
   return (
     <a href={url} download className={s.fileAttachment}>
-      {renderFileIcon(extension, 16)}
+      {getFileIcon(extension, 16)}
       <span className={s.fileName}>{getDisplayName(filename)}</span>
       <IconDownload size={14} className={s.downloadIcon} />
     </a>
@@ -87,16 +60,7 @@ function AttachmentItem({ postId, filename, onImageClick }) {
 }
 
 export default function PostBody({ post }) {
-  const contentRef = useRef(null)
-  const [collapsed, setCollapsed] = useState(true)
-  const [canExpand, setCanExpand] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(null)
-
-  useLayoutEffect(() => {
-    if (contentRef.current) {
-      setCanExpand(contentRef.current.scrollHeight > COLLAPSED_HEIGHT)
-    }
-  }, [post.content])
 
   const attachments = useMemo(() => post.attachments || [], [post.attachments])
 
@@ -118,23 +82,17 @@ export default function PostBody({ post }) {
 
   return (
     <div className={s.body}>
-      <div
-        ref={contentRef}
-        className={`${s.content} ${collapsed && canExpand ? s.collapsed : ''}`}
+      <ExpandableContent
+        maxHeight={COLLAPSED_HEIGHT}
+        watchKey={post.content}
+        className={`${s.content} markdown-content`}
+        collapsedClassName={s.collapsed}
+        toggleClassName={s.showMoreBtn}
       >
-        <ReactMarkdown>{post.content}</ReactMarkdown>
-      </div>
-
-      {canExpand && (
-        <button
-          type="button"
-          className={s.showMoreBtn}
-          onClick={() => setCollapsed((v) => !v)}
-        >
-          <span>{collapsed ? 'Show more' : 'Show less'}</span>
-          <IconChevron up={!collapsed} size={12} />
-        </button>
-      )}
+        <ReactMarkdown remarkPlugins={MARKDOWN_PLUGINS} components={MARKDOWN_COMPONENTS}>
+          {post.content}
+        </ReactMarkdown>
+      </ExpandableContent>
 
       {attachments.length > 0 && (
         <div className={s.attachments}>

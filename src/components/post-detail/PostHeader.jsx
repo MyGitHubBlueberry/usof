@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
 import { commentsService } from '../../services/comments.service'
+import { toPostEdit } from '../../constants/routes'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
 import { IconDots, IconStar, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
 import s from './PostHeader.module.css'
@@ -18,6 +20,7 @@ export default function PostHeader({
   onRequireCommentsRefresh,
 }) {
   const { showFlash } = useFlash()
+  const navigate = useNavigate()
   const [favoriteLoading, setFavoriteLoading] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
   const isOwner = !!currentUser && Number(currentUser.id) === Number(post.user_id)
@@ -118,7 +121,7 @@ export default function PostHeader({
             Share
           </ActionMenuItem>
           {isOwner && (
-            <ActionMenuItem icon={<IconPencil size={13} />} onClick={() => { /* todo: edit post */ }}>
+            <ActionMenuItem icon={<IconPencil size={13} />} onClick={() => navigate(toPostEdit(post.id))}>
               Edit
             </ActionMenuItem>
           )}

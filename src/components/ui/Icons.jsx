@@ -505,6 +505,77 @@ export function IconZoomOut({ className = '', size = 16 }) {
   )
 }
 
+export function IconBold({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M6 4h8a4 4 0 0 1 0 8H6z" />
+      <path d="M6 12h9a4 4 0 0 1 0 8H6z" />
+    </svg>
+  )
+}
+
+export function IconItalic({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="19" y1="4" x2="10" y2="4" />
+      <line x1="14" y1="20" x2="5" y2="20" />
+      <line x1="15" y1="4" x2="9" y2="20" />
+    </svg>
+  )
+}
+
+export function IconHeading({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M6 4v16" />
+      <path d="M18 4v16" />
+      <path d="M6 12h12" />
+    </svg>
+  )
+}
+
+export function IconList({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="9" y1="6" x2="20" y2="6" />
+      <line x1="9" y1="12" x2="20" y2="12" />
+      <line x1="9" y1="18" x2="20" y2="18" />
+      <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="18" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+export function IconCode({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </svg>
+  )
+}
+
+export function IconCodeBlock({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="3" y="4" width="18" height="16" rx="1" />
+      <polyline points="9 10 7 12 9 14" />
+      <polyline points="15 10 17 12 15 14" />
+    </svg>
+  )
+}
+
+export function IconTable({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="3" y="4" width="18" height="16" rx="1" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="9" y1="4" x2="9" y2="20" />
+    </svg>
+  )
+}
+
 export function IconBell({ className = '', size = 16, filled = false }) {
   return (
     <svg

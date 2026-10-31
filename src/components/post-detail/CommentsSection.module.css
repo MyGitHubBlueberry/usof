@@ -32,6 +32,11 @@
   color: var(--text-h);
 }
 
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
 .textarea {
   width: 100%;
   box-sizing: border-box;

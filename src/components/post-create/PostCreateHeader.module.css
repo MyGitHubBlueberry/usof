@@ -1,0 +1,63 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.titleInput {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 26px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-h);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.titleInput::placeholder {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.titleInput:focus {
+  border-color: var(--accent);
+}
+
+.titleInput.invalid {
+  border-color: #ef4444;
+}
+
+.fieldError {
+  font-size: 12px;
+  color: #ef4444;
+}
+
+.categoryDropdown {
+  align-self: flex-start;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.categoryTag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+@media (max-width: 640px) {
+  .titleInput {
+    font-size: 21px;
+  }
+}

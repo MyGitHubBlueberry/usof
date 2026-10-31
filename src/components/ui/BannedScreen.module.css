@@ -1,0 +1,132 @@
+.screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 40px 36px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.logo {
+  display: inline-flex;
+  margin-bottom: 20px;
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.iconDanger {
+  color: #e53e3e;
+}
+
+.title {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 10px;
+  letter-spacing: -0.3px;
+}
+
+.msg {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.reason {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.expiry {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.countdownUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 56px;
+  padding: 10px 6px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.countdownValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e53e3e;
+  font-family: var(--mono);
+}
+
+.countdownLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.logoutBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.logoutBtn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 480px) {
+  .countdownUnit {
+    min-width: 46px;
+    padding: 8px 4px;
+  }
+
+  .countdownValue {
+    font-size: 18px;
+  }
+}

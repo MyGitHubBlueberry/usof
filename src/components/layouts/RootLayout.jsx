@@ -5,6 +5,7 @@ import { selectIsAuthenticated } from '../../redux/slices/authSlice'
 import { ROUTES } from '../../constants/routes'
 import Header from './Header'
 import Footer from './Footer'
+import BannedScreen from '../ui/BannedScreen'
 import LeaderboardWidget from '../widgets/LeaderboardWidget'
 import CategoriesWidget from '../widgets/CategoriesWidget'
 import NotificationsWidget from '../widgets/NotificationsWidget'
@@ -15,8 +16,13 @@ import s from './RootLayout.module.css'
 export default function RootLayout() {
   const location = useLocation()
   const isAuthenticated = useSelector(selectIsAuthenticated)
+  const banned = useSelector((state) => state.auth.banned)
   const isHome = location.pathname === ROUTES.HOME
   const isFullSpan = location.pathname.startsWith(ROUTES.ADMIN)
+
+  if (banned) {
+    return <BannedScreen ban={banned} />
+  }
 
   return (
     <div className={s.appShell}>

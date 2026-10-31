@@ -697,6 +697,22 @@
   width: 100%;
 }
 
+.durationRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.durationInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.durationUnit {
+  width: 110px;
+  flex-shrink: 0;
+}
+
 .required {
   color: #e53e3e;
 }

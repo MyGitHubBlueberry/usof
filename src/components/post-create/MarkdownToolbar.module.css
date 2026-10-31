@@ -1,0 +1,36 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  background: var(--code-bg);
+  box-sizing: border-box;
+}
+
+.toolBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.toolBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--bg);
+}
+
+@media (max-width: 640px) {
+  .toolBtn {
+    width: 32px;
+    height: 32px;
+  }
+}
