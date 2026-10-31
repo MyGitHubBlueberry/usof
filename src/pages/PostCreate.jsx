@@ -9,6 +9,7 @@ import { ROUTES, toPost } from '../constants/routes'
 import PostCreateHeader from '../components/post-create/PostCreateHeader'
 import MarkdownEditor from '../components/post-create/MarkdownEditor'
 import AttachmentUploader from '../components/post-create/AttachmentUploader'
+import BackButton from '../components/ui/BackButton'
 import s from './PostCreate.module.css'
 
 function validate({ title, content }) {
@@ -74,6 +75,7 @@ function PostCreateForm() {
 
   return (
     <div className={s.postPage} onKeyDown={handleKeyDown}>
+      <BackButton />
       <h1 className={s.pageTitle}>Create a new post</h1>
 
       <PostCreateHeader

@@ -94,15 +94,17 @@ export default function PostHeader({
   return (
     <div className={s.header}>
       <div className={s.titleRow}>
-        <button
-          type="button"
-          //todo className={}
-          onClick={toggleFavorite}
-          aria-label="Favorite post"
-        >
-          <IconStar size={24} filled={isFavorited} />
-        </button>
-        <h1 className={s.title}>{post.title}</h1>
+        <div>
+          <button
+            type="button"
+            className={`${s.favoriteBtn} ${isFavorited ? s.favoriteBtnActive : ''}`}
+            onClick={toggleFavorite}
+            aria-label="Favorite post"
+          >
+            <IconStar size={24} filled={isFavorited} />
+          </button>
+          <h1 className={s.title}>{post.title}</h1>
+        </div>
 
         <ActionMenu
           trigger={({ toggle, open }) => (

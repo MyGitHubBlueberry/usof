@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
@@ -6,10 +6,13 @@ import { categoriesService } from '../services/categories.service'
 import { useFlash } from '../hooks/useFlash'
 import { FlashProvider } from '../context/FlashProvider'
 import { ROUTES, toPost } from '../constants/routes'
-import { getDisplayName } from '../utils/attachments'
+import { IMAGE_EXTENSIONS, getExtension, getDisplayName, getAttachmentUrl } from '../utils/attachments'
 import PostCreateHeader from '../components/post-create/PostCreateHeader'
 import MarkdownEditor from '../components/post-create/MarkdownEditor'
 import AttachmentUploader from '../components/post-create/AttachmentUploader'
+import AttachmentGrid from '../components/ui/AttachmentGrid'
+import Lightbox from '../components/ui/Lightbox'
+import BackButton from '../components/ui/BackButton'
 import s from './PostCreate.module.css'
 
 function validate({ title, content }) {
@@ -28,8 +31,40 @@ function PostEditForm({ post, categories }) {
   const [selectedCategories, setSelectedCategories] = useState(categories.map((c) => c.title))
   const [categoryOptions, setCategoryOptions] = useState([])
   const [newAttachments, setNewAttachments] = useState([])
+  const [existingAttachments, setExistingAttachments] = useState(post.attachments || [])
+  const [removingAttachment, setRemovingAttachment] = useState(null)
+  const [lightboxIndex, setLightboxIndex] = useState(null)
   const [touched, setTouched] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+
+  const images = useMemo(
+    () =>
+      existingAttachments
+        .filter((filename) => IMAGE_EXTENSIONS.includes(getExtension(filename)))
+        .map((filename) => ({
+          src: getAttachmentUrl(post.id, filename),
+          alt: getDisplayName(filename),
+        })),
+    [existingAttachments, post.id]
+  )
+
+  function handleImageClick(filename) {
+    const idx = images.findIndex((img) => img.src === getAttachmentUrl(post.id, filename))
+    if (idx !== -1) setLightboxIndex(idx)
+  }
+
+  function handleRemoveAttachment(filename) {
+    if (removingAttachment) return
+    setRemovingAttachment(filename)
+    postsService
+      .deleteAttachment(post.id, filename)
+      .then(() => {
+        setExistingAttachments((prev) => prev.filter((f) => f !== filename))
+        showFlash('Attachment removed.', 'success')
+      })
+      .catch((err) => showFlash(err.message || 'Could not remove attachment.', 'error'))
+      .finally(() => setRemovingAttachment(null))
+  }
 
   useEffect(() => {
     categoriesService
@@ -75,6 +110,7 @@ function PostEditForm({ post, categories }) {
 
   return (
     <div className={s.postPage} onKeyDown={handleKeyDown}>
+      <BackButton />
       <h1 className={s.pageTitle}>Edit post</h1>
 
       {post.status === 'inactive' && (
@@ -94,17 +130,20 @@ function PostEditForm({ post, categories }) {
 
       <MarkdownEditor value={content} onChange={setContent} error={errors.content} />
 
-      {post.attachments?.length > 0 && (
+      {existingAttachments.length > 0 && (
         <div className={s.existingAttachments}>
           <span className={s.existingAttachmentsLabel}>Existing attachments</span>
-          <div className={s.existingAttachmentsList}>
-            {post.attachments.map((filename) => (
-              <span key={filename} className={s.existingAttachmentItem}>
-                {getDisplayName(filename)}
-              </span>
-            ))}
-          </div>
+          <AttachmentGrid
+            postId={post.id}
+            attachments={existingAttachments}
+            onImageClick={handleImageClick}
+            onRemove={handleRemoveAttachment}
+          />
         </div>
+      )}
+
+      {lightboxIndex !== null && (
+        <Lightbox images={images} startIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />
       )}
 
       <AttachmentUploader files={newAttachments} onChange={setNewAttachments} />

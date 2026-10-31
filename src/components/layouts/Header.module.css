@@ -39,6 +39,7 @@
 .menuBtn,
 .userBtn,
 .loginBtn {
+  height: 42px;
   display: flex;
   align-items: center;
   gap: 8px;

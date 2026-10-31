@@ -127,7 +127,7 @@ export default function Header() {
             <ActionMenuDivider />
 
             <ActionMenuItem icon={<IconUser className={s.itemIcon} />} to={profileRoute}>
-              Your Profile
+              My Profile
             </ActionMenuItem>
 
             <ActionMenuItem icon={<IconDocument className={s.itemIcon} />} to={myPostsRoute}>

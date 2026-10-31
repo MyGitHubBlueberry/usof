@@ -219,102 +219,108 @@ export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNot
         </div>
 
         <div className={s.identity}>
-          <span className={s.login}>{profile.login}</span>
-
-          {editingName ? (
-            <div className={s.nameEditRow}>
-              <input
-                type="text"
-                className={s.nameInput}
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                onKeyDown={handleNameKeyDown}
-                disabled={nameSaving}
-                autoFocus
-              />
-              <button
-                type="button"
-                className={s.nameActionBtn}
-                onClick={saveName}
-                disabled={nameSaving}
-                aria-label="Save full name"
-                title="Save"
-              >
-                <IconCheck size={14} />
-              </button>
-              <button
-                type="button"
-                className={s.nameActionBtn}
-                onClick={cancelEditName}
-                disabled={nameSaving}
-                aria-label="Cancel editing full name"
-                title="Cancel"
-              >
-                <IconX size={14} />
-              </button>
-            </div>
-          ) : (
-            <div className={s.nameRow}>
-              <span className={s.fullName}>{profile.full_name}</span>
-              {isOwner && (
+          <div>
+            {editingName ? (
+              <div className={s.nameEditRow}>
+                <input
+                  type="text"
+                  className={s.nameInput}
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={handleNameKeyDown}
+                  disabled={nameSaving}
+                  autoFocus
+                />
                 <button
                   type="button"
-                  className={s.editNameBtn}
-                  onClick={startEditName}
-                  aria-label="Edit full name"
-                  title="Edit full name"
+                  className={s.nameActionBtn}
+                  onClick={saveName}
+                  disabled={nameSaving}
+                  aria-label="Save full name"
+                  title="Save"
                 >
-                  <IconPencil size={13} />
+                  <IconCheck size={14} />
                 </button>
-              )}
-            </div>
-          )}
-          {nameError && <span className={s.nameError}>{nameError}</span>}
-
-          <div className={s.stats}>
-            <span className={s.stat}>Posts: {postCount ?? '—'}</span>
-            <span className={s.stat}>Rating: {profile.rating ?? 0}</span>
+                <button
+                  type="button"
+                  className={s.nameActionBtn}
+                  onClick={cancelEditName}
+                  disabled={nameSaving}
+                  aria-label="Cancel editing full name"
+                  title="Cancel"
+                >
+                  <IconX size={14} />
+                </button>
+              </div>
+            ) : (
+              <div className={s.nameRow}>
+                <span className={s.fullName}>{profile.full_name}</span>
+                {isOwner && (
+                  <button
+                    type="button"
+                    className={s.editNameBtn}
+                    onClick={startEditName}
+                    aria-label="Edit full name"
+                    title="Edit full name"
+                  >
+                    <IconPencil size={13} />
+                  </button>
+                )}
+              </div>
+            )}
+            {isOwner && (
+              <button
+                type="button"
+                className={s.bellBtn}
+                onClick={onNotificationsClick}
+                aria-label="View notifications"
+                title="Notifications"
+              >
+                <IconBell size={20} />
+                {unreadCount > 0 && <span className={s.bellBadge}>{unreadCount}</span>}
+              </button>
+            )}
           </div>
-        </div>
 
-        {isOwner && (
-          <button
-            type="button"
-            className={s.bellBtn}
-            onClick={onNotificationsClick}
-            aria-label="View notifications"
-            title="Notifications"
-          >
-            <IconBell size={20} />
-            {unreadCount > 0 && <span className={s.bellBadge}>{unreadCount}</span>}
-          </button>
-        )}
+          {nameError && <span className={s.nameError}>{nameError}</span>}
+          <span className={s.login}>{profile.login}</span>
+
+
+          <div className={s.bottomRow}>
+            <div className={s.stats}>
+              <span className={s.stat}>Posts: {postCount ?? '—'}</span>
+              <span className={s.stat}>Rating: {profile.rating ?? 0}</span>
+            </div>
+            {isOwner && (
+              <div className={s.dangerZone}>
+                <button
+                  type="button"
+                  className={s.deleteAccountBtn}
+                  onClick={() => setDeleteModalOpen(true)}
+                >
+                  <IconAlertTriangle size={14} />
+                  Delete Account
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
 
-      {isOwner && (
-        <div className={s.dangerZone}>
-          <button
-            type="button"
-            className={s.deleteAccountBtn}
-            onClick={() => setDeleteModalOpen(true)}
-          >
-            <IconAlertTriangle size={14} />
-            Delete Account
-          </button>
-        </div>
-      )}
-
-      {deleteModalOpen && (
-        <ActionModal
-          title="Delete Account"
-          message="This action is permanent and cannot be undone. All of your posts, comments, and account data will be removed."
-          confirmText="Delete my account"
-          isDanger
-          isLoading={deleteLoading}
-          onClose={() => setDeleteModalOpen(false)}
-          onConfirm={handleDeleteAccount}
-        />
-      )}
-    </div>
+      {
+        deleteModalOpen && (
+          <ActionModal
+            title="Delete Account"
+            message="This action is permanent and cannot be undone. All of your posts, comments, and account data will be removed."
+            confirmText="Delete my account"
+            isDanger
+            isLoading={deleteLoading}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={handleDeleteAccount}
+          />
+        )
+      }
+    </div >
   )
 }

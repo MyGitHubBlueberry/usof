@@ -2,6 +2,30 @@
   align-items: flex-start;
   justify-content: flex-start;
   gap: 8px;
+  cursor: pointer;
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.item:hover .deleteBtn,
+.item:focus-within .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: #e53e3e;
 }
 
 .dot {

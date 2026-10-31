@@ -27,6 +27,14 @@
   transform-origin: center center;
 }
 
+.cursorZoomIn {
+  cursor: zoom-in;
+}
+
+.cursorZoomOut {
+  cursor: zoom-out;
+}
+
 .zoom0 {
   transform: scale(1);
 }

@@ -11,7 +11,6 @@
   align-items: flex-start;
   gap: 20px;
   padding: 24px;
-  padding-right: 64px;
 }
 
 .avatarWrap {
@@ -170,6 +169,12 @@
   color: #e53e3e;
 }
 
+.bottomRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .stats {
   display: flex;
   gap: 16px;
@@ -221,7 +226,6 @@
 }
 
 .dangerZone {
-  padding: 0 24px 20px;
   display: flex;
   justify-content: flex-end;
 }
@@ -269,5 +273,10 @@
 
   .dangerZone {
     justify-content: center;
+  }
+
+  .bottomRow {
+    gap: 5px;
+    flex-direction: column;
   }
 }

@@ -21,7 +21,7 @@
 .searchInput {
   flex: 1;
   min-width: 0;
-  height: 36px;
+  height: 32px;
   padding: 0 12px;
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -53,7 +53,7 @@
 
 .clearAllBtn {
   flex-shrink: 0;
-  height: 36px;
+  height: 32px;
   padding: 0 14px;
   background: transparent;
   border: 1px solid var(--border);
@@ -74,7 +74,7 @@
 
 .toggleFiltersBtn {
   flex-shrink: 0;
-  height: 36px;
+  height: 32px;
   padding: 0 12px;
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -95,6 +95,10 @@
 .toggleFiltersBtn[aria-expanded="true"] {
   border-color: var(--text);
   color: var(--text-h);
+}
+
+.toggleFiltersBtn.open svg {
+  color: var(--accent);
 }
 
 .toggleBtnText {

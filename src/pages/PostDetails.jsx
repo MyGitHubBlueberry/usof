@@ -6,6 +6,7 @@ import { usersService } from '../services/users.service'
 import { FlashProvider } from '../context/FlashProvider'
 import { ROUTES } from '../constants/routes'
 import { IconXCircle } from '../components/ui/Icons'
+import BackButton from '../components/ui/BackButton'
 import PostHeader from '../components/post-detail/PostHeader'
 import PostBody from '../components/post-detail/PostBody'
 import PostFooter from '../components/post-detail/PostFooter'
@@ -106,6 +107,7 @@ export default function PostDetails() {
   return (
     <FlashProvider>
       <div className={s.postPage}>
+        <BackButton />
         <PostHeader
           post={post}
           categories={categories}

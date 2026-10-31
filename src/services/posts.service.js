@@ -20,4 +20,5 @@ export const postsService = {
   getComments: (id, params) => api.get(API.POSTS.COMMENTS(id), { params }),
   addComment: (id, content) => api.post(API.POSTS.COMMENTS(id), { content }),
   getCategories: (id) => api.get(API.POSTS.CATEGORIES(id)),
+  deleteAttachment: (id, filename) => api.delete(API.POSTS.DELETE_ATTACHMENT(id, filename)),
 }

@@ -6,6 +6,10 @@
   box-sizing: border-box;
 }
 
+.backBtn {
+  margin: 16px 16px 0;
+}
+
 .stateMsg {
   flex: 1;
   display: flex;

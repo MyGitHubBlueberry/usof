@@ -38,6 +38,7 @@ export const API = {
     COMMENTS: (id) => `/posts/${id}/comments`,
     CATEGORIES: (id) => `/posts/${id}/categories`,
     ATTACHMENT: (id, filename) => `/posts/${id}/attachments/${filename}`,
+    DELETE_ATTACHMENT: (id, filename) => `/posts/${id}/attachments/${filename}`,
   },
 
   COMMENTS: {
@@ -69,5 +70,7 @@ export const API = {
     UNREAD_COUNT: '/notifications/unread-count',
     READ_ALL: '/notifications/read-all',
     READ: (id) => `/notifications/${id}/read`,
+    DELETE: (id) => `/notifications/${id}`,
+    DELETE_ALL: '/notifications',
   },
 }
