@@ -6,9 +6,9 @@ import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
 import ActionModal from '../ui/ActionModal'
+import Rating from '../ui/Rating'
+import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
 import {
-  IconThumbsUp,
-  IconThumbsDown,
   IconCornerDownRight,
   IconCheck,
   IconSend,
@@ -21,11 +21,10 @@ import {
 } from '../ui/Icons'
 import s from './CommentItem.module.css'
 
-const COLLAPSE_LENGTH = 280
-
 export default function CommentItem({
   comment,
   postStatus,
+  postAuthorId,
   isAdmin,
   currentUser,
   usersById,
@@ -37,10 +36,9 @@ export default function CommentItem({
 }) {
   const { showFlash } = useFlash()
   const author = usersById[comment.user_id]
-  const menuRef = useRef(null)
 
   const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0 })
-  const [myReaction, setMyReaction] = useState(null) //todo: should load if user have reacted to the comment already
+  const [myReaction, setMyReaction] = useState(null)
   const [reacting, setReacting] = useState(false)
   const [resolving, setResolving] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
@@ -48,7 +46,8 @@ export default function CommentItem({
   const [replyText, setReplyText] = useState('')
   const [replyPosting, setReplyPosting] = useState(false)
   const [collapsed, setCollapsed] = useState(true)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [canCollapse, setCanCollapse] = useState(false)
+  const contentRef = useRef(null)
 
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(comment.content)
@@ -63,7 +62,10 @@ export default function CommentItem({
     commentsService
       .getLikes(comment.id)
       .then((res) => {
-        if (isMounted) setLikeCounts(res.data ?? { likes: 0, dislikes: 0 })
+        if (!isMounted) return
+        const data = res.data ?? { likes: 0, dislikes: 0, myReaction: null }
+        setLikeCounts(data)
+        setMyReaction(data.myReaction ?? null)
       })
       .catch(() => { })
     return () => {
@@ -72,26 +74,21 @@ export default function CommentItem({
   }, [comment.id])
 
   useEffect(() => {
-    function handleClickOutside(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false)
-      }
-    }
-    if (menuOpen) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [menuOpen])
+    const el = contentRef.current
+    if (!el || comment.status === 'inactive') return
+    setCanCollapse(el.scrollHeight - el.clientHeight > 1)
+  }, [comment.content, comment.status])
 
+  const isTombstone = comment.status === 'inactive'
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
+  const isPostOwner = !!currentUser && !!postAuthorId && Number(currentUser.id) === Number(postAuthorId)
   const canReplyOrResolve = isAdmin || (postStatus !== 'resolved' && postStatus !== 'inactive')
-  const canReact = isAdmin || postStatus !== 'inactive'
+  const canReact = isAdmin || (postStatus !== 'inactive' && !isTombstone)
   const canEdit = isCommentOwner && canReplyOrResolve
   const canDelete = (isCommentOwner || isAdmin) && canReplyOrResolve
-  const canResolve = (isCommentOwner || isAdmin) && canReplyOrResolve
+  const canResolve = (isPostOwner || isAdmin) && canReplyOrResolve
   const isResolved = comment.status === 'resolved'
   const replyCount = comment.replies.length
-  const isLongContent = comment.content.length > COLLAPSE_LENGTH
-  const displayedContent =
-    isLongContent && collapsed ? `${comment.content.slice(0, COLLAPSE_LENGTH)}…` : comment.content
 
   function refreshLikes() {
     return commentsService
@@ -222,75 +219,40 @@ export default function CommentItem({
 
   function commentActionsDropdown() {
     return (
-      <div className={s.menuWrap} ref={menuRef}>
-        <button
-          type="button"
-          className={s.menuTrigger}
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Comment actions"
-          aria-expanded={menuOpen}
-        >
-          <IconDots size={15} />
-        </button>
-
-        {menuOpen && (
-          <div className={s.dropdown}>
-            {canEdit && (
-              <button
-                type="button"
-                className={s.dropdownItem}
-                onClick={() => {
-                  startEdit()
-                  setMenuOpen(false)
-                }}
-              >
-                <IconPencil size={13} />
-                <span>Edit</span>
-              </button>
-            )}
-            {isAdmin && postStatus !== 'active' && (
-              <button
-                type="button"
-                className={s.dropdownItem}
-                onClick={() => {
-                  updateCommentStatus('active')
-                  setMenuOpen(false)
-                }}
-              >
-                <IconEye size={13} />
-                <span>Set Active</span>
-              </button>
-            )}
-            {isAdmin && postStatus !== 'inactive' && (
-              <button
-                type="button"
-                className={s.dropdownItem}
-                onClick={() => {
-                  updateCommentStatus('inactive')
-                  setMenuOpen(false)
-                }}
-              >
-                <IconEyeClosed size={13} />
-                <span>Set Inactive</span>
-              </button>
-            )}
-            {canDelete && (
-              <button
-                type="button"
-                className={s.dropdownItem}
-                onClick={() => {
-                  setDeleteModalOpen(true)
-                  setMenuOpen(false)
-                }}
-              >
-                <IconTrash size={13} />
-                <span>Delete</span>
-              </button>
-            )}
-
-          </div>
+      <ActionMenu
+        trigger={({ toggle, open }) => (
+          <button
+            type="button"
+            className={s.menuTrigger}
+            onClick={toggle}
+            aria-label="Comment actions"
+            aria-expanded={open}
+          >
+            <IconDots size={15} />
+          </button>
         )}
-      </div>
+      >
+        {canEdit && (
+          <ActionMenuItem icon={<IconPencil size={13} />} onClick={startEdit}>
+            Edit
+          </ActionMenuItem>
+        )}
+        {isAdmin && postStatus !== 'active' && (
+          <ActionMenuItem icon={<IconEye size={13} />} onClick={() => updateCommentStatus('active')}>
+            Set Active
+          </ActionMenuItem>
+        )}
+        {isAdmin && postStatus !== 'inactive' && (
+          <ActionMenuItem icon={<IconEyeClosed size={13} />} onClick={() => updateCommentStatus('inactive')}>
+            Set Inactive
+          </ActionMenuItem>
+        )}
+        {canDelete && (
+          <ActionMenuItem icon={<IconTrash size={13} />} onClick={() => setDeleteModalOpen(true)} danger>
+            Delete
+          </ActionMenuItem>
+        )}
+      </ActionMenu>
     )
   }
 
@@ -334,8 +296,10 @@ export default function CommentItem({
   function commentContent() {
     return (
       <>
-        <p className={s.content}>{displayedContent}</p>
-        {isLongContent && (
+        <p ref={contentRef} className={`${s.content} ${collapsed ? s.clamped : ''}`}>
+          {comment.content}
+        </p>
+        {canCollapse && (
           <button type="button" className={s.showMoreBtn} onClick={() => setCollapsed((v) => !v)}>
             {collapsed ? 'Show more' : 'Show less'}
           </button>
@@ -346,29 +310,13 @@ export default function CommentItem({
 
   function reactions() {
     return (
-      <div className={s.rating}>
-        <button
-          type="button"
-          className={`${s.reactBtn} ${myReaction === 'like' ? s.reactBtnActive : ''}`}
-          onClick={() => handleReact('like')}
-          disabled={reacting || !canReact}
-          aria-label="Like"
-          title="Like"
-        >
-          <IconThumbsUp size={13} filled={myReaction === 'like'} />
-        </button>
-        <span className={s.ratingCount}>{(likeCounts.likes ?? 0) - (likeCounts.dislikes ?? 0)}</span>
-        <button
-          type="button"
-          className={`${s.reactBtn} ${myReaction === 'dislike' ? s.reactBtnActive : ''}`}
-          onClick={() => handleReact('dislike')}
-          disabled={reacting || !canReact}
-          aria-label="Dislike"
-          title="Dislike"
-        >
-          <IconThumbsDown size={13} filled={myReaction === 'dislike'} />
-        </button>
-      </div>
+      <Rating
+        counts={likeCounts}
+        myReaction={myReaction}
+        onReact={handleReact}
+        disabled={reacting || !canReact}
+        size="sm"
+      />
     )
   }
 
@@ -424,6 +372,7 @@ export default function CommentItem({
             key={reply.id}
             comment={reply}
             postStatus={postStatus}
+            postAuthorId={postAuthorId}
             isAdmin={isAdmin}
             currentUser={currentUser}
             usersById={usersById}
@@ -457,16 +406,18 @@ export default function CommentItem({
   }
 
   return (
-    <div className={`${s.comment} ${depth > 0 ? s.nested : ''} ${isResolved ? s.resolved : ''}`}>
+    <div className={`${s.comment} ${depth > 0 ? s.nested : ''} ${isResolved ? s.resolved : ''} ${isTombstone ? s.tombstone : ''}`}>
       <div className={s.header}>
         <Avatar
-          userId={author?.id}
-          avatarPath={author?.profile_picture_path}
-          name={author?.login || author?.full_name}
+          userId={isTombstone ? undefined : author?.id}
+          avatarPath={isTombstone ? undefined : author?.profile_picture_path}
+          name={isTombstone ? '' : author?.login || author?.full_name}
           size="small"
         />
         <div className={s.headerMeta}>
-          {author ? (
+          {isTombstone ? (
+            <span className={s.authorName}>[Deleted]</span>
+          ) : author ? (
             <Link to={toProfile(author.id)} className={s.authorName}>
               {author.login}
             </Link>
@@ -476,28 +427,36 @@ export default function CommentItem({
           <span className={s.date}>{formatFullDate(comment.publish_date)}</span>
         </div>
         {comment.status !== 'active' && <span className={s.statusBadge}>{comment.status}</span>}
-        {(canEdit || canDelete) && commentActionsDropdown()}
+        {!isTombstone && (canEdit || canDelete) && commentActionsDropdown()}
       </div>
 
-      {editing ? commentEdit() : commentContent()}
+      {isTombstone ? (
+        <p className={s.content}>This comment has been removed or deleted.</p>
+      ) : editing ? (
+        commentEdit()
+      ) : (
+        commentContent()
+      )}
 
       <div className={s.footer}>
         {reactions()}
 
-        <div>
-          {!isResolved && canResolve && resolveButton()}
+        {!isTombstone && (
+          <div>
+            {!isResolved && canResolve && resolveButton()}
 
-          {currentUser && canReplyOrResolve && !editing && responseButton()}
+            {currentUser && canReplyOrResolve && !editing && responseButton()}
 
-          {statusSaving && <span className={s.savingHint}>Saving…</span>}
-        </div>
+            {statusSaving && <span className={s.savingHint}>Saving…</span>}
+          </div>
+        )}
       </div>
 
-      {replying && replyBox()}
+      {!isTombstone && replying && replyBox()}
 
       {replyCount > 0 && replies()}
 
-      {deleteModalOpen && deleteModal()}
+      {!isTombstone && deleteModalOpen && deleteModal()}
     </div>
   )
 }

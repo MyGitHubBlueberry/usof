@@ -20,9 +20,16 @@
   word-break: break-word;
 }
 
-.menuWrap {
-  position: relative;
+.statusBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  color: var(--text);
   flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 6px;
 }
 
 .menuTrigger {
@@ -36,56 +43,12 @@
   color: var(--text);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
 }
 
 .menuTrigger:hover {
   border-color: var(--accent);
   color: var(--accent);
-}
-
-.dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  min-width: 190px;
-  padding: 6px 0;
-  z-index: 50;
-  animation: fadeIn 0.12s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.dropdownItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 9px 16px;
-  font-size: 14px;
-  color: var(--text-h);
-  background: transparent;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  box-sizing: border-box;
-  font-family: inherit;
-  transition: background 0.1s, color 0.1s;
-}
-
-.dropdownItem:hover {
-  background: var(--code-bg);
 }
 
 .categories {

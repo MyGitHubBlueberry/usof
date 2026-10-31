@@ -48,6 +48,7 @@ function collectDescendantIds(flatComments, rootId) {
 export default function CommentsSection({
   postId,
   postStatus,
+  postAuthorId,
   isAdmin,
   currentUser,
   refreshToken,
@@ -74,7 +75,7 @@ export default function CommentsSection({
         const data = res.data?.data ?? []
         setComments(data)
 
-        const uniqueUserIds = [...new Set(data.map((c) => c.user_id))]
+        const uniqueUserIds = [...new Set(data.map((c) => c.user_id).filter(Boolean))]
         return Promise.all(
           uniqueUserIds.map((userId) =>
             usersService
@@ -135,7 +136,7 @@ export default function CommentsSection({
 
   function handleReplyAdded(newReply) {
     ensureAuthorKnown(newReply.user_id)
-    setComments((prev) => [...prev, newReply])
+    setComments((prev) => [...prev, { status: 'active', publish_date: new Date().toISOString(), ...newReply }])
   }
 
   const roots = useMemo(() => buildCommentTree(comments), [comments])
@@ -228,6 +229,7 @@ export default function CommentsSection({
                 key={comment.id}
                 comment={comment}
                 postStatus={postStatus}
+                postAuthorId={postAuthorId}
                 isAdmin={isAdmin}
                 currentUser={currentUser}
                 usersById={usersById}

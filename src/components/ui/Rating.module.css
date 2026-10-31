@@ -1,0 +1,57 @@
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reactBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.reactBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.reactBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reactBtnActive {
+  color: white;
+}
+
+.ratingCount {
+  display: flex;
+  justify-content: center;
+  min-width: 18px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.sm .reactBtn {
+  width: 26px;
+  height: 26px;
+}
+
+.sm .ratingCount {
+  font-size: 13px;
+}
+
+.md .reactBtn {
+  width: 32px;
+  height: 32px;
+}
+
+.md .ratingCount {
+  font-size: 14px;
+}

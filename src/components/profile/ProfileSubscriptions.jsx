@@ -3,7 +3,7 @@ import { postsService } from '../../services/posts.service'
 import ProfilePostList from './ProfilePostList'
 
 export default function ProfileSubscriptions() {
-  const fetchFn = useCallback((page) => postsService.getSubscriptions({ page, limit: 5 }), [])
+  const fetchFn = useCallback((params) => postsService.getSubscriptions(params), [])
 
   return <ProfilePostList fetchFn={fetchFn} emptyMessage="No subscribed posts yet." />
 }

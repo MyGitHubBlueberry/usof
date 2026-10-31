@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
 import { commentsService } from '../../services/comments.service'
-import { IconDots, IconStar, IconRss, IconShare, IconEye, IconEyeClosed, IconBell, IconTrash, IconPencil } from '../ui/Icons'
+import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
+import { IconDots, IconStar, IconRss, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
 import s from './PostHeader.module.css'
 
 export default function PostHeader({
@@ -19,11 +20,9 @@ export default function PostHeader({
   onRequireCommentsRefresh,
 }) {
   const { showFlash } = useFlash()
-  const [menuOpen, setMenuOpen] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
   const [subscribeLoading, setSubscribeLoading] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
-  const menuRef = useRef(null)
   const isOwner = !!currentUser && Number(currentUser.id) === Number(post.user_id)
   const canDelete = isAdmin || isOwner;
 
@@ -59,16 +58,6 @@ export default function PostHeader({
       .finally(() => setStatusSaving(false))
   }
 
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false)
-      }
-    }
-    if (menuOpen) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [menuOpen])
-
   function requireAuth() {
     if (!isAuthenticated) {
       showFlash('Sign in to do that.', 'error')
@@ -87,10 +76,7 @@ export default function PostHeader({
         showFlash(isFavorited ? 'Removed from favorites.' : 'Added to favorites.', 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not update favorites.', 'error'))
-      .finally(() => {
-        setFavoriteLoading(false)
-        setMenuOpen(false)
-      })
+      .finally(() => setFavoriteLoading(false))
   }
 
   function toggleSubscribe() {
@@ -103,10 +89,7 @@ export default function PostHeader({
         showFlash(isSubscribed ? 'Unsubscribed from post.' : 'Subscribed to post.', 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not update subscription.', 'error'))
-      .finally(() => {
-        setSubscribeLoading(false)
-        setMenuOpen(false)
-      })
+      .finally(() => setSubscribeLoading(false))
   }
 
   function handleShare() {
@@ -119,7 +102,6 @@ export default function PostHeader({
         .then(() => showFlash('Link copied to clipboard.', 'success'))
         .catch(() => showFlash('Could not copy link.', 'error'))
     }
-    setMenuOpen(false)
   }
 
   return (
@@ -134,83 +116,56 @@ export default function PostHeader({
           <IconStar size={24} filled={isFavorited} />
         </button>
         <h1 className={s.title}>{post.title}</h1>
+        {post.status !== 'active' && <span className={s.statusBadge}>{post.status}</span>}
 
-        <div className={s.menuWrap} ref={menuRef}>
-          <button
-            type="button"
-            className={s.menuTrigger}
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Post actions"
-            aria-expanded={menuOpen}
-          >
-            <IconDots size={18} />
-          </button>
-
-          {menuOpen && (
-            <div className={s.dropdown}>
-              <button type="button" className={s.dropdownItem} onClick={toggleSubscribe}>
-                <IconRss size={15} />
-                <span>{isSubscribed ? 'Unsubscribe' : 'Subscribe'}</span>
-              </button>
-              <button type="button" className={s.dropdownItem} onClick={handleShare}>
-                <IconShare size={15} />
-                <span>Share</span>
-              </button>
-              {isOwner && (
-                <button
-                  type="button"
-                  className={s.dropdownItem}
-                  onClick={() => {
-                    // todo: edit post, idk???
-                    setMenuOpen(false)
-                  }}
-                >
-                  <IconPencil size={13} />
-                  <span>Edit</span>
-                </button>
-              )}
-              {isAdmin && post.status !== 'active' && (
-                <button
-                  type="button"
-                  className={s.dropdownItem}
-                  onClick={() => {
-                    handleStatusChange('active')
-                    setMenuOpen(false)
-                  }}
-                >
-                  <IconEye size={13} />
-                  <span>Set Active</span>
-                </button>
-              )}
-              {isAdmin && post.status !== 'inactive' && (
-                <button
-                  type="button"
-                  className={s.dropdownItem}
-                  onClick={() => {
-                    handleStatusChange('inactive')
-                    setMenuOpen(false)
-                  }}
-                >
-                  <IconEyeClosed size={13} />
-                  <span>Set Inactive</span>
-                </button>
-              )}
-              {canDelete && (
-                <button
-                  type="button"
-                  className={s.dropdownItem}
-                  onClick={() => {
-                    // todo: setDeleteModalOpen(true)
-                    setMenuOpen(false)
-                  }}
-                >
-                  <IconTrash size={13} />
-                  <span>Delete</span>
-                </button>
-              )}
-            </div>
+        <ActionMenu
+          trigger={({ toggle, open }) => (
+            <button
+              type="button"
+              className={s.menuTrigger}
+              onClick={toggle}
+              aria-label="Post actions"
+              aria-expanded={open}
+            >
+              <IconDots size={18} />
+            </button>
           )}
-        </div>
+        >
+          <ActionMenuItem icon={<IconRss size={15} />} onClick={toggleSubscribe}>
+            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+          </ActionMenuItem>
+          <ActionMenuItem icon={<IconShare size={15} />} onClick={handleShare}>
+            Share
+          </ActionMenuItem>
+          {isOwner && (
+            <ActionMenuItem icon={<IconPencil size={13} />} onClick={() => { /* todo: edit post */ }}>
+              Edit
+            </ActionMenuItem>
+          )}
+          {isAdmin && post.status !== 'active' && (
+            <ActionMenuItem
+              icon={<IconEye size={13} />}
+              onClick={() => handleStatusChange('active')}
+              disabled={statusSaving}
+            >
+              Set Active
+            </ActionMenuItem>
+          )}
+          {isAdmin && post.status !== 'inactive' && (
+            <ActionMenuItem
+              icon={<IconEyeClosed size={13} />}
+              onClick={() => handleStatusChange('inactive')}
+              disabled={statusSaving}
+            >
+              Set Inactive
+            </ActionMenuItem>
+          )}
+          {canDelete && (
+            <ActionMenuItem icon={<IconTrash size={13} />} onClick={() => { /* todo: setDeleteModalOpen(true) */ }} danger>
+              Delete
+            </ActionMenuItem>
+          )}
+        </ActionMenu>
       </div>
 
       {categories.length > 0 && (

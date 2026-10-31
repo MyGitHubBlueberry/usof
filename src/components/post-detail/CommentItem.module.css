@@ -4,10 +4,20 @@
   gap: 8px;
   padding: 12px;
   border: 1px solid var(--border);
+  background-color: var(--bg);
 }
 
 .resolved {
   background-color: var(--code-bg);
+}
+
+.tombstone {
+  background-color: var(--code-bg);
+  opacity: 0.7;
+}
+
+.tombstone .content {
+  font-style: italic;
 }
 
 .nested {
@@ -60,11 +70,6 @@
   flex-shrink: 0;
 }
 
-.menuWrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
 .menuTrigger {
   display: flex;
   align-items: center;
@@ -76,64 +81,11 @@
   color: var(--text);
   cursor: pointer;
   transition: color 0.15s;
+  flex-shrink: 0;
 }
 
 .menuTrigger:hover {
   color: var(--accent);
-}
-
-.dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  min-width: 150px;
-  padding: 6px 0;
-  z-index: 40;
-  animation: fadeIn 0.12s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.dropdownItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  font-size: 13px;
-  color: var(--text-h);
-  background: transparent;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  box-sizing: border-box;
-  font-family: inherit;
-  transition: background 0.15s;
-}
-
-.dropdownItem svg {
-  color: var(--text)
-}
-.dropdownItem:hover svg {
-  color: var(--accent);
-  transition: color 0.15s;
-}
-
-.dropdownItem:hover {
-  background: var(--code-bg);
 }
 
 .content {
@@ -143,6 +95,14 @@
   margin: 0;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+}
+
+.clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
 }
 
 .showMoreBtn {
@@ -171,50 +131,6 @@
 .footer * {
   display: flex;
   gap: 10px;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.reactBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.reactBtn:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.reactBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.reactBtnActive {
-  color: white;
-  font-weight: bold;
-}
-
-.ratingCount {
-  display: flex;
-  justify-content: center;
-  min-width: 18px;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-h);
 }
 
 .actionBtn {
@@ -295,6 +211,13 @@
   background: var(--bg);
   color: var(--text-h);
   resize: vertical;
+}
+
+/* .editBox is a column flex container, so the shared .replyTextarea's
+   flex: 1 stretches it on the cross (height) axis, which fights the
+   native resize handle. Opt it out there so dragging the handle sticks. */
+.editBox .replyTextarea {
+  flex: none;
 }
 
 .replyTextarea:focus {

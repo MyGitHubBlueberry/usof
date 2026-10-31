@@ -7,7 +7,7 @@ import ProfileSubscriptions from './ProfileSubscriptions'
 import s from './ProfileTabs.module.css'
 
 const ALL_TABS = [
-  { id: 'posts', label: 'My Posts', icon: IconDocument, ownerOnly: false },
+  { id: 'posts', label: 'Posts', icon: IconDocument, ownerOnly: false },
   { id: 'favorites', label: 'Favorites', icon: IconStar, ownerOnly: true },
   { id: 'notifications', label: 'Notifications', icon: IconBell, ownerOnly: true },
   { id: 'subscriptions', label: 'Subscriptions', icon: IconRss, ownerOnly: true },
@@ -15,7 +15,10 @@ const ALL_TABS = [
 
 export default function ProfileTabs({ profile, isOwner, activeTab, onTabChange }) {
   const tabs = useMemo(
-    () => ALL_TABS.filter((tab) => !tab.ownerOnly || isOwner),
+    () =>
+      ALL_TABS.filter((tab) => !tab.ownerOnly || isOwner).map((tab) =>
+        tab.id === 'posts' && isOwner ? { ...tab, label: 'My Posts' } : tab
+      ),
     [isOwner]
   )
   const effectiveTab = tabs.some((tab) => tab.id === activeTab) ? activeTab : 'posts'

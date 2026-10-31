@@ -20,3 +20,64 @@
   font-size: 14px;
   text-align: center;
 }
+
+.notFoundState {
+  flex: 1;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 24px;
+  margin: 24px 20px;
+  border: 1px dashed var(--border);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.notFoundIcon {
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.notFoundTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.notFoundMsg {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+.notFoundLink {
+  margin-top: 10px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 20px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.notFoundLink:hover {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.notFoundLink:active {
+  transform: scale(0.98);
+}

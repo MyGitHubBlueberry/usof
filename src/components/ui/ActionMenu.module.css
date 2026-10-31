@@ -1,0 +1,108 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-width: 210px;
+  padding: 6px 0;
+  z-index: 200;
+  animation: fadeIn 0.12s ease-out;
+}
+
+.alignLeft {
+  left: 0;
+}
+
+.alignRight {
+  right: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px;
+  font-size: 14px;
+  color: var(--text-h);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: background 0.1s, color 0.1s;
+}
+
+.item svg {
+  color: var(--text);
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.item:hover:not(:disabled) {
+  background: var(--code-bg);
+}
+
+.item:hover:not(:disabled) svg {
+  color: var(--accent);
+}
+
+.item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.itemDanger {
+  color: #e53e3e;
+}
+
+.itemDanger svg {
+  color: #e53e3e;
+}
+
+.itemDanger:hover:not(:disabled) {
+  background: #e53e3e;
+  color: #fff;
+}
+
+.itemDanger:hover:not(:disabled) svg {
+  color: #fff;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+.header {
+  display: block;
+  padding: 10px 16px 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s;
+}
+
+.header:hover {
+  background: var(--code-bg);
+}

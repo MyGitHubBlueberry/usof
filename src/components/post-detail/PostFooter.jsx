@@ -5,7 +5,7 @@ import { useFlash } from '../../hooks/useFlash'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
-import { IconThumbsUp, IconThumbsDown } from '../ui/Icons'
+import Rating from '../ui/Rating'
 import s from './PostFooter.module.css'
 
 export default function PostFooter({
@@ -16,13 +16,13 @@ export default function PostFooter({
   onLikeCountsChange,
 }) {
   const { showFlash } = useFlash()
-  const [myReaction, setMyReaction] = useState(null)
   const [reacting, setReacting] = useState(false)
+  const myReaction = likeCounts.myReaction ?? null
 
   function refreshCounts() {
     return postsService
       .getLikes(post.id)
-      .then((res) => onLikeCountsChange(res.data ?? { likes: 0, dislikes: 0 }))
+      .then((res) => onLikeCountsChange(res.data ?? { likes: 0, dislikes: 0, myReaction: null }))
       .catch(() => {})
   }
 
@@ -38,10 +38,7 @@ export default function PostFooter({
       myReaction === type ? postsService.removeLike(post.id) : postsService.like(post.id, type)
 
     action
-      .then(() => {
-        setMyReaction(myReaction === type ? null : type)
-        return refreshCounts()
-      })
+      .then(() => refreshCounts())
       .catch((err) => showFlash(err.message || 'Could not save your reaction.', 'error'))
       .finally(() => setReacting(false))
   }
@@ -68,29 +65,7 @@ export default function PostFooter({
       </div>
 
       <div className={s.actions}>
-        <div className={s.rating}>
-          <button
-            type="button"
-            className={`${s.reactBtn} ${myReaction === 'like' ? s.reactBtnActive : ''}`}
-            onClick={() => handleReact('like')}
-            disabled={reacting}
-            aria-label="Like"
-            title="Like"
-          >
-            <IconThumbsUp size={15} />
-          </button>
-          <span className={s.ratingCount}>{(likeCounts.likes ?? 0) - (likeCounts.dislikes ?? 0)}</span>
-          <button
-            type="button"
-            className={`${s.reactBtn} ${myReaction === 'dislike' ? s.reactBtnActiveDown : ''}`}
-            onClick={() => handleReact('dislike')}
-            disabled={reacting}
-            aria-label="Dislike"
-            title="Dislike"
-          >
-            <IconThumbsDown size={15} />
-          </button>
-        </div>
+        <Rating counts={likeCounts} myReaction={myReaction} onReact={handleReact} disabled={reacting} size="md" />
       </div>
     </div>
   )

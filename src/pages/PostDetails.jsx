@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
 import { usersService } from '../services/users.service'
 import { FlashProvider } from '../context/FlashProvider'
+import { ROUTES } from '../constants/routes'
+import { IconXCircle } from '../components/ui/Icons'
 import PostHeader from '../components/post-detail/PostHeader'
 import PostBody from '../components/post-detail/PostBody'
 import PostFooter from '../components/post-detail/PostFooter'
@@ -18,7 +20,7 @@ export default function PostDetails() {
   const [post, setPost] = useState(null)
   const [author, setAuthor] = useState(null)
   const [categories, setCategories] = useState([])
-  const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0 })
+  const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0, myReaction: null })
   const [isFavorited, setIsFavorited] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -40,7 +42,7 @@ export default function PostDetails() {
         const tasks = [
           usersService.getById(data.user_id).catch(() => null),
           postsService.getCategories(id).catch(() => ({ data: [] })),
-          postsService.getLikes(id).catch(() => ({ data: { likes: 0, dislikes: 0 } })),
+          postsService.getLikes(id).catch(() => ({ data: { likes: 0, dislikes: 0, myReaction: null } })),
           currentUser ? postsService.getFavorites({ limit: 100 }).catch(() => null) : Promise.resolve(null),
           currentUser ? postsService.getSubscriptions({ limit: 100 }).catch(() => null) : Promise.resolve(null),
         ]
@@ -50,7 +52,7 @@ export default function PostDetails() {
             if (!isMounted) return
             setAuthor(authorRes?.data ?? null)
             setCategories(categoriesRes.data ?? [])
-            setLikeCounts(likesRes.data ?? { likes: 0, dislikes: 0 })
+            setLikeCounts(likesRes.data ?? { likes: 0, dislikes: 0, myReaction: null })
 
             if (favoritesRes) {
               const favs = favoritesRes.data?.data ?? []
@@ -88,8 +90,15 @@ export default function PostDetails() {
 
   if (notFound || !post) {
     return (
-      <div className={s.stateMsg}>
-        <p>This post could not be found.</p>
+      <div className={s.notFoundState}>
+        <IconXCircle size={48} className={s.notFoundIcon} />
+        <h1 className={s.notFoundTitle}>Post not found</h1>
+        <p className={s.notFoundMsg}>
+          This post doesn't exist, or it may have been removed.
+        </p>
+        <Link to={ROUTES.HOME} className={s.notFoundLink}>
+          Back to the feed
+        </Link>
       </div>
     )
   }
@@ -122,6 +131,7 @@ export default function PostDetails() {
         <CommentsSection
           postId={post.id}
           postStatus={post.status}
+          postAuthorId={post.user_id}
           isAdmin={isAdmin}
           currentUser={currentUser}
           refreshToken={commentsRefreshToken}

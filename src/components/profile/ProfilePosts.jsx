@@ -4,14 +4,7 @@ import ProfilePostList from './ProfilePostList'
 
 export default function ProfilePosts({ profile }) {
   const fetchFn = useCallback(
-    (page) =>
-      postsService.getAll({
-        author: profile.login,
-        page,
-        limit: 5,
-        sortBy: 'publish_date',
-        order: 'desc',
-      }),
+    (params) => postsService.getAll({ ...params, author: profile.login }),
     [profile.login]
   )
 
