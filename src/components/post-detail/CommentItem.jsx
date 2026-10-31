@@ -426,8 +426,12 @@ export default function CommentItem({
           )}
           <span className={s.date}>{formatFullDate(comment.publish_date)}</span>
         </div>
-        {comment.status !== 'active' && <span className={s.statusBadge}>{comment.status}</span>}
-        {!isTombstone && (canEdit || canDelete) && commentActionsDropdown()}
+        {comment.status !== 'active' && (
+          <span className={`${s.statusBadge} ${comment.status === 'resolved' ? s.statusResolved : s.statusInactive}`}>
+            {comment.status}
+          </span>
+        )}
+        {(canEdit || canDelete) && commentActionsDropdown()}
       </div>
 
       {isTombstone ? (

@@ -6,24 +6,34 @@ import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
 import Rating from '../ui/Rating'
+import { IconRss } from '../ui/Icons'
 import s from './PostFooter.module.css'
+
+const STATUS_CLASSES = {
+  active: 'statusActive',
+  resolved: 'statusResolved',
+  inactive: 'statusInactive',
+}
 
 export default function PostFooter({
   post,
   author,
   likeCounts,
   isAuthenticated,
+  isSubscribed,
   onLikeCountsChange,
+  onSubscribeChange,
 }) {
   const { showFlash } = useFlash()
   const [reacting, setReacting] = useState(false)
+  const [subscribeLoading, setSubscribeLoading] = useState(false)
   const myReaction = likeCounts.myReaction ?? null
 
   function refreshCounts() {
     return postsService
       .getLikes(post.id)
       .then((res) => onLikeCountsChange(res.data ?? { likes: 0, dislikes: 0, myReaction: null }))
-      .catch(() => {})
+      .catch(() => { })
   }
 
   function handleReact(type) {
@@ -41,6 +51,24 @@ export default function PostFooter({
       .then(() => refreshCounts())
       .catch((err) => showFlash(err.message || 'Could not save your reaction.', 'error'))
       .finally(() => setReacting(false))
+  }
+
+  function toggleSubscribe() {
+    if (!isAuthenticated) {
+      showFlash('Sign in to subscribe to posts.', 'error')
+      return
+    }
+    if (subscribeLoading) return
+
+    setSubscribeLoading(true)
+    const action = isSubscribed ? postsService.unsubscribe(post.id) : postsService.subscribe(post.id)
+    action
+      .then(() => {
+        onSubscribeChange(!isSubscribed)
+        showFlash(isSubscribed ? 'Unsubscribed from post.' : 'Subscribed to post.', 'success')
+      })
+      .catch((err) => showFlash(err.message || 'Could not update subscription.', 'error'))
+      .finally(() => setSubscribeLoading(false))
   }
 
   return (
@@ -65,6 +93,22 @@ export default function PostFooter({
       </div>
 
       <div className={s.actions}>
+        {post.status !== 'active' && (
+          <span className={`${s.statusBadge} ${s[STATUS_CLASSES[post.status]] || ''}`}>
+            {post.status}
+          </span>
+        )}
+        <button
+          type="button"
+          className={`${s.subscribeBtn} ${isSubscribed ? s.subscribeBtnActive : ''}`}
+          onClick={toggleSubscribe}
+          disabled={subscribeLoading}
+          aria-label={isSubscribed ? 'Unsubscribe from post' : 'Subscribe to post'}
+          title={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+        >
+          <IconRss size={14} />
+          <span>{isSubscribed ? 'Subscribed' : 'Subscribe'}</span>
+        </button>
         <Rating counts={likeCounts} myReaction={myReaction} onReact={handleReact} disabled={reacting} size="md" />
       </div>
     </div>

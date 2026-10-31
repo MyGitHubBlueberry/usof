@@ -12,7 +12,11 @@
 }
 
 .tombstone {
-  background-color: var(--code-bg);
+  background: color-mix(in srgb, #e53e3e 6%, var(--code-bg));
+}
+
+.tombstone .headerMeta,
+.tombstone .content {
   opacity: 0.7;
 }
 
@@ -68,6 +72,18 @@
   border: 1px solid var(--border);
   color: var(--text);
   flex-shrink: 0;
+}
+
+.statusResolved {
+  background: color-mix(in srgb, #10b981 12%, transparent);
+  border-color: color-mix(in srgb, #10b981 35%, transparent);
+  color: #10b981;
+}
+
+.statusInactive {
+  background: color-mix(in srgb, #e53e3e 12%, transparent);
+  border-color: color-mix(in srgb, #e53e3e 35%, transparent);
+  color: #e53e3e;
 }
 
 .menuTrigger {

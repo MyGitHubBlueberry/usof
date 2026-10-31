@@ -111,11 +111,9 @@ export default function PostDetails() {
           categories={categories}
           isAuthenticated={!!currentUser}
           isFavorited={isFavorited}
-          isSubscribed={isSubscribed}
           isAdmin={isAdmin}
           currentUser={currentUser}
           onFavoriteChange={setIsFavorited}
-          onSubscribeChange={setIsSubscribed}
           onStatusChange={(status) => setPost((prev) => (prev ? { ...prev, status } : prev))}
           onRequireCommentsRefresh={() => setCommentsRefreshToken((v) => v + 1)}
         />
@@ -126,7 +124,9 @@ export default function PostDetails() {
           likeCounts={likeCounts}
           isAuthenticated={!!currentUser}
           isAdmin={isAdmin}
+          isSubscribed={isSubscribed}
           onLikeCountsChange={setLikeCounts}
+          onSubscribeChange={setIsSubscribed}
         />
         <CommentsSection
           postId={post.id}

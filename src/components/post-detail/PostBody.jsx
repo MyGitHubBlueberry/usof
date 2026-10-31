@@ -1,10 +1,24 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { API } from '../../constants/api'
-import { IconFile, IconDownload, IconChevron } from '../ui/Icons'
+import {
+  IconFile,
+  IconFilePdf,
+  IconFileArchive,
+  IconFileCode,
+  IconFileSpreadsheet,
+  IconDownload,
+  IconChevron,
+  IconImageOff,
+} from '../ui/Icons'
+import Lightbox from '../ui/Lightbox'
 import s from './PostBody.module.css'
 
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg']
+const PDF_EXTENSIONS = ['.pdf']
+const ARCHIVE_EXTENSIONS = ['.zip', '.rar', '.7z', '.tar', '.gz']
+const CODE_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.py', '.java', '.c', '.cpp', '.json', '.html', '.css', '.sql', '.sh']
+const SPREADSHEET_EXTENSIONS = ['.xls', '.xlsx', '.csv']
 const COLLAPSED_HEIGHT = 320
 
 function getExtension(filename) {
@@ -12,26 +26,61 @@ function getExtension(filename) {
   return idx === -1 ? '' : filename.slice(idx).toLowerCase()
 }
 
+function getDisplayName(filename) {
+  return filename.split('/').pop()
+}
+
+function renderFileIcon(extension, size) {
+  if (PDF_EXTENSIONS.includes(extension)) return <IconFilePdf size={size} />
+  if (ARCHIVE_EXTENSIONS.includes(extension)) return <IconFileArchive size={size} />
+  if (CODE_EXTENSIONS.includes(extension)) return <IconFileCode size={size} />
+  if (SPREADSHEET_EXTENSIONS.includes(extension)) return <IconFileSpreadsheet size={size} />
+  return <IconFile size={size} />
+}
+
 function getAttachmentUrl(postId, filename) {
   return `${import.meta.env.VITE_API_URL}${API.POSTS.ATTACHMENT(postId, filename)}`
 }
 
-function AttachmentItem({ postId, filename }) {
-  const url = getAttachmentUrl(postId, filename)
-  const isImage = IMAGE_EXTENSIONS.includes(getExtension(filename))
+function ImageAttachment({ url, filename, onClick }) {
+  const [broken, setBroken] = useState(false)
 
-  if (isImage) {
+  if (broken) {
     return (
-      <a href={url} target="_blank" rel="noreferrer" className={s.imageAttachment}>
-        <img src={url} alt={filename} className={s.imageThumb} />
-      </a>
+      <div className={s.imageAttachment}>
+        <div className={s.imageFallback}>
+          <IconImageOff size={22} />
+          <span>Image not found</span>
+        </div>
+      </div>
     )
   }
 
   return (
+    <button type="button" className={s.imageAttachment} onClick={onClick}>
+      <img
+        src={url}
+        alt={getDisplayName(filename)}
+        className={s.imageThumb}
+        onError={() => setBroken(true)}
+      />
+    </button>
+  )
+}
+
+function AttachmentItem({ postId, filename, onImageClick }) {
+  const url = getAttachmentUrl(postId, filename)
+  const extension = getExtension(filename)
+  const isImage = IMAGE_EXTENSIONS.includes(extension)
+
+  if (isImage) {
+    return <ImageAttachment url={url} filename={filename} onClick={onImageClick} />
+  }
+
+  return (
     <a href={url} download className={s.fileAttachment}>
-      <IconFile size={16} />
-      <span className={s.fileName}>{filename}</span>
+      {renderFileIcon(extension, 16)}
+      <span className={s.fileName}>{getDisplayName(filename)}</span>
       <IconDownload size={14} className={s.downloadIcon} />
     </a>
   )
@@ -41,6 +90,7 @@ export default function PostBody({ post }) {
   const contentRef = useRef(null)
   const [collapsed, setCollapsed] = useState(true)
   const [canExpand, setCanExpand] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(null)
 
   useLayoutEffect(() => {
     if (contentRef.current) {
@@ -48,7 +98,23 @@ export default function PostBody({ post }) {
     }
   }, [post.content])
 
-  const attachments = post.attachments || []
+  const attachments = useMemo(() => post.attachments || [], [post.attachments])
+
+  const images = useMemo(
+    () =>
+      attachments
+        .filter((filename) => IMAGE_EXTENSIONS.includes(getExtension(filename)))
+        .map((filename) => ({
+          src: getAttachmentUrl(post.id, filename),
+          alt: getDisplayName(filename),
+        })),
+    [attachments, post.id]
+  )
+
+  function handleImageClick(filename) {
+    const idx = images.findIndex((img) => img.src === getAttachmentUrl(post.id, filename))
+    if (idx !== -1) setLightboxIndex(idx)
+  }
 
   return (
     <div className={s.body}>
@@ -73,9 +139,18 @@ export default function PostBody({ post }) {
       {attachments.length > 0 && (
         <div className={s.attachments}>
           {attachments.map((filename) => (
-            <AttachmentItem key={filename} postId={post.id} filename={filename} />
+            <AttachmentItem
+              key={filename}
+              postId={post.id}
+              filename={filename}
+              onImageClick={() => handleImageClick(filename)}
+            />
           ))}
         </div>
+      )}
+
+      {lightboxIndex !== null && (
+        <Lightbox images={images} startIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />
       )}
     </div>
   )

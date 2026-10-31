@@ -20,18 +20,6 @@
   word-break: break-word;
 }
 
-.statusBadge {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border: 1px solid var(--border);
-  color: var(--text);
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 6px;
-}
-
 .menuTrigger {
   display: flex;
   align-items: center;

@@ -423,6 +423,88 @@ export function IconStar({ className = '', size = 16, filled = false }) {
   )
 }
 
+export function IconFilePdf({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <path d="M8 17v-4h1.3a1.3 1.3 0 1 1 0 2.6H8" />
+      <path d="M12.5 17v-4h1a1.5 1.5 0 0 1 0 4h-1z" strokeLinejoin="round" />
+      <path d="M17.5 13h-1.3v4" />
+      <path d="M16.2 15h1.1" />
+    </svg>
+  )
+}
+
+export function IconFileArchive({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="11" y1="11" x2="13" y2="11" />
+      <line x1="11" y1="13.5" x2="13" y2="13.5" />
+      <line x1="11" y1="16" x2="13" y2="16" />
+      <circle cx="12" cy="18.5" r="1.5" />
+    </svg>
+  )
+}
+
+export function IconFileCode({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <polyline points="10 12.5 8 14.5 10 16.5" />
+      <polyline points="14 12.5 16 14.5 14 16.5" />
+    </svg>
+  )
+}
+
+export function IconFileSpreadsheet({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="8" y1="13" x2="16" y2="13" />
+      <line x1="8" y1="17" x2="16" y2="17" />
+      <line x1="12" y1="13" x2="12" y2="21" />
+    </svg>
+  )
+}
+
+export function IconImageOff({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M21 15.5V5a2 2 0 0 0-2-2H7.5" />
+      <path d="M3 9v10a2 2 0 0 0 2 2h14a2 2 0 0 0 1.7-.95" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="M3 3l18 18" />
+      <path d="M21 15l-4.5-4.5a2 2 0 0 0-2.8 0L7 17" />
+    </svg>
+  )
+}
+
+export function IconZoomIn({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <line x1="11" y1="8" x2="11" y2="14" />
+      <line x1="8" y1="11" x2="14" y2="11" />
+    </svg>
+  )
+}
+
+export function IconZoomOut({ className = '', size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <line x1="8" y1="11" x2="14" y2="11" />
+    </svg>
+  )
+}
+
 export function IconBell({ className = '', size = 16, filled = false }) {
   return (
     <svg

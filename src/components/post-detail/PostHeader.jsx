@@ -3,7 +3,7 @@ import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
 import { commentsService } from '../../services/comments.service'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
-import { IconDots, IconStar, IconRss, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
+import { IconDots, IconStar, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
 import s from './PostHeader.module.css'
 
 export default function PostHeader({
@@ -11,17 +11,14 @@ export default function PostHeader({
   categories,
   isAuthenticated,
   isFavorited,
-  isSubscribed,
   isAdmin,
   currentUser,
   onFavoriteChange,
-  onSubscribeChange,
   onStatusChange,
   onRequireCommentsRefresh,
 }) {
   const { showFlash } = useFlash()
   const [favoriteLoading, setFavoriteLoading] = useState(false)
-  const [subscribeLoading, setSubscribeLoading] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
   const isOwner = !!currentUser && Number(currentUser.id) === Number(post.user_id)
   const canDelete = isAdmin || isOwner;
@@ -79,19 +76,6 @@ export default function PostHeader({
       .finally(() => setFavoriteLoading(false))
   }
 
-  function toggleSubscribe() {
-    if (!requireAuth() || subscribeLoading) return
-    setSubscribeLoading(true)
-    const action = isSubscribed ? postsService.unsubscribe(post.id) : postsService.subscribe(post.id)
-    action
-      .then(() => {
-        onSubscribeChange(!isSubscribed)
-        showFlash(isSubscribed ? 'Unsubscribed from post.' : 'Subscribed to post.', 'success')
-      })
-      .catch((err) => showFlash(err.message || 'Could not update subscription.', 'error'))
-      .finally(() => setSubscribeLoading(false))
-  }
-
   function handleShare() {
     const url = window.location.href
     if (navigator.share) {
@@ -116,7 +100,6 @@ export default function PostHeader({
           <IconStar size={24} filled={isFavorited} />
         </button>
         <h1 className={s.title}>{post.title}</h1>
-        {post.status !== 'active' && <span className={s.statusBadge}>{post.status}</span>}
 
         <ActionMenu
           trigger={({ toggle, open }) => (
@@ -131,9 +114,6 @@ export default function PostHeader({
             </button>
           )}
         >
-          <ActionMenuItem icon={<IconRss size={15} />} onClick={toggleSubscribe}>
-            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-          </ActionMenuItem>
           <ActionMenuItem icon={<IconShare size={15} />} onClick={handleShare}>
             Share
           </ActionMenuItem>
