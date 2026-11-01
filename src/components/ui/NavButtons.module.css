@@ -1,0 +1,49 @@
+.backBtn,
+.forwardBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.backBtn {
+  align-self: flex-start;
+}
+
+.forwardBtn {
+  align-self: flex-end;
+}
+
+.backBtn:hover,
+.forwardBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.backBtn:active,
+.forwardBtn:active {
+  transform: scale(0.98);
+}
+
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  box-sizing: border-box;
+  margin: 20px 24px;
+  margin-bottom: 0px;
+}
+
+.navRow .backBtn,
+.navRow .forwardBtn {
+  align-self: auto;
+}

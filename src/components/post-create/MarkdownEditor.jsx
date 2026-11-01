@@ -28,7 +28,8 @@ export default function MarkdownEditor({
           className={`${s.tab} ${mode === 'write' ? s.tabActive : ''}`}
           onClick={() => setMode('write')}
         >
-          Write
+        //todo: icon
+          <span>Write</span>
         </button>
         <button
           type="button"
@@ -37,7 +38,8 @@ export default function MarkdownEditor({
           className={`${s.tab} ${mode === 'preview' ? s.tabActive : ''}`}
           onClick={() => setMode('preview')}
         >
-          Preview
+          //todo:icon
+          <span>Preview</span>
         </button>
       </div>
 

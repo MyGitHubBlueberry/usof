@@ -36,6 +36,7 @@ export default function CommentItem({
   onCommentDeleted,
   onReplyAdded,
   onPostResolved,
+  onLikesChanged,
 }) {
   const { showFlash } = useFlash()
   const author = usersById[comment.user_id]
@@ -74,12 +75,13 @@ export default function CommentItem({
         const data = res.data ?? { likes: 0, dislikes: 0, myReaction: null }
         setLikeCounts(data)
         setMyReaction(data.myReaction ?? null)
+        onLikesChanged?.(comment.id, data)
       })
       .catch(() => { })
     return () => {
       isMounted = false
     }
-  }, [comment.id])
+  }, [comment.id, onLikesChanged])
 
   const isTombstone = comment.status === 'inactive'
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
@@ -95,7 +97,11 @@ export default function CommentItem({
   function refreshLikes() {
     return commentsService
       .getLikes(comment.id)
-      .then((res) => setLikeCounts(res.data ?? { likes: 0, dislikes: 0 }))
+      .then((res) => {
+        const data = res.data ?? { likes: 0, dislikes: 0 }
+        setLikeCounts(data)
+        onLikesChanged?.(comment.id, data)
+      })
       .catch(() => { })
   }
 
@@ -389,6 +395,7 @@ export default function CommentItem({
             onCommentDeleted={onCommentDeleted}
             onReplyAdded={onReplyAdded}
             onPostResolved={onPostResolved}
+            onLikesChanged={onLikesChanged}
           />
         ))}
       </div>

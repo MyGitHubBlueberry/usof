@@ -9,7 +9,7 @@ import { ROUTES, toPost } from '../constants/routes'
 import PostCreateHeader from '../components/post-create/PostCreateHeader'
 import MarkdownEditor from '../components/post-create/MarkdownEditor'
 import AttachmentUploader from '../components/post-create/AttachmentUploader'
-import BackButton from '../components/ui/BackButton'
+import NavRow from '../components/ui/NavButtons'
 import s from './PostCreate.module.css'
 
 function validate({ title, content }) {
@@ -36,7 +36,7 @@ function PostCreateForm() {
       .getAll({ limit: 100 })
       .then((res) => {
         const cats = res.data?.data ?? []
-        setCategoryOptions(cats.map((c) => ({ value: c.title, label: c.title })))
+        setCategoryOptions(cats.map((c) => ({ value: c.title, label: c.title, description: c.description || '' })))
       })
       .catch(() => setCategoryOptions([]))
   }, [])
@@ -74,32 +74,33 @@ function PostCreateForm() {
   }
 
   return (
-    <div className={s.postPage} onKeyDown={handleKeyDown}>
-      <BackButton />
-      <h1 className={s.pageTitle}>Create a new post</h1>
+    <>
+      <NavRow />
+      <div className={s.postPage} onKeyDown={handleKeyDown}>
+        <PostCreateHeader
+          mode="create"
+          title={title}
+          onTitleChange={setTitle}
+          titleError={errors.title}
+          selectedCategories={selectedCategories}
+          categoryOptions={categoryOptions}
+          onCategoriesChange={setSelectedCategories}
+        />
 
-      <PostCreateHeader
-        title={title}
-        onTitleChange={setTitle}
-        titleError={errors.title}
-        selectedCategories={selectedCategories}
-        categoryOptions={categoryOptions}
-        onCategoriesChange={setSelectedCategories}
-      />
+        <MarkdownEditor value={content} onChange={setContent} error={errors.content} />
 
-      <MarkdownEditor value={content} onChange={setContent} error={errors.content} />
+        <AttachmentUploader files={attachments} onChange={setAttachments} />
 
-      <AttachmentUploader files={attachments} onChange={setAttachments} />
-
-      <div className={s.actions}>
-        <Link to={ROUTES.HOME} className={s.cancelBtn}>
-          Cancel
-        </Link>
-        <button type="button" className={s.submitBtn} onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Publishing…' : 'Publish post'}
-        </button>
+        <div className={s.actions}>
+          <Link to={ROUTES.HOME} className={s.cancelBtn}>
+            Cancel
+          </Link>
+          <button type="button" className={s.submitBtn} onClick={handleSubmit} disabled={submitting}>
+            {submitting ? 'Publishing…' : 'Publish post'}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

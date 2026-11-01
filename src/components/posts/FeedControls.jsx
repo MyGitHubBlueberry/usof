@@ -46,6 +46,7 @@ export default function FeedControls({
   showReset = true,
   showSearchType = false,
   rightAction = null,
+  searchRowExtra = null,
   customFilterRow = null,
   showActiveTags = true,
   searchAriaLabel = 'Search posts',
@@ -69,8 +70,6 @@ export default function FeedControls({
   const [searchInput, setSearchInput] = useState(() => (
     params.author && !params.search ? (params.author || '') : (params.search || '')
   ))
-  const [prevSearchParam, setPrevSearchParam] = useState(params.search || '')
-  const [prevAuthorParam, setPrevAuthorParam] = useState(params.author || '')
 
   const [debouncedUpdate, cancelUpdate] = useDebouncedCallback((patch) => {
     onChange(patch)
@@ -79,10 +78,7 @@ export default function FeedControls({
   const curSearch = params.search || ''
   const curAuthor = params.author || ''
 
-  if (curSearch !== prevSearchParam || curAuthor !== prevAuthorParam) {
-    setPrevSearchParam(curSearch)
-    setPrevAuthorParam(curAuthor)
-
+  useEffect(() => {
     if (curAuthor && !curSearch) {
       setSearchMode('user')
       setSearchInput(curAuthor)
@@ -92,7 +88,7 @@ export default function FeedControls({
     } else {
       setSearchInput('')
     }
-  }
+  }, [curSearch, curAuthor])
 
   const selectedCats = params.categories
     ? params.categories.split(',').filter(Boolean)
@@ -260,6 +256,8 @@ export default function FeedControls({
           </button>
         )}
 
+        {searchRowExtra}
+
         {rightAction}
 
         {showReset && resolvedIsDirty && (
@@ -287,6 +285,7 @@ export default function FeedControls({
     const categoryOptions = categories.map((cat) => ({
       value: cat.title,
       label: cat.title,
+      description: cat.description || '',
     }))
 
     return (

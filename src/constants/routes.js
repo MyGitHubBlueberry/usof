@@ -18,6 +18,5 @@ export const toPost = (id) => `/posts/${id}`
 export const toPostEdit = (id) => `/posts/${id}/edit`
 export const toProfile = (id) => `/users/${id}`
 export const toProfileTab = (id, tab) => `/users/${id}?tab=${tab}`
-export const toUserPosts = (id) => `/users/${id}/posts`
 export const toConfirmEmail = (token) => `/confirm-email/${token}`
 export const toPasswordResetConfirm = (token) => `/password-reset/${token}`

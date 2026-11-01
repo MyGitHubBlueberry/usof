@@ -6,11 +6,11 @@ import { usersService } from '../services/users.service'
 import { FlashProvider } from '../context/FlashProvider'
 import { ROUTES } from '../constants/routes'
 import { IconXCircle } from '../components/ui/Icons'
-import BackButton from '../components/ui/BackButton'
 import PostHeader from '../components/post-detail/PostHeader'
 import PostBody from '../components/post-detail/PostBody'
 import PostFooter from '../components/post-detail/PostFooter'
 import CommentsSection from '../components/post-detail/CommentsSection'
+import NavRow from '../components/ui/NavButtons'
 import s from './PostDetails.module.css'
 
 export default function PostDetails() {
@@ -106,8 +106,8 @@ export default function PostDetails() {
 
   return (
     <FlashProvider>
+      <NavRow />
       <div className={s.postPage}>
-        <BackButton />
         <PostHeader
           post={post}
           categories={categories}

@@ -12,7 +12,7 @@ import MarkdownEditor from '../components/post-create/MarkdownEditor'
 import AttachmentUploader from '../components/post-create/AttachmentUploader'
 import AttachmentGrid from '../components/ui/AttachmentGrid'
 import Lightbox from '../components/ui/Lightbox'
-import BackButton from '../components/ui/BackButton'
+import NavRow from '../components/ui/NavButtons'
 import s from './PostCreate.module.css'
 
 function validate({ title, content }) {
@@ -71,7 +71,7 @@ function PostEditForm({ post, categories }) {
       .getAll({ limit: 100 })
       .then((res) => {
         const cats = res.data?.data ?? []
-        setCategoryOptions(cats.map((c) => ({ value: c.title, label: c.title })))
+        setCategoryOptions(cats.map((c) => ({ value: c.title, label: c.title, description: c.description || '' })))
       })
       .catch(() => setCategoryOptions([]))
   }, [])
@@ -110,7 +110,7 @@ function PostEditForm({ post, categories }) {
 
   return (
     <div className={s.postPage} onKeyDown={handleKeyDown}>
-      <BackButton />
+      <NavRow/>
       <h1 className={s.pageTitle}>Edit post</h1>
 
       {post.status === 'inactive' && (
@@ -120,6 +120,7 @@ function PostEditForm({ post, categories }) {
       )}
 
       <PostCreateHeader
+        mode="edit"
         title={title}
         onTitleChange={setTitle}
         titleError={errors.title}

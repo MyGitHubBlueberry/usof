@@ -5,29 +5,15 @@
 }
 
 .tabs {
-  display: flex;
-  gap: 4px;
+  composes: tabBar from '../ui/Tabs.module.css';
 }
 
 .tab {
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--text);
-  background: transparent;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.tab:hover {
-  color: var(--text-h);
+  composes: tabBtn from '../ui/Tabs.module.css';
 }
 
 .tabActive {
-  color: var(--accent);
-  border-color: var(--accent);
+  composes: tabBtnActive from '../ui/Tabs.module.css';
 }
 
 .writeGroup {

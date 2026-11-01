@@ -97,7 +97,9 @@
   color: var(--text-h);
 }
 
-.toggleFiltersBtn.open svg {
+.toggleFiltersBtn:hover .itemIcon,
+.toggleFiltersBtn.open .itemIcon,
+.toggleFiltersBtn[aria-expanded="true"] .itemIcon {
   color: var(--accent);
 }
 

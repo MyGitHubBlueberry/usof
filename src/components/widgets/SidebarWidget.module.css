@@ -63,10 +63,15 @@
 
 .empty,
 .loading {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 24px 14px;
   font-size: 13px;
   color: var(--text);
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* Shared Widget List & Row Styles */

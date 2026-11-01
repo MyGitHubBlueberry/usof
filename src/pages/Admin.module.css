@@ -39,46 +39,16 @@
 }
 
 .tabBar {
-  display: flex;
-  gap: 0;
+  composes: tabBar from '../components/ui/Tabs.module.css';
   padding: 0 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.tabBar::-webkit-scrollbar {
-  display: none;
 }
 
 .tabBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 12px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  color: var(--text);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
-  margin-bottom: -1px;
-}
-
-.tabBtn:hover {
-  color: var(--text-h);
+  composes: tabBtn from '../components/ui/Tabs.module.css';
 }
 
 .tabBtnActive {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-  background: var(--active-bg);
-  font-weight: 600;
+  composes: tabBtnActive from '../components/ui/Tabs.module.css';
 }
 
 .tabPanel {
@@ -888,5 +858,47 @@
 
   .searchWrap {
     min-width: unset;
+  }
+}
+
+@media (max-width: 1024px) {
+  .colAvatar {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .colRating {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .colFullName {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .colEmail {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .colLikes {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .colPublishDate {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .colAttachments {
+    display: none;
   }
 }

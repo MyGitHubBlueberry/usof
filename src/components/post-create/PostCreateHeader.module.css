@@ -4,10 +4,23 @@
   gap: 10px;
 }
 
+.headerLabelWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-h);
+}
+
+.headerLabel {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
 .titleInput {
   width: 100%;
   padding: 10px 0;
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 700;
   font-family: inherit;
   color: var(--text-h);
@@ -48,12 +61,32 @@
 }
 
 .categoryTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
   font-weight: 600;
   padding: 3px 10px;
   background: var(--accent-bg);
   color: var(--accent);
   border: 1px solid var(--accent-border);
+}
+
+.categoryTagRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.categoryTag:hover .categoryTagRemove {
+  opacity: 1;
 }
 
 @media (max-width: 640px) {

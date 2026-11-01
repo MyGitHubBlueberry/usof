@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { ROUTES, toProfile, toProfileTab, toUserPosts } from '../../constants/routes'
+import { ROUTES, toProfile, toProfileTab } from '../../constants/routes'
 import { selectIsAuthenticated, logoutThunk } from '../../redux/slices/authSlice'
 import { useTheme } from '../../hooks/useTheme'
 import Logo from '../ui/Logo'
@@ -17,7 +17,6 @@ import {
   IconShield,
   IconSun,
   IconMoon,
-  IconUser,
   IconLogout,
   IconDocument,
   IconRss,
@@ -38,8 +37,7 @@ export default function Header() {
 
   const displayName = user?.login || user?.full_name || 'User'
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
-  const profileRoute = user?.id ? toProfile(user.id) : ROUTES.LOGIN
-  const myPostsRoute = user?.id ? toUserPosts(user.id) : ROUTES.LOGIN
+  const myPostsRoute = user?.id ? toProfile(user.id) : ROUTES.LOGIN
   const notificationsRoute = user?.id ? toProfileTab(user.id, 'notifications') : ROUTES.LOGIN
   const favoritesRoute = user?.id ? toProfileTab(user.id, 'favorites') : ROUTES.LOGIN
   const subscriptionsRoute = user?.id ? toProfileTab(user.id, 'subscriptions') : ROUTES.LOGIN
@@ -119,7 +117,7 @@ export default function Header() {
               </button>
             )}
           >
-            <ActionMenuHeader to={profileRoute}>
+            <ActionMenuHeader to={myPostsRoute}>
               <div className={s.userInfo}>
                 <div className={s.userNameFull}>{user?.full_name || displayName}</div>
                 <div className={s.userLogin}>@{user?.login || 'user'}</div>
@@ -128,10 +126,6 @@ export default function Header() {
             </ActionMenuHeader>
 
             <ActionMenuDivider />
-
-            <ActionMenuItem icon={<IconUser className={s.itemIcon} />} to={profileRoute}>
-              My Profile
-            </ActionMenuItem>
 
             <ActionMenuItem icon={<IconDocument className={s.itemIcon} />} to={myPostsRoute}>
               My Posts

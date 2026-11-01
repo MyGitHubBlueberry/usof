@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { postsService } from '../../services/posts.service'
 import { usersService } from '../../services/users.service'
+import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import { ROUTES } from '../../constants/routes'
@@ -66,6 +67,7 @@ export default function CommentsSection({
 
   const [comments, setComments] = useState([])
   const [usersById, setUsersById] = useState({})
+  const [likeNet, setLikeNet] = useState({})
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [sortMode, setSortMode] = useState('liked')
@@ -89,7 +91,7 @@ export default function CommentsSection({
         setComments(data)
 
         const uniqueUserIds = [...new Set(data.map((c) => c.user_id).filter(Boolean))]
-        return Promise.all(
+        const usersPromise = Promise.all(
           uniqueUserIds.map((userId) =>
             usersService
               .getById(userId)
@@ -97,13 +99,27 @@ export default function CommentsSection({
               .catch(() => [userId, null])
           )
         )
+
+        const rootIds = data.filter((c) => !c.parent_comment_id).map((c) => c.id)
+        const likesPromise = Promise.all(
+          rootIds.map((id) =>
+            commentsService
+              .getLikes(id)
+              .then((r) => [id, (r.data?.likes ?? 0) - (r.data?.dislikes ?? 0)])
+              .catch(() => [id, 0])
+          )
+        )
+
+        return Promise.all([usersPromise, likesPromise])
       })
-      .then((entries) => {
-        setUsersById(Object.fromEntries(entries))
+      .then(([userEntries, likeEntries]) => {
+        setUsersById(Object.fromEntries(userEntries))
+        setLikeNet(Object.fromEntries(likeEntries))
       })
       .catch(() => {
         setComments([])
         setUsersById({})
+        setLikeNet({})
       })
       .finally(() => setLoading(false))
   }, [postId])
@@ -155,9 +171,15 @@ export default function CommentsSection({
   const roots = useMemo(() => buildCommentTree(comments), [comments])
 
   const sortedRoots = useMemo(() => {
-    if (sortMode !== 'chrono') return roots
-    return [...roots].sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date))
-  }, [roots, sortMode])
+    if (sortMode === 'chrono') {
+      return [...roots].sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date))
+    }
+    return [...roots].sort((a, b) => (likeNet[b.id] ?? 0) - (likeNet[a.id] ?? 0))
+  }, [roots, sortMode, likeNet])
+
+  const handleLikesChanged = useCallback((commentId, counts) => {
+    setLikeNet((prev) => ({ ...prev, [commentId]: (counts.likes ?? 0) - (counts.dislikes ?? 0) }))
+  }, [])
 
   const totalRootPages = Math.max(1, Math.ceil(sortedRoots.length / ROOTS_PER_PAGE))
   const clampedPage = Math.min(page, totalRootPages)
@@ -277,6 +299,7 @@ export default function CommentsSection({
                 onCommentDeleted={handleCommentDeleted}
                 onReplyAdded={handleReplyAdded}
                 onPostResolved={onPostStatusChange}
+                onLikesChanged={handleLikesChanged}
               />
             ))}
           </div>

@@ -8,7 +8,6 @@ import Pagination from '../ui/Pagination'
 import FeedControls from '../posts/FeedControls'
 import { SelectDropdown } from '../ui/SelectDropdown'
 import { IconCheck, IconTrash } from '../ui/Icons'
-import fc from '../posts/FeedControls.module.css'
 import s from './ProfileTabContent.module.css'
 import sn from './ProfileNotifications.module.css'
 
@@ -133,17 +132,15 @@ export default function ProfileNotifications() {
   const isDirty = Boolean(filters.search && filters.search.trim()) || filters.status !== 'all'
   const activeFiltersCount = filters.status !== 'all' ? 1 : 0
 
-  function customFilterRow() {
+  function statusFilterControl() {
     return (
-      <div className={fc.col}>
-        <span className={fc.colLabel}>Status</span>
-        <SelectDropdown
-          value={filters.status}
-          options={STATUS_OPTIONS}
-          onChange={(val) => handleControlChange({ status: val })}
-          ariaLabel="Filter by read status"
-        />
-      </div>
+      <SelectDropdown
+        className={sn.statusFilterWrap}
+        value={filters.status}
+        options={STATUS_OPTIONS}
+        onChange={(val) => handleControlChange({ status: val })}
+        ariaLabel="Filter by read status"
+      />
     )
   }
 
@@ -158,27 +155,28 @@ export default function ProfileNotifications() {
         isDirty={isDirty}
         searchAriaLabel="Search notifications"
         showActiveTags={false}
-        customFilterRow={customFilterRow()}
+        customFilterRow={statusFilterControl()}
+        rightAction={
+          <div className={sn.toolbar}>
+            <button
+              type="button"
+              className={sn.toolbarBtn}
+              onClick={markAllRead}
+              disabled={!hasUnread}>
+              <IconCheck size={14} />
+              <span className={sn.btnLabel}>Read All</span>
+            </button>
+            <button
+              type="button"
+              className={sn.toolbarBtn}
+              onClick={deleteAll}
+              disabled={notifications.length === 0}>
+              <IconTrash size={14} />
+              <span className={sn.btnLabel}>Delete All</span>
+            </button>
+          </div>
+        }
       />
-
-      {notifications.length > 0 && (
-        <div className={sn.toolbar}>
-          <button
-            type="button"
-            className={sn.markAllBtn}
-            onClick={markAllRead}
-            disabled={!hasUnread}>
-            Mark all as read
-          </button>
-          <button
-            type="button"
-            className={sn.deleteAllBtn}
-            onClick={deleteAll}
-            disabled={notifications.length === 0}>
-            Delete all
-          </button>
-        </div>
-      )}
 
       {notifications.length === 0 ? (
         <div className={s.state}>

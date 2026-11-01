@@ -4,14 +4,16 @@ import s from './SelectDropdown.module.css'
 
 export function MultiSelectDropdown({
   selectedValues = [],
-  options = [], // [{ value: '1', label: 'Category' }]
+  options = [], // [{ value: '1', label: 'Category', description?: '...' }]
   onChange, // returns array of selected values
   triggerLabel = 'Select options',
   emptyLabel = 'No options available',
   className = ''
 }) {
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const ref = useRef(null)
+  const searchRef = useRef(null)
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -23,12 +25,24 @@ export function MultiSelectDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open])
 
+  useEffect(() => {
+    if (open) {
+      searchRef.current?.focus()
+    } else {
+      setQuery('')
+    }
+  }, [open])
+
   function toggleOption(value) {
     const next = selectedValues.includes(value)
       ? selectedValues.filter((v) => v !== value)
       : [...selectedValues, value]
     onChange(next)
   }
+
+  const filteredOptions = query.trim()
+    ? options.filter((opt) => opt.label.toLowerCase().includes(query.trim().toLowerCase()))
+    : options
 
   return (
     <div className={`${s.dropdownWrap} ${className}`} ref={ref}>
@@ -45,15 +59,30 @@ export function MultiSelectDropdown({
 
       {open && (
         <div className={s.dropdownMenu} role="listbox" aria-multiselectable="true">
+          {options.length > 0 && (
+            <input
+              ref={searchRef}
+              type="text"
+              className={s.dropdownSearch}
+              placeholder="Search…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search options"
+            />
+          )}
+
           {options.length === 0 ? (
             <div className={s.dropdownEmpty}>{emptyLabel}</div>
+          ) : filteredOptions.length === 0 ? (
+            <div className={s.dropdownEmpty}>No matching options</div>
           ) : (
-            options.map((opt) => {
+            filteredOptions.map((opt) => {
               const checked = selectedValues.includes(opt.value)
               return (
                 <label
                   key={opt.value}
                   className={`${s.checkItem} ${checked ? s.checked : ''}`}
+                  title={opt.description || undefined}
                 >
                   <input
                     type="checkbox"

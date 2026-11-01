@@ -1,29 +1,48 @@
 .toolbar {
   display: flex;
-  justify-content: flex-end;
   gap: 8px;
 }
 
-.markAllBtn,
-.deleteAllBtn {
-  padding: 6px 12px;
+.toolbarBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
   font-size: 12px;
   font-weight: 600;
-  background: transparent;
+  font-family: inherit;
+  background: var(--code-bg);
   border: 1px solid var(--border);
   color: var(--text);
   cursor: pointer;
+  white-space: nowrap;
   transition: border-color 0.15s, color 0.15s;
 }
 
-.markAllBtn:hover {
+.toolbarBtn:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.deleteAllBtn:hover {
-  border-color: #e53e3e;
-  color: #e53e3e;
+.toolbarBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.toolbarBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.statusFilterWrap {
+  width: auto;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .btnLabel {
+    display: none;
+  }
 }
 
 .list {

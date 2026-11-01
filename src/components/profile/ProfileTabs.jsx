@@ -36,7 +36,7 @@ export default function ProfileTabs({ profile, isOwner, activeTab, onTabChange }
             onClick={() => onTabChange(id)}
           >
             <Icon size={15} />
-            {label}
+            <span>{label}</span>
           </button>
         ))}
       </nav>

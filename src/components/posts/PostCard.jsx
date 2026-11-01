@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import ReactMarkdown from 'react-markdown'
 import { toPost, toProfile } from '../../constants/routes'
@@ -12,6 +12,7 @@ import { IconMessageCircle, IconPaperclip, IconThumbsUp, IconShare, IconCheck } 
 import s from './PostCard.module.css'
 
 export default function PostCard({ post }) {
+  const navigate = useNavigate()
   const currentUser = useSelector((state) => state.auth.user)
   const { showFlash } = useFlash()
   const [likes, setLikes] = useState(null)
@@ -55,6 +56,17 @@ export default function PostCard({ post }) {
 
   const statusClass = post.status === 'resolved' ? s.statusResolved : s.statusInactive
 
+  function handleCardClick() {
+    navigate(toPost(post.id))
+  }
+
+  function handleCardKeyDown(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      navigate(toPost(post.id))
+    }
+  }
+
   function handleShare(e) {
     e.preventDefault()
     e.stopPropagation()
@@ -71,7 +83,13 @@ export default function PostCard({ post }) {
   }
 
   return (
-    <Link to={toPost(post.id)} className={s.postCard}>
+    <article
+      className={s.postCard}
+      role="link"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+    >
       <div className={s.postHeader}>
         <FavoriteButton
           postId={post.id}
@@ -155,6 +173,6 @@ export default function PostCard({ post }) {
           {post.publish_date && <span>On {formatFullDate(post.publish_date)}</span>}
         </div>
       </div>
-    </Link>
+    </article>
   )
 }

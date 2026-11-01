@@ -9,10 +9,6 @@ import { SelectDropdown } from '../components/ui/SelectDropdown'
 import Avatar from '../components/ui/Avatar'
 import s from './Admin.module.css'
 
-//todo: hide user avatar, then rating, then full name, then email when adapting view
-//todo: add rating column
-//todo: either add click header to sort or remove this from posts tab for consistensy
-
 import {
   IconUser,
   IconTrash,
@@ -188,6 +184,14 @@ export default function UsersTab() {
       sortBy: 'login',
       order: 'asc',
       page: '1',
+    })
+  }
+
+  const handleUserSortToggle = (field) => {
+    setUserFilters((prev) => {
+      const isCurrent = prev.sortBy === field
+      const nextOrder = isCurrent && prev.order === 'desc' ? 'asc' : 'desc'
+      return { ...prev, sortBy: field, order: nextOrder, page: '1' }
     })
   }
 
@@ -496,7 +500,7 @@ export default function UsersTab() {
   function rowFromUser(user) {
     return (
       <tr key={user.id} className={user.is_banned ? s.bannedRow : ''}>
-        <td>
+        <td className={s.colAvatar}>
           <Avatar
             userId={user.id}
             avatarPath={user.profile_picture_path}
@@ -505,8 +509,9 @@ export default function UsersTab() {
           />
         </td>
         <td className={s.loginCell}>{user.login}</td>
-        <td className={s.dimCell}>{user.full_name ?? '—'}</td>
-        <td className={s.dimCell}>{user.email}</td>
+        <td className={`${s.dimCell} ${s.colRating}`}>{user.rating ?? 0}</td>
+        <td className={`${s.dimCell} ${s.colFullName}`}>{user.full_name ?? '—'}</td>
+        <td className={`${s.dimCell} ${s.colEmail}`}>{user.email}</td>
         <td>
           <span className={`${s.roleBadge} ${s[`role_${user.role}`]}`}>
             {user.role}
@@ -803,10 +808,29 @@ export default function UsersTab() {
           <table className={s.table}>
             <thead>
               <tr>
-                <th>Avatar</th>
-                <th>Login</th>
-                <th>Full Name</th>
-                <th>Email</th>
+                <th className={s.colAvatar}>Avatar</th>
+                <th
+                  className={s.sortableTh}
+                  onClick={() => handleUserSortToggle('login')}
+                  title="Sort by username"
+                >
+                  Login {userFilters.sortBy === 'login' ? (userFilters.order === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th
+                  className={`${s.sortableTh} ${s.colRating}`}
+                  onClick={() => handleUserSortToggle('rating')}
+                  title="Sort by rating"
+                >
+                  Rating {userFilters.sortBy === 'rating' ? (userFilters.order === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th className={s.colFullName}>Full Name</th>
+                <th
+                  className={`${s.sortableTh} ${s.colEmail}`}
+                  onClick={() => handleUserSortToggle('email')}
+                  title="Sort by email"
+                >
+                  Email {userFilters.sortBy === 'email' ? (userFilters.order === 'asc' ? '↑' : '↓') : ''}
+                </th>
                 <th>Role</th>
                 <th>Status</th>
                 <th>Actions</th>

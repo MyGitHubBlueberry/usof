@@ -14,12 +14,8 @@ import {
 } from '../components/ui/Icons'
 import s from "./Admin.module.css"
 
-//TODO: remove resolved from availible statuses if not selected already: it requires a comment to resolve properly
-//TODO: remove sort col by click or add to all cols
-//TODO: add attachment count
-//TODO: remove likes, publish date and att count when changing view port
 const POSTS_PER_PAGE = 10
-const POST_STATUSES = ['active', 'inactive', 'resolved']
+const EDITABLE_POST_STATUSES = ['active', 'inactive']
 
 export default function PostsTab() {
   const navigate = useNavigate()
@@ -284,19 +280,20 @@ export default function PostsTab() {
                 <th>Author</th>
                 <th>Status</th>
                 <th
-                  className={s.sortableTh}
+                  className={`${s.sortableTh} ${s.colLikes}`}
                   onClick={() => handleSortToggle('likes')}
                   title="Sort by likes"
                 >
                   Likes {filterParams.sort === 'likes' ? (filterParams.order === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th
-                  className={s.sortableTh}
+                  className={`${s.sortableTh} ${s.colPublishDate}`}
                   onClick={() => handleSortToggle('date')}
                   title="Sort by published date"
                 >
                   Published {(!filterParams.sort || filterParams.sort === 'date') ? (filterParams.order === 'asc' ? '↑' : '↓') : ''}
                 </th>
+                <th className={s.colAttachments}>Attachments</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -322,25 +319,30 @@ export default function PostsTab() {
                     </td>
                     <td className={s.dimCell}>{authorDisplay}</td>
                     <td>
-                      <select
-                        className={`${s.statusSelect} ${s[`statusSel_${post.status}`]}`}
-                        value={post.status}
-                        onChange={(e) => handleStatusChange(post, e.target.value)}
-                        aria-label={`Change status for ${post.title}`}
-                      >
-                        {POST_STATUSES.map((st) => (
-                          <option key={st} value={st}>
-                            {st.charAt(0).toUpperCase() + st.slice(1)}
-                          </option>
-                        ))}
-                      </select>
+                      {post.status === 'resolved' ? (
+                        <span className={`${s.statusBadge} ${s.statusSel_resolved}`}>Resolved</span>
+                      ) : (
+                        <select
+                          className={`${s.statusSelect} ${s[`statusSel_${post.status}`]}`}
+                          value={post.status}
+                          onChange={(e) => handleStatusChange(post, e.target.value)}
+                          aria-label={`Change status for ${post.title}`}
+                        >
+                          {EDITABLE_POST_STATUSES.map((st) => (
+                            <option key={st} value={st}>
+                              {st.charAt(0).toUpperCase() + st.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </td>
-                    <td className={s.dimCell}>
+                    <td className={`${s.dimCell} ${s.colLikes}`}>
                       {post.like_count !== undefined
                         ? Number(post.like_count)
                         : (postLikes[post.id] !== undefined ? postLikes[post.id] : 0)}
                     </td>
-                    <td className={s.dimCell}>{formatDate(post.publish_date)}</td>
+                    <td className={`${s.dimCell} ${s.colPublishDate}`}>{formatDate(post.publish_date)}</td>
+                    <td className={`${s.dimCell} ${s.colAttachments}`}>{post.attachment_count ?? 0}</td>
                     <td>
                       <div className={s.actions}>
                         <button

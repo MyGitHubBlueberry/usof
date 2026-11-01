@@ -62,7 +62,7 @@ export default function Admin() {
               onClick={() => setActiveTab(id)}
             >
               <Icon size={15} />
-              {label}
+              <span>{label}</span>
             </button>
           ))}
         </nav>
