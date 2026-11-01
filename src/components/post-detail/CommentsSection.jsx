@@ -9,11 +9,17 @@ import Avatar from '../ui/Avatar'
 import Pagination from '../ui/Pagination'
 import CommentItem from './CommentItem'
 import MarkdownToolbar from '../post-create/MarkdownToolbar'
+import { SelectDropdown } from '../ui/SelectDropdown'
 import { IconSend } from '../ui/Icons'
 import s from './CommentsSection.module.css'
 
 const ROOTS_PER_PAGE = 5
 const MAX_COMMENTS = 100
+
+const SORT_OPTIONS = [
+  { value: 'liked', label: 'Most Liked' },
+  { value: 'chrono', label: 'Chronological' },
+]
 
 function buildCommentTree(flatComments) {
   const byId = new Map()
@@ -62,6 +68,7 @@ export default function CommentsSection({
   const [usersById, setUsersById] = useState({})
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [sortMode, setSortMode] = useState('liked')
 
   const [newComment, setNewComment] = useState('')
   const [posting, setPosting] = useState(false)
@@ -146,12 +153,23 @@ export default function CommentsSection({
   }
 
   const roots = useMemo(() => buildCommentTree(comments), [comments])
-  const totalRootPages = Math.max(1, Math.ceil(roots.length / ROOTS_PER_PAGE))
+
+  const sortedRoots = useMemo(() => {
+    if (sortMode !== 'chrono') return roots
+    return [...roots].sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date))
+  }, [roots, sortMode])
+
+  const totalRootPages = Math.max(1, Math.ceil(sortedRoots.length / ROOTS_PER_PAGE))
   const clampedPage = Math.min(page, totalRootPages)
-  const visibleRoots = roots.slice(
+  const visibleRoots = sortedRoots.slice(
     (clampedPage - 1) * ROOTS_PER_PAGE,
     clampedPage * ROOTS_PER_PAGE
   )
+
+  function handleSortChange(value) {
+    setSortMode(value)
+    setPage(1)
+  }
 
   function handleSubmitComment() {
     const trimmed = newComment.trim()
@@ -179,7 +197,18 @@ export default function CommentsSection({
 
   return (
     <div className={s.section}>
-      <h2 className={s.heading}>Comments</h2>
+      <div className={s.headingRow}>
+        <h2 className={s.heading}>Comments</h2>
+        {roots.length > 1 && (
+          <SelectDropdown
+            className={s.sortDropdown}
+            value={sortMode}
+            options={SORT_OPTIONS}
+            onChange={handleSortChange}
+            ariaLabel="Sort comments"
+          />
+        )}
+      </div>
 
       {currentUser ? (
         canCreateRootComment ? (

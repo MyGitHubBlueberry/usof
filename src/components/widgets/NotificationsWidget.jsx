@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { notificationsService } from '../../services/notifications.service'
-import { toProfile, toPost } from '../../constants/routes'
+import { toProfileTab, toPost } from '../../constants/routes'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { formatDate } from '../../utils/format'
 import { IconBell, IconTrash } from '../ui/Icons'
@@ -12,7 +12,7 @@ import s from './NotificationsWidget.module.css'
 export default function NotificationsWidget() {
   const navigate = useNavigate()
   const user = useSelector((state) => state.auth.user)
-  const profileRoute = toProfile(user?.id)
+  const profileRoute = toProfileTab(user?.id, 'notifications')
   const { data: notifications, loading, setData } = useAsyncData(
     () => notificationsService.getAll({ limit: 4 }),
     [],

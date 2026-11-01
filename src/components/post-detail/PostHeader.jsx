@@ -5,7 +5,8 @@ import { useFlash } from '../../hooks/useFlash'
 import { commentsService } from '../../services/comments.service'
 import { toPostEdit } from '../../constants/routes'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
-import { IconDots, IconStar, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
+import FavoriteButton from '../ui/FavoriteButton'
+import { IconDots, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
 import s from './PostHeader.module.css'
 
 export default function PostHeader({
@@ -21,7 +22,6 @@ export default function PostHeader({
 }) {
   const { showFlash } = useFlash()
   const navigate = useNavigate()
-  const [favoriteLoading, setFavoriteLoading] = useState(false)
   const [statusSaving, setStatusSaving] = useState(false)
   const isOwner = !!currentUser && Number(currentUser.id) === Number(post.user_id)
   const canDelete = isAdmin || isOwner;
@@ -58,27 +58,6 @@ export default function PostHeader({
       .finally(() => setStatusSaving(false))
   }
 
-  function requireAuth() {
-    if (!isAuthenticated) {
-      showFlash('Sign in to do that.', 'error')
-      return false
-    }
-    return true
-  }
-
-  function toggleFavorite() {
-    if (!requireAuth() || favoriteLoading) return
-    setFavoriteLoading(true)
-    const action = isFavorited ? postsService.unfavorite(post.id) : postsService.favorite(post.id)
-    action
-      .then(() => {
-        onFavoriteChange(!isFavorited)
-        showFlash(isFavorited ? 'Removed from favorites.' : 'Added to favorites.', 'success')
-      })
-      .catch((err) => showFlash(err.message || 'Could not update favorites.', 'error'))
-      .finally(() => setFavoriteLoading(false))
-  }
-
   function handleShare() {
     const url = window.location.href
     if (navigator.share) {
@@ -95,14 +74,13 @@ export default function PostHeader({
     <div className={s.header}>
       <div className={s.titleRow}>
         <div>
-          <button
-            type="button"
-            className={`${s.favoriteBtn} ${isFavorited ? s.favoriteBtnActive : ''}`}
-            onClick={toggleFavorite}
-            aria-label="Favorite post"
-          >
-            <IconStar size={24} filled={isFavorited} />
-          </button>
+          <FavoriteButton
+            postId={post.id}
+            isFavorited={isFavorited}
+            isAuthenticated={isAuthenticated}
+            onChange={onFavoriteChange}
+            size={24}
+          />
           <h1 className={s.title}>{post.title}</h1>
         </div>
 

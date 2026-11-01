@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { ROUTES, toProfile, toUserPosts } from '../../constants/routes'
+import { ROUTES, toProfile, toProfileTab, toUserPosts } from '../../constants/routes'
 import { selectIsAuthenticated, logoutThunk } from '../../redux/slices/authSlice'
 import { useTheme } from '../../hooks/useTheme'
 import Logo from '../ui/Logo'
@@ -40,6 +40,9 @@ export default function Header() {
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
   const profileRoute = user?.id ? toProfile(user.id) : ROUTES.LOGIN
   const myPostsRoute = user?.id ? toUserPosts(user.id) : ROUTES.LOGIN
+  const notificationsRoute = user?.id ? toProfileTab(user.id, 'notifications') : ROUTES.LOGIN
+  const favoritesRoute = user?.id ? toProfileTab(user.id, 'favorites') : ROUTES.LOGIN
+  const subscriptionsRoute = user?.id ? toProfileTab(user.id, 'subscriptions') : ROUTES.LOGIN
 
   return (
     <header className={s.header}>
@@ -66,7 +69,7 @@ export default function Header() {
           <ActionMenuItem icon={<IconTrophy className={s.itemIcon} />} to={ROUTES.LEADERBOARD}>
             Leaderboard
           </ActionMenuItem>
-          <ActionMenuItem icon={<IconBell className={s.itemIcon} />} to={profileRoute}>
+          <ActionMenuItem icon={<IconBell className={s.itemIcon} />} to={notificationsRoute}>
             Notifications
           </ActionMenuItem>
 
@@ -134,11 +137,11 @@ export default function Header() {
               My Posts
             </ActionMenuItem>
 
-            <ActionMenuItem icon={<IconStar className={s.itemIcon} />} to={profileRoute}>
+            <ActionMenuItem icon={<IconStar className={s.itemIcon} />} to={favoritesRoute}>
               Favorite Posts
             </ActionMenuItem>
 
-            <ActionMenuItem icon={<IconRss className={s.itemIcon} />} to={profileRoute}>
+            <ActionMenuItem icon={<IconRss className={s.itemIcon} />} to={subscriptionsRoute}>
               Subscriptions
             </ActionMenuItem>
 

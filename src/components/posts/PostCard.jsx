@@ -1,13 +1,22 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { toPost } from '../../constants/routes'
+import { useSelector } from 'react-redux'
+import ReactMarkdown from 'react-markdown'
+import { toPost, toProfile } from '../../constants/routes'
 import { postsService } from '../../services/posts.service'
+import { useFlash } from '../../hooks/useFlash'
 import { formatFullDate } from '../../utils/format'
-import { IconMessageCircle, IconPaperclip } from '../ui/Icons'
+import { MARKDOWN_PLUGINS, MARKDOWN_COMPONENTS } from '../../utils/markdown'
+import FavoriteButton from '../ui/FavoriteButton'
+import { IconMessageCircle, IconPaperclip, IconThumbsUp, IconShare, IconCheck } from '../ui/Icons'
 import s from './PostCard.module.css'
 
 export default function PostCard({ post }) {
+  const currentUser = useSelector((state) => state.auth.user)
+  const { showFlash } = useFlash()
   const [likes, setLikes] = useState(null)
+  const [favorited, setFavorited] = useState(!!post?.is_favorited)
+  const [shared, setShared] = useState(false)
 
   useEffect(() => {
     if (!post?.id || post.like_count !== undefined) return
@@ -42,17 +51,37 @@ export default function PostCard({ post }) {
 
   const commentCount = Number(post.comment_count ?? 0)
   const attachmentCount = Number(post.attachment_count ?? 0)
+  const showStatusBadge = post.status === 'resolved' || post.status === 'inactive'
 
-  const statusClass =
-    post.status === 'resolved'
-      ? s.statusResolved
-      : post.status === 'active'
-      ? s.statusActive
-      : ''
+  const statusClass = post.status === 'resolved' ? s.statusResolved : s.statusInactive
+
+  function handleShare(e) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const url = `${window.location.origin}${toPost(post.id)}`
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        setShared(true)
+        showFlash('Link copied to clipboard.', 'success')
+        setTimeout(() => setShared(false), 1500)
+      })
+      .catch(() => showFlash('Could not copy link.', 'error'))
+  }
 
   return (
     <Link to={toPost(post.id)} className={s.postCard}>
       <div className={s.postHeader}>
+        <FavoriteButton
+          postId={post.id}
+          isFavorited={favorited}
+          isAuthenticated={!!currentUser}
+          onChange={setFavorited}
+          size={18}
+          className={s.cardFavoriteBtn}
+        />
+
         <div className={s.titleGroup}>
           <h2 className={s.postTitle}>{post.title}</h2>
           {categories.length > 0 && (
@@ -65,19 +94,38 @@ export default function PostCard({ post }) {
             </div>
           )}
         </div>
-        {post.status && (
-          <span className={`${s.statusBadge} ${statusClass}`}>
-            {post.status}
-          </span>
-        )}
+
+        <div className={s.headerActions}>
+          {showStatusBadge && (
+            <span className={`${s.statusBadge} ${statusClass}`}>
+              {post.status}
+            </span>
+          )}
+          <button
+            type="button"
+            className={s.shareBtn}
+            onClick={handleShare}
+            aria-label="Copy post link"
+            title={shared ? 'Copied!' : 'Share'}
+          >
+            {shared ? <IconCheck size={15} /> : <IconShare size={15} />}
+          </button>
+        </div>
       </div>
 
-      {post.content && <p className={s.postSnippet}>{post.content}</p>}
+      {post.content && (
+        <div className={s.postSnippet}>
+          <ReactMarkdown remarkPlugins={MARKDOWN_PLUGINS} components={MARKDOWN_COMPONENTS}>
+            {post.content}
+          </ReactMarkdown>
+        </div>
+      )}
 
       <div className={s.postFooter}>
         <div className={s.metaGroup}>
-          <span className={s.ratingBadge}>
-            {displayLikes} likes
+          <span className={s.metricItem} title="Likes">
+            <IconThumbsUp size={13} />
+            {displayLikes}
           </span>
           <span className={s.metricItem} title="Comments">
             <IconMessageCircle size={13} />
@@ -89,9 +137,22 @@ export default function PostCard({ post }) {
               {attachmentCount}
             </span>
           )}
-          {post.publish_date && (
-            <span>{formatFullDate(post.publish_date)}</span>
+        </div>
+
+        <div className={s.authorMeta}>
+          {post.author_login && (
+            <span>
+              By{' '}
+              <Link
+                to={toProfile(post.user_id)}
+                className={s.authorLink}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {post.author_login}
+              </Link>
+            </span>
           )}
+          {post.publish_date && <span>On {formatFullDate(post.publish_date)}</span>}
         </div>
       </div>
     </Link>

@@ -68,23 +68,6 @@
   white-space: nowrap;
 }
 
-.favoriteBtn {
-  color: var(--text);
-  background: none;
-  border: none;
-  height: min-content;
-  padding: 5px;
-  transition: color 0.15s;
-}
-
-.favoriteBtn:hover {
-  color: var(--accent);
-}
-
-.favoriteBtnActive {
-  color: white;
-}
-
 @media (max-width: 640px) {
   .title {
     font-size: 21px;

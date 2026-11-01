@@ -65,7 +65,7 @@ export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNot
     notificationsService
       .getUnreadCount()
       .then((res) => {
-        if (isMounted) setUnreadCount(res.data?.count ?? 0)
+        if (isMounted) setUnreadCount(res.data?.unreadCount ?? 0)
       })
       .catch(() => {
         if (isMounted) setUnreadCount(0)

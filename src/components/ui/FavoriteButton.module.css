@@ -1,0 +1,24 @@
+.favoriteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: none;
+  border: none;
+  height: min-content;
+  padding: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.favoriteBtn:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.favoriteBtn:disabled {
+  cursor: not-allowed;
+}
+
+.favoriteBtnActive {
+  color: var(--accent);
+}

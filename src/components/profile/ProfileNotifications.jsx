@@ -5,11 +5,14 @@ import { useFlash } from '../../hooks/useFlash'
 import { toPost } from '../../constants/routes'
 import { formatDate } from '../../utils/format'
 import Pagination from '../ui/Pagination'
+import FeedControls from '../posts/FeedControls'
+import { SelectDropdown } from '../ui/SelectDropdown'
 import { IconCheck, IconTrash } from '../ui/Icons'
+import fc from '../posts/FeedControls.module.css'
 import s from './ProfileTabContent.module.css'
 import sn from './ProfileNotifications.module.css'
 
-const FILTERS = [
+const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
   { value: 'unread', label: 'Unread' },
   { value: 'read', label: 'Read' },
@@ -20,33 +23,24 @@ export default function ProfileNotifications() {
   const { showFlash } = useFlash()
 
   const [notifications, setNotifications] = useState([])
-  const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-
-  const filterKey = `${search}|${statusFilter}`
-  const [appliedFilterKey, setAppliedFilterKey] = useState(filterKey)
-  if (appliedFilterKey !== filterKey) {
-    setAppliedFilterKey(filterKey)
-    setPage(1)
-  }
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setSearch(searchInput.trim()), 300)
-    return () => clearTimeout(timeout)
-  }, [searchInput])
+  const [filters, setFilters] = useState({ search: '', status: 'all', page: '1' })
+  const pageParam = parseInt(filters.page || '1', 10)
 
   useEffect(() => {
     let isMounted = true
     setLoading(true)
 
     notificationsService
-      .getAll({ page, limit: 10, search: search || undefined, status: statusFilter === 'all' ? undefined : statusFilter })
+      .getAll({
+        page: pageParam,
+        limit: 10,
+        search: filters.search || undefined,
+        status: filters.status === 'all' ? undefined : filters.status,
+      })
       .then((res) => {
         if (!isMounted) return
         setNotifications(res.data?.data || [])
@@ -65,7 +59,19 @@ export default function ProfileNotifications() {
     return () => {
       isMounted = false
     }
-  }, [page, search, statusFilter])
+  }, [pageParam, filters.search, filters.status])
+
+  const handleControlChange = (patch) => {
+    setFilters((prev) => {
+      const next = { ...prev, ...patch }
+      if (patch.page === undefined) next.page = '1'
+      return next
+    })
+  }
+
+  const handleReset = () => {
+    setFilters({ search: '', status: 'all', page: '1' })
+  }
 
   function markRead(id) {
     notificationsService
@@ -124,30 +130,38 @@ export default function ProfileNotifications() {
   }
 
   const hasUnread = notifications.some((n) => !n.is_read)
-  const hasAny = notifications.length > 0 || search || statusFilter !== 'all'
+  const isDirty = Boolean(filters.search && filters.search.trim()) || filters.status !== 'all'
+  const activeFiltersCount = filters.status !== 'all' ? 1 : 0
+
+  function customFilterRow() {
+    return (
+      <div className={fc.col}>
+        <span className={fc.colLabel}>Status</span>
+        <SelectDropdown
+          value={filters.status}
+          options={STATUS_OPTIONS}
+          onChange={(val) => handleControlChange({ status: val })}
+          ariaLabel="Filter by read status"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={s.tabContent}>
-      <div className={sn.filters}>
-        <input
-          type="text"
-          className={sn.searchInput}
-          placeholder="Search notifications…"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-        />
-        <div className={sn.filterToggle}>
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              type="button"
-              className={`${sn.filterBtn} ${statusFilter === f.value ? sn.filterBtnActive : ''}`}
-              onClick={() => setStatusFilter(f.value)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+      <FeedControls
+        params={filters}
+        onChange={handleControlChange}
+        onReset={handleReset}
+        placeholder="Search notifications…"
+        activeFiltersCount={activeFiltersCount}
+        isDirty={isDirty}
+        searchAriaLabel="Search notifications"
+        showActiveTags={false}
+        customFilterRow={customFilterRow()}
+      />
+
+      {notifications.length > 0 && (
         <div className={sn.toolbar}>
           <button
             type="button"
@@ -160,16 +174,15 @@ export default function ProfileNotifications() {
             type="button"
             className={sn.deleteAllBtn}
             onClick={deleteAll}
-            disabled={notifications.length > 0}>
+            disabled={notifications.length === 0}>
             Delete all
           </button>
         </div>
-      </div>
-
+      )}
 
       {notifications.length === 0 ? (
         <div className={s.state}>
-          {hasAny ? 'No notifications match your filters.' : 'No notifications yet.'}
+          {isDirty ? 'No notifications match your filters.' : 'No notifications yet.'}
         </div>
       ) : (
         <ul className={sn.list}>
@@ -208,9 +221,9 @@ export default function ProfileNotifications() {
       )}
 
       <Pagination
-        currentPage={page}
+        currentPage={pageParam}
         totalPages={totalPages}
-        onPageChange={setPage}
+        onPageChange={(p) => handleControlChange({ page: String(p) })}
         hideOnSinglePage
       />
     </div>

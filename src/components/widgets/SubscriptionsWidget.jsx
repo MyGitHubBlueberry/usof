@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { postsService } from '../../services/posts.service'
-import { toProfile } from '../../constants/routes'
+import { toProfileTab } from '../../constants/routes'
 import { IconRss } from '../ui/Icons'
 import PostListWidget from './PostListWidget'
 
@@ -11,7 +11,7 @@ export default function SubscriptionsWidget() {
     <PostListWidget
       title="Subscriptions"
       icon={<IconRss size={14} />}
-      actionLink={toProfile(user?.id)}
+      actionLink={toProfileTab(user?.id, 'subscriptions')}
       actionText="All"
       fetchFn={() => postsService.getSubscriptions({ limit: 4 })}
       emptyMessage="No subscribed posts"

@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ROUTES, toProfile } from '../../constants/routes'
+import { ROUTES, toProfileTab } from '../../constants/routes'
 import { selectIsAuthenticated } from '../../redux/slices/authSlice'
 import s from './Footer.module.css'
 
 export default function Footer() {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const user = useSelector((state) => state.auth.user)
-  const favoritesRoute = isAuthenticated && user?.id ? toProfile(user.id) : ROUTES.LOGIN
+  const favoritesRoute = isAuthenticated && user?.id ? toProfileTab(user.id, 'favorites') : ROUTES.LOGIN
 
   return (
     <footer className={s.footer}>

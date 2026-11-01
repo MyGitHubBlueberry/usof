@@ -20,7 +20,8 @@ import {
   IconCheck,
   IconRefresh,
   IconArrowUp,
-  IconArrowDown
+  IconArrowDown,
+  IconPlus,
 } from '../components/ui/Icons'
 
 const USERS_PER_PAGE = 10
@@ -48,6 +49,34 @@ const USER_ORDER_OPTIONS = [
   { value: 'asc', label: 'Ascending (A–Z)' },
   { value: 'desc', label: 'Descending (Z–A)' },
 ]
+
+const CREATE_ROLE_OPTIONS = [
+  { value: 'user', label: 'User' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'superadmin', label: 'Superadmin' },
+]
+
+const MIN_PASSWORD = 8
+
+function validateNewUser(form) {
+  const e = {}
+  if (!form.login.trim()) e.login = 'Login is required'
+  else if (form.login.trim().length < 3) e.login = 'At least 3 characters'
+  else if (!/^[a-zA-Z0-9_]+$/.test(form.login)) e.login = 'Letters, numbers and _ only'
+
+  if (!form.full_name.trim()) e.full_name = 'Full name is required'
+
+  if (!form.email.trim()) e.email = 'Email is required'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email address'
+
+  if (!form.password) e.password = 'Password is required'
+  else if (form.password.length < MIN_PASSWORD) e.password = `At least ${MIN_PASSWORD} characters`
+
+  if (!form.confirmed_password) e.confirmed_password = 'Please confirm the password'
+  else if (form.password !== form.confirmed_password) e.confirmed_password = 'Passwords do not match'
+
+  return e
+}
 
 const BAN_DURATION_UNIT_OPTIONS = [
   { value: 'hours', label: 'Hours' },
@@ -91,6 +120,17 @@ export default function UsersTab() {
   const [unbanLoading, setUnbanLoading] = useState(false)
   const [deleteTargetUser, setDeleteTargetUser] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [showAddUserModal, setShowAddUserModal] = useState(false)
+  const [addUserForm, setAddUserForm] = useState({
+    login: '',
+    full_name: '',
+    email: '',
+    password: '',
+    confirmed_password: '',
+    role: 'user',
+  })
+  const [addUserTouched, setAddUserTouched] = useState(false)
+  const [addUserLoading, setAddUserLoading] = useState(false)
   const { showFlash } = useFlash()
 
   const pageParam = parseInt(userFilters.page || '1', 10)
@@ -207,6 +247,43 @@ export default function UsersTab() {
       showFlash(err?.message ?? 'Failed to delete user', 'error')
     } finally {
       setDeleteLoading(false)
+    }
+  }
+
+  const closeAddUserModal = () => {
+    setShowAddUserModal(false)
+    setAddUserTouched(false)
+    setAddUserForm({
+      login: '',
+      full_name: '',
+      email: '',
+      password: '',
+      confirmed_password: '',
+      role: 'user',
+    })
+  }
+
+  const handleAddUserChange = (field) => (e) => {
+    setAddUserForm((prev) => ({ ...prev, [field]: e.target.value }))
+  }
+
+  const addUserErrors = addUserTouched ? validateNewUser(addUserForm) : {}
+
+  const handleAddUserSubmit = async (e) => {
+    e.preventDefault()
+    setAddUserTouched(true)
+    if (Object.keys(validateNewUser(addUserForm)).length > 0) return
+
+    setAddUserLoading(true)
+    try {
+      await usersService.create(addUserForm)
+      showFlash(`User "${addUserForm.login}" created`)
+      closeAddUserModal()
+      setRetryCount((c) => c + 1)
+    } catch (err) {
+      showFlash(err?.message ?? 'Failed to create user', 'error')
+    } finally {
+      setAddUserLoading(false)
     }
   }
 
@@ -447,6 +524,96 @@ export default function UsersTab() {
     )
   }
 
+  function addUserModal() {
+    return (
+      <ActionModal
+        title="Create User"
+        confirmText="Create User"
+        isLoading={addUserLoading}
+        onConfirm={handleAddUserSubmit}
+        onClose={closeAddUserModal}
+      >
+        <label className={s.formLabel}>
+          Login <span className={s.required}>*</span>
+          <input
+            className={s.input}
+            type="text"
+            placeholder="cool_username"
+            value={addUserForm.login}
+            onChange={handleAddUserChange('login')}
+            autoFocus
+            required
+          />
+          {addUserErrors.login && <span className={s.fieldError}>{addUserErrors.login}</span>}
+        </label>
+
+        <label className={s.formLabel}>
+          Full name <span className={s.required}>*</span>
+          <input
+            className={s.input}
+            type="text"
+            placeholder="John Doe"
+            value={addUserForm.full_name}
+            onChange={handleAddUserChange('full_name')}
+            required
+          />
+          {addUserErrors.full_name && <span className={s.fieldError}>{addUserErrors.full_name}</span>}
+        </label>
+
+        <label className={s.formLabel}>
+          Email <span className={s.required}>*</span>
+          <input
+            className={s.input}
+            type="email"
+            placeholder="you@example.com"
+            value={addUserForm.email}
+            onChange={handleAddUserChange('email')}
+            required
+          />
+          {addUserErrors.email && <span className={s.fieldError}>{addUserErrors.email}</span>}
+        </label>
+
+        <label className={s.formLabel}>
+          Password <span className={s.required}>*</span>
+          <input
+            className={s.input}
+            type="password"
+            placeholder="••••••••"
+            value={addUserForm.password}
+            onChange={handleAddUserChange('password')}
+            required
+          />
+          {addUserErrors.password && <span className={s.fieldError}>{addUserErrors.password}</span>}
+        </label>
+
+        <label className={s.formLabel}>
+          Confirm password <span className={s.required}>*</span>
+          <input
+            className={s.input}
+            type="password"
+            placeholder="••••••••"
+            value={addUserForm.confirmed_password}
+            onChange={handleAddUserChange('confirmed_password')}
+            required
+          />
+          {addUserErrors.confirmed_password && (
+            <span className={s.fieldError}>{addUserErrors.confirmed_password}</span>
+          )}
+        </label>
+
+        <label className={s.formLabel}>
+          Role
+          <SelectDropdown
+            value={addUserForm.role}
+            options={CREATE_ROLE_OPTIONS}
+            onChange={(val) => setAddUserForm((prev) => ({ ...prev, role: val }))}
+            ariaLabel="New user role"
+          />
+        </label>
+      </ActionModal>
+    )
+  }
+
   function banModal() {
     return (
       <ActionModal
@@ -591,7 +758,21 @@ export default function UsersTab() {
         isDirty={usersIsDirty}
         searchAriaLabel="Search users by username or email"
         customFilterRow={customFilterRow()}
+        rightAction={
+          isSuperadmin && (
+            <button
+              className={s.btnPrimary}
+              type="button"
+              onClick={() => setShowAddUserModal(true)}
+            >
+              <IconPlus size={14} />
+              Create User
+            </button>
+          )
+        }
       />
+
+      {showAddUserModal && addUserModal()}
 
       {isLoading && (
         <div className={s.feedState}>

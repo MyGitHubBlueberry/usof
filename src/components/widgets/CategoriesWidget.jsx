@@ -40,7 +40,7 @@ export default function CategoriesWidget({ onSelectCategory }) {
               </button>
             ) : (
               <Link
-                to={`${ROUTES.HOME}?category=${encodeURIComponent(cat.title)}`}
+                to={`${ROUTES.HOME}?categories=${encodeURIComponent(cat.title)}`}
                 className={sw.itemBlock}
               >
                 <div className={s.titleRow}>

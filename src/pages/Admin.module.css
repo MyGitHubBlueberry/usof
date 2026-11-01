@@ -717,6 +717,11 @@
   color: #e53e3e;
 }
 
+.fieldError {
+  font-size: 12px;
+  color: #e53e3e;
+}
+
 .addCategoryFields {
   display: flex;
   gap: 10px;

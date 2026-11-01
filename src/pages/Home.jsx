@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { postsService } from '../services/posts.service'
+import { FlashProvider } from '../context/FlashProvider'
 import PostCard from '../components/posts/PostCard'
 import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
@@ -149,20 +150,22 @@ export default function Home() {
   }
 
   return (
-    <div className={s.feedContainer}>
-      <FeedControls params={params} onChange={handleControlChange} showSearchType={true} />
+    <FlashProvider>
+      <div className={s.feedContainer}>
+        <FeedControls params={params} onChange={handleControlChange} showSearchType={true} />
 
-      {renderFeedBody()}
+        {renderFeedBody()}
 
-      {!isLoading && !error && posts.length > 0 && (
-        <div className={s.paginationWrapper}>
-          <Pagination
-            currentPage={pageParam}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
-    </div>
+        {!isLoading && !error && posts.length > 0 && (
+          <div className={s.paginationWrapper}>
+            <Pagination
+              currentPage={pageParam}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
+      </div>
+    </FlashProvider>
   )
 }

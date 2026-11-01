@@ -23,12 +23,40 @@
   gap: 12px;
 }
 
+.cardFavoriteBtn {
+  padding: 0px;
+  flex-shrink: 0;
+}
+
 .titleGroup {
   display: flex;
   flex-direction: column;
   gap: 6px;
   flex: 1;
   min-width: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.shareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.shareBtn:hover {
+  color: var(--accent);
 }
 
 .postTitle {
@@ -68,15 +96,22 @@
 }
 
 .postSnippet {
+  position: relative;
+  max-height: 68px;
+  overflow: hidden;
   font-size: 14px;
   color: var(--text);
   line-height: 1.5;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 18px), transparent 100%);
+  mask-image: linear-gradient(to bottom, black calc(100% - 18px), transparent 100%);
+}
+
+.postSnippet :global(p) {
+  margin: 0 0 6px;
+}
+
+.postSnippet :global(p:last-child) {
+  margin-bottom: 0;
 }
 
 .postFooter {
@@ -94,19 +129,28 @@
   gap: 12px;
 }
 
-.ratingBadge {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--active-bg);
-  padding: 2px 8px;
-}
-
 .metricItem {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.authorMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.authorLink {
+  color: var(--text-h);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.authorLink:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .statusBadge {
@@ -119,9 +163,9 @@
   color: var(--text);
 }
 
-.statusActive {
-  border-color: var(--accent-border);
-  color: var(--accent);
+.statusInactive {
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .statusResolved {
@@ -132,5 +176,10 @@
 @media (max-width: 640px) {
   .postCard {
     padding: 14px 14px;
+  }
+
+  .postFooter {
+    flex-wrap: wrap;
+    gap: 6px;
   }
 }
