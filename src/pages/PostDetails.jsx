@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
 import { usersService } from '../services/users.service'
+import { usePolling } from '../hooks/usePolling'
 import { FlashProvider } from '../context/FlashProvider'
 import { ROUTES } from '../constants/routes'
 import { IconXCircle } from '../components/ui/Icons'
@@ -84,6 +85,30 @@ export default function PostDetails() {
   }, [id, currentUser])
 
   useEffect(() => loadPost(), [loadPost])
+
+  usePolling(
+    () => {
+      if (!post) return
+      postsService
+        .getLikes(id)
+        .then((res) => {
+          const fresh = res.data ?? { likes: 0, dislikes: 0, myReaction: null }
+          setLikeCounts((prev) => {
+            if (
+              prev.likes !== fresh.likes ||
+              prev.dislikes !== fresh.dislikes ||
+              prev.myReaction !== fresh.myReaction
+            ) {
+              return fresh
+            }
+            return prev
+          })
+        })
+        .catch(() => {})
+    },
+    30_000,
+    [id, post]
+  )
 
   if (loading) {
     return <div className={s.stateMsg}>Loading post…</div>

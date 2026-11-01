@@ -6,16 +6,7 @@
 }
 
 .tabBar {
-  composes: tabBar from '../ui/Tabs.module.css';
   padding: 0 24px;
-}
-
-.tabBtn {
-  composes: tabBtn from '../ui/Tabs.module.css';
-}
-
-.tabBtnActive {
-  composes: tabBtnActive from '../ui/Tabs.module.css';
 }
 
 .tabPanel {

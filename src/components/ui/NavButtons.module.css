@@ -6,12 +6,17 @@
   padding: 6px 12px;
   background: transparent;
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--text-h);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.icon {
+  color: var(--text);
+  transition: color 0.15s;
 }
 
 .backBtn {
@@ -24,7 +29,12 @@
 
 .backBtn:hover,
 .forwardBtn:hover {
-  border-color: var(--accent);
+  border-color: var(--text);
+  color: var(--text-h);
+}
+
+.backBtn:hover .icon,
+.forwardBtn:hover .icon {
   color: var(--accent);
 }
 

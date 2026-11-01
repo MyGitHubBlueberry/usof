@@ -4,6 +4,7 @@ import CategoriesTab from './AdminPanelCategoriesTab'
 import UsersTab from './AdminPanelUsersTab'
 import PostsTab from './AdminPanelPostsTab'
 import { FlashProvider } from '../context/FlashProvider'
+import TabBar from '../components/ui/TabBar'
 import {
   IconShield,
   IconUser,
@@ -52,20 +53,7 @@ export default function Admin() {
           </div>
         </div>
 
-        <nav className={s.tabBar} role="tablist">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              role="tab"
-              aria-selected={activeTab === id}
-              className={`${s.tabBtn} ${activeTab === id ? s.tabBtnActive : ''}`}
-              onClick={() => setActiveTab(id)}
-            >
-              <Icon size={15} />
-              <span>{label}</span>
-            </button>
-          ))}
-        </nav>
+        <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} className={s.tabBar} />
 
         <div className={s.tabPanel} role="tabpanel">
           {activeTab === 'users' && <UsersTab />}

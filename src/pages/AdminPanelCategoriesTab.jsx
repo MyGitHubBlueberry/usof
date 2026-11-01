@@ -243,13 +243,14 @@ export default function CategoriesTab() {
             onClick={() => handleSaveEdit(cat)}
             disabled={editLoading || !editTitle.trim()}
             type="button"
+            title="Save category"
           >
             <IconCheck size={14} />
-            {editLoading ? 'Saving…' : 'Save'}
+            <span className={s.actionBtnLabel}>{editLoading ? 'Saving…' : 'Save'}</span>
           </button>
-          <button className={s.btnGhost} onClick={cancelEdit} type="button">
+          <button className={s.btnGhost} onClick={cancelEdit} type="button" title="Cancel editing">
             <IconX size={14} />
-            Cancel
+            <span className={s.actionBtnLabel}>Cancel</span>
           </button>
         </div>
       </div>
@@ -282,7 +283,7 @@ export default function CategoriesTab() {
           type="button"
         >
           <IconPen size={14} />
-          Edit
+          <span className={s.actionBtnLabel}>Edit</span>
         </button>
         <button
           className={`${s.actionBtn} ${s.actionDangerBtn}`}
@@ -291,7 +292,7 @@ export default function CategoriesTab() {
           type="button"
         >
           <IconTrash size={14} />
-          Delete
+          <span className={s.actionBtnLabel}>Delete</span>
         </button>
       </div>
     </>
@@ -321,9 +322,10 @@ export default function CategoriesTab() {
             className={s.btnPrimary}
             type="button"
             onClick={() => setShowAddModal(true)}
+            title="Add category"
           >
             <IconPlus size={14} />
-            Add Category
+            <span className={s.actionBtnLabel}>Add Category</span>
           </button>
         }
       />

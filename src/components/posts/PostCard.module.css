@@ -1,13 +1,11 @@
 .postCard {
   background: var(--bg);
   border: 1px solid var(--border);
-  padding: 18px 20px;
   transition: border-color 0.15s, background 0.12s;
   text-decoration: none;
   color: inherit;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   box-sizing: border-box;
   cursor: pointer;
 }
@@ -15,6 +13,45 @@
 .postCard:hover {
   border-color: var(--text);
   background: var(--code-bg);
+}
+
+
+.postCardWithPreview {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.cardPreviewWrapper {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.cardPreview {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  min-height: 120px;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  background: var(--code-bg);
+  align-self: stretch;
+}
+
+.cardPreviewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
 }
 
 .postHeader {
@@ -175,8 +212,16 @@
 }
 
 @media (max-width: 640px) {
-  .postCard {
+  .cardBody {
     padding: 14px 14px;
+  }
+
+  .cardPreview {
+    display: none;
+  }
+
+  .postCardWithPreview {
+    flex-direction: column;
   }
 
   .postFooter {

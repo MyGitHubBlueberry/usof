@@ -7,6 +7,7 @@ import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
 import { formatFullDate } from '../../utils/format'
 import { MARKDOWN_PLUGINS, MARKDOWN_COMPONENTS } from '../../utils/markdown'
+import { IMAGE_EXTENSIONS, getExtension, getAttachmentUrl } from '../../utils/attachments'
 import FavoriteButton from '../ui/FavoriteButton'
 import { IconMessageCircle, IconPaperclip, IconThumbsUp, IconShare, IconCheck } from '../ui/Icons'
 import s from './PostCard.module.css'
@@ -18,6 +19,7 @@ export default function PostCard({ post }) {
   const [likes, setLikes] = useState(null)
   const [favorited, setFavorited] = useState(!!post?.is_favorited)
   const [shared, setShared] = useState(false)
+  const [previewSrc, setPreviewSrc] = useState(null)
 
   useEffect(() => {
     if (!post?.id || post.like_count !== undefined) return
@@ -37,6 +39,27 @@ export default function PostCard({ post }) {
     }
   }, [post?.id, post?.like_count])
 
+  useEffect(() => {
+    if (!post?.id || !post?.attachment_count) return
+    let isMounted = true
+    // The feed list endpoint only returns attachment_count, not filenames, so
+    // finding the first image means fetching the full post. This adds one
+    // extra request per card that has attachments — acceptable since feeds
+    // are paginated to a handful of posts per page.
+    postsService
+      .getById(post.id)
+      .then((res) => {
+        if (!isMounted) return
+        const attachments = res.data?.attachments ?? []
+        const firstImage = attachments.find((f) => IMAGE_EXTENSIONS.includes(getExtension(f)))
+        if (firstImage) setPreviewSrc(getAttachmentUrl(post.id, firstImage))
+      })
+      .catch(() => { })
+    return () => {
+      isMounted = false
+    }
+  }, [post?.id, post?.attachment_count])
+
   const categories = useMemo(
     () =>
       post?.category_titles
@@ -50,6 +73,8 @@ export default function PostCard({ post }) {
   const displayLikes =
     post.like_count !== undefined ? Number(post.like_count) : (likes ?? 0)
 
+  // comment_count is a snapshot from the list response and isn't polled live;
+  // it only refreshes when the feed itself refetches (page/filter change).
   const commentCount = Number(post.comment_count ?? 0)
   const attachmentCount = Number(post.attachment_count ?? 0)
   const showStatusBadge = post.status === 'resolved' || post.status === 'inactive'
@@ -84,93 +109,109 @@ export default function PostCard({ post }) {
 
   return (
     <article
-      className={s.postCard}
+      className={`${s.postCard} ${previewSrc ? s.postCardWithPreview : ''}`}
       role="link"
       tabIndex={0}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
     >
-      <div className={s.postHeader}>
-        <FavoriteButton
-          postId={post.id}
-          isFavorited={favorited}
-          isAuthenticated={!!currentUser}
-          onChange={setFavorited}
-          size={18}
-          className={s.cardFavoriteBtn}
-        />
-
-        <div className={s.titleGroup}>
-          <h2 className={s.postTitle}>{post.title}</h2>
-          {categories.length > 0 && (
-            <div className={s.categoryRow}>
-              {categories.map((title) => (
-                <span key={title} className={s.categoryTag}>
-                  {title}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className={s.headerActions}>
-          {showStatusBadge && (
-            <span className={`${s.statusBadge} ${statusClass}`}>
-              {post.status}
-            </span>
-          )}
-          <button
-            type="button"
-            className={s.shareBtn}
-            onClick={handleShare}
-            aria-label="Copy post link"
-            title={shared ? 'Copied!' : 'Share'}
-          >
-            {shared ? <IconCheck size={15} /> : <IconShare size={15} />}
-          </button>
-        </div>
-      </div>
-
-      {post.content && (
-        <div className={s.postSnippet}>
-          <ReactMarkdown remarkPlugins={MARKDOWN_PLUGINS} components={MARKDOWN_COMPONENTS}>
-            {post.content}
-          </ReactMarkdown>
+      {previewSrc && (
+        <div className={s.cardPreviewWrapper}>
+          <div className={s.cardPreview}>
+            <img
+              src={previewSrc}
+              alt=""
+              aria-hidden="true"
+              className={s.cardPreviewImg}
+              onError={() => setPreviewSrc(null)}
+            />
+          </div>
         </div>
       )}
 
-      <div className={s.postFooter}>
-        <div className={s.metaGroup}>
-          <span className={s.metricItem} title="Likes">
-            <IconThumbsUp size={13} />
-            {displayLikes}
-          </span>
-          <span className={s.metricItem} title="Comments">
-            <IconMessageCircle size={13} />
-            {commentCount}
-          </span>
-          {attachmentCount > 0 && (
-            <span className={s.metricItem} title="Attachments">
-              <IconPaperclip size={13} />
-              {attachmentCount}
-            </span>
-          )}
+      <div className={s.cardBody}>
+        <div className={s.postHeader}>
+          <FavoriteButton
+            postId={post.id}
+            isFavorited={favorited}
+            isAuthenticated={!!currentUser}
+            onChange={setFavorited}
+            size={18}
+            className={s.cardFavoriteBtn}
+          />
+
+          <div className={s.titleGroup}>
+            <h2 className={s.postTitle}>{post.title}</h2>
+            {categories.length > 0 && (
+              <div className={s.categoryRow}>
+                {categories.map((title) => (
+                  <span key={title} className={s.categoryTag}>
+                    {title}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className={s.headerActions}>
+            {showStatusBadge && (
+              <span className={`${s.statusBadge} ${statusClass}`}>
+                {post.status}
+              </span>
+            )}
+            <button
+              type="button"
+              className={s.shareBtn}
+              onClick={handleShare}
+              aria-label="Copy post link"
+              title={shared ? 'Copied!' : 'Share'}
+            >
+              {shared ? <IconCheck size={15} /> : <IconShare size={15} />}
+            </button>
+          </div>
         </div>
 
-        <div className={s.authorMeta}>
-          {post.author_login && (
-            <span>
-              By{' '}
-              <Link
-                to={toProfile(post.user_id)}
-                className={s.authorLink}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {post.author_login}
-              </Link>
+        {post.content && (
+          <div className={s.postSnippet}>
+            <ReactMarkdown remarkPlugins={MARKDOWN_PLUGINS} components={MARKDOWN_COMPONENTS}>
+              {post.content}
+            </ReactMarkdown>
+          </div>
+        )}
+
+        <div className={s.postFooter}>
+          <div className={s.metaGroup}>
+            <span className={s.metricItem} title="Likes">
+              <IconThumbsUp size={13} />
+              {displayLikes}
             </span>
-          )}
-          {post.publish_date && <span>On {formatFullDate(post.publish_date)}</span>}
+            <span className={s.metricItem} title="Comments">
+              <IconMessageCircle size={13} />
+              {commentCount}
+            </span>
+            {attachmentCount > 0 && (
+              <span className={s.metricItem} title="Attachments">
+                <IconPaperclip size={13} />
+                {attachmentCount}
+              </span>
+            )}
+          </div>
+
+          <div className={s.authorMeta}>
+            {post.author_login && (
+              <span>
+                By{' '}
+                <Link
+                  to={toProfile(post.user_id)}
+                  className={s.authorLink}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {post.author_login}
+                </Link>
+              </span>
+            )}
+            {post.publish_date && <span>On {formatFullDate(post.publish_date)}</span>}
+          </div>
         </div>
       </div>
     </article>

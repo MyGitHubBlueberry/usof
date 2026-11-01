@@ -12,7 +12,7 @@ export function BackButton({ className = '' }) {
       onClick={() => navigate(-1)}
       aria-label="Go back"
     >
-      <IconChevronLeft size={16} />
+      <IconChevronLeft size={16} className={s.icon} />
       <span>Back</span>
     </button>
   )
@@ -29,7 +29,7 @@ export function ForwardButton({ className = '' }) {
       aria-label="Go forward"
     >
       <span>Forward</span>
-      <IconChevronRight size={16} />
+      <IconChevronRight size={16} className={s.icon} />
     </button>
   )
 }

@@ -84,57 +84,34 @@
   background: #e53e3e;
 }
 
-.fileAttachment {
-  display: inline-flex;
+.fileContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
-}
-
-.fileLink {
-  display: inline-flex;
-  align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  color: var(--text-h);
-  text-decoration: none;
-  font-size: 13px;
-  transition: border-color 0.15s, color 0.15s;
+  padding: 10px;
+  box-sizing: border-box;
+  color: var(--text);
 }
 
-.fileLink:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.fileTypeIcon {
+  display: flex;
+  color: var(--text);
 }
 
 .fileName {
-  max-width: 220px;
+  font-size: 11px;
+  text-align: center;
+  color: var(--text-h);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.downloadIcon {
-  flex-shrink: 0;
-}
-
-.fileRemoveBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  flex-shrink: 0;
-}
-
-.fileRemoveBtn:hover {
-  border-color: #e53e3e;
-  color: #e53e3e;
+  word-break: break-word;
 }
 
 @media (max-width: 640px) {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { IconChevron } from './Icons.jsx'
+import { IconChevron, IconX } from './Icons.jsx'
 import s from './SelectDropdown.module.css'
 
 export function MultiSelectDropdown({
@@ -59,6 +59,13 @@ export function MultiSelectDropdown({
 
       {open && (
         <div className={s.dropdownMenu} role="listbox" aria-multiselectable="true">
+          {selectedValues.length > 0 && (
+            <button type="button" className={s.clearSelectionBtn} onClick={() => onChange([])}>
+              <IconX size={10} />
+              <span>Clear selection</span>
+            </button>
+          )}
+
           {options.length > 0 && (
             <input
               ref={searchRef}

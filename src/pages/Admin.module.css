@@ -39,16 +39,7 @@
 }
 
 .tabBar {
-  composes: tabBar from '../components/ui/Tabs.module.css';
   padding: 0 24px;
-}
-
-.tabBtn {
-  composes: tabBtn from '../components/ui/Tabs.module.css';
-}
-
-.tabBtnActive {
-  composes: tabBtnActive from '../components/ui/Tabs.module.css';
 }
 
 .tabPanel {
@@ -358,7 +349,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
 }
 
 .actionBtn {
@@ -410,6 +400,9 @@
   background: color-mix(in srgb, #e53e3e 8%, transparent);
   color: #e53e3e;
   border-color: color-mix(in srgb, #e53e3e 40%, transparent);
+}
+
+.actionBtnLabel {
 }
 
 
@@ -736,6 +729,10 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text-h);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .categoryDesc {
@@ -819,11 +816,6 @@
     padding: 0 16px;
   }
 
-  .tabBtn {
-    padding: 10px 12px;
-    font-size: 12px;
-  }
-
   .table th,
   .table td {
     padding: 8px 10px;
@@ -891,6 +883,22 @@
   }
 }
 
+@media (max-width: 600px) {
+  .actionBtnLabel {
+    display: none;
+  }
+
+  .actionBtn {
+    padding: 4px 8px;
+  }
+
+  .btnPrimary .actionBtnLabel,
+  .btnGhost .actionBtnLabel,
+  .btnDanger .actionBtnLabel {
+    display: none;
+  }
+}
+
 @media (max-width: 860px) {
   .colPublishDate {
     display: none;
@@ -900,5 +908,11 @@
 @media (max-width: 768px) {
   .colAttachments {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .adminHeaderInner {
+    justify-content: center;
   }
 }

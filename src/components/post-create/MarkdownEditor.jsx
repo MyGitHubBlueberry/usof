@@ -4,6 +4,7 @@ import { MARKDOWN_PLUGINS, MARKDOWN_COMPONENTS } from '../../utils/markdown'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import ExpandableContent from '../ui/ExpandableContent'
 import MarkdownToolbar from './MarkdownToolbar'
+import { IconPen, IconEye } from '../ui/Icons'
 import s from './MarkdownEditor.module.css'
 
 const PREVIEW_COLLAPSED_HEIGHT = 320
@@ -28,7 +29,7 @@ export default function MarkdownEditor({
           className={`${s.tab} ${mode === 'write' ? s.tabActive : ''}`}
           onClick={() => setMode('write')}
         >
-        //todo: icon
+          <IconPen size={14} />
           <span>Write</span>
         </button>
         <button
@@ -38,7 +39,7 @@ export default function MarkdownEditor({
           className={`${s.tab} ${mode === 'preview' ? s.tabActive : ''}`}
           onClick={() => setMode('preview')}
         >
-          //todo:icon
+          <IconEye size={14} />
           <span>Preview</span>
         </button>
       </div>

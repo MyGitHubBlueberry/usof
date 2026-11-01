@@ -41,6 +41,10 @@
 }
 
 @media (max-width: 480px) {
+  .tabBar {
+    justify-content: center;
+  }
+
   .tabBtn:not(.tabBtnActive) span {
     display: none;
   }

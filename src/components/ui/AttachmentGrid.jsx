@@ -67,23 +67,37 @@ function FileAttachment({ url, filename, onRemove }) {
   const extension = getExtension(filename)
 
   return (
-    <div className={s.fileAttachment}>
-      <a href={url} download className={s.fileLink}>
-        {getFileIcon(extension, 16)}
+    <div className={s.imageAttachment}>
+      <div className={s.fileContent}>
+        <span className={s.fileTypeIcon}>{getFileIcon(extension, 28)}</span>
         <span className={s.fileName}>{getDisplayName(filename)}</span>
-        <IconDownload size={14} className={s.downloadIcon} />
-      </a>
-      {onRemove && (
-        <button
-          type="button"
-          className={s.fileRemoveBtn}
-          onClick={() => onRemove(filename)}
-          aria-label={`Remove ${getDisplayName(filename)}`}
-          title="Remove attachment"
+      </div>
+      <div className={s.overlayActions}>
+        <a
+          href={url}
+          download
+          className={s.overlayBtn}
+          onClick={(e) => e.stopPropagation()}
+          aria-label={`Download ${getDisplayName(filename)}`}
+          title="Download"
         >
-          <IconTrash size={13} />
-        </button>
-      )}
+          <IconDownload size={13} />
+        </a>
+        {onRemove && (
+          <button
+            type="button"
+            className={`${s.overlayBtn} ${s.overlayBtnDanger}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              onRemove(filename)
+            }}
+            aria-label={`Remove ${getDisplayName(filename)}`}
+            title="Remove attachment"
+          >
+            <IconTrash size={13} />
+          </button>
+        )}
+      </div>
     </div>
   )
 }

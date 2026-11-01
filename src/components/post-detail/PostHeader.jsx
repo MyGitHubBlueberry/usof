@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
 import { commentsService } from '../../services/comments.service'
-import { toPostEdit } from '../../constants/routes'
+import { ROUTES, toPostEdit } from '../../constants/routes'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
+import ActionModal from '../ui/ActionModal'
 import FavoriteButton from '../ui/FavoriteButton'
 import { IconDots, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } from '../ui/Icons'
 import s from './PostHeader.module.css'
@@ -23,8 +24,24 @@ export default function PostHeader({
   const { showFlash } = useFlash()
   const navigate = useNavigate()
   const [statusSaving, setStatusSaving] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const isOwner = !!currentUser && Number(currentUser.id) === Number(post.user_id)
   const canDelete = isAdmin || isOwner;
+
+  function handleDelete() {
+    setDeleting(true)
+    postsService
+      .delete(post.id)
+      .then(() => {
+        navigate(ROUTES.HOME)
+        showFlash('Post deleted.', 'success')
+      })
+      .catch((err) => {
+        showFlash(err.message || 'Could not delete post.', 'error')
+        setDeleting(false)
+      })
+  }
 
   function handleStatusChange(status) {
     const wasResolved = post.status === 'resolved'
@@ -124,7 +141,7 @@ export default function PostHeader({
             </ActionMenuItem>
           )}
           {canDelete && (
-            <ActionMenuItem icon={<IconTrash size={13} />} onClick={() => { /* todo: setDeleteModalOpen(true) */ }} danger>
+            <ActionMenuItem icon={<IconTrash size={13} />} onClick={() => setDeleteModalOpen(true)} danger>
               Delete
             </ActionMenuItem>
           )}
@@ -139,6 +156,18 @@ export default function PostHeader({
             </span>
           ))}
         </div>
+      )}
+
+      {deleteModalOpen && (
+        <ActionModal
+          title="Delete post?"
+          message="This action cannot be undone. The post and all its comments will be permanently deleted."
+          confirmText="Delete"
+          isDanger
+          isLoading={deleting}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={handleDelete}
+        />
       )}
     </div>
   )

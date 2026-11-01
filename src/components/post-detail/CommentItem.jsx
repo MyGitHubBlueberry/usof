@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
+import { usePolling } from '../../hooks/usePolling'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
@@ -66,22 +67,25 @@ export default function CommentItem({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  useEffect(() => {
-    let isMounted = true
-    commentsService
+  const fetchLikes = useCallback(() => {
+    return commentsService
       .getLikes(comment.id)
       .then((res) => {
-        if (!isMounted) return
         const data = res.data ?? { likes: 0, dislikes: 0, myReaction: null }
         setLikeCounts(data)
         setMyReaction(data.myReaction ?? null)
         onLikesChanged?.(comment.id, data)
       })
       .catch(() => { })
-    return () => {
-      isMounted = false
-    }
   }, [comment.id, onLikesChanged])
+
+  useEffect(() => {
+    fetchLikes()
+  }, [fetchLikes])
+
+  // Comment-level likes aren't included in the new-comment poll in
+  // CommentsSection, so each comment refreshes its own reaction counts here.
+  usePolling(fetchLikes, 30_000, [fetchLikes])
 
   const isTombstone = comment.status === 'inactive'
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
@@ -93,17 +97,6 @@ export default function CommentItem({
   const canResolve = (isPostOwner || isAdmin) && canReplyOrResolve
   const isResolved = comment.status === 'resolved'
   const replyCount = comment.replies.length
-
-  function refreshLikes() {
-    return commentsService
-      .getLikes(comment.id)
-      .then((res) => {
-        const data = res.data ?? { likes: 0, dislikes: 0 }
-        setLikeCounts(data)
-        onLikesChanged?.(comment.id, data)
-      })
-      .catch(() => { })
-  }
 
   function handleReact(type) {
     if (!currentUser) {
@@ -117,10 +110,7 @@ export default function CommentItem({
       myReaction === type ? commentsService.removeLike(comment.id) : commentsService.like(comment.id, type)
 
     action
-      .then(() => {
-        setMyReaction(myReaction === type ? null : type)
-        return refreshLikes()
-      })
+      .then(() => fetchLikes())
       .catch((err) => showFlash(err.message || 'Could not save your reaction.', 'error'))
       .finally(() => setReacting(false))
   }

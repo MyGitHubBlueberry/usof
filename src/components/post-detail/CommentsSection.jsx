@@ -5,6 +5,7 @@ import { usersService } from '../../services/users.service'
 import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
+import { usePolling } from '../../hooks/usePolling'
 import { ROUTES } from '../../constants/routes'
 import Avatar from '../ui/Avatar'
 import Pagination from '../ui/Pagination'
@@ -66,6 +67,7 @@ export default function CommentsSection({
   const { showFlash } = useFlash()
 
   const [comments, setComments] = useState([])
+  const [autoRefreshToken, setAutoRefreshToken] = useState(0)
   const [usersById, setUsersById] = useState({})
   const [likeNet, setLikeNet] = useState({})
   const [loading, setLoading] = useState(true)
@@ -126,7 +128,26 @@ export default function CommentsSection({
 
   useEffect(() => {
     loadComments()
-  }, [loadComments, refreshToken])
+  }, [loadComments, refreshToken, autoRefreshToken])
+
+  usePolling(
+    () => {
+      postsService
+        .getComments(postId, { limit: 1 })
+        .then((res) => {
+          const freshTotal = res.data?.pagination?.totalItems ?? res.data?.total ?? res.data?.count ?? 0
+          setComments((prev) => {
+            if (freshTotal !== prev.length) {
+              setAutoRefreshToken((t) => t + 1)
+            }
+            return prev
+          })
+        })
+        .catch(() => {})
+    },
+    20_000,
+    [postId]
+  )
 
   // If a post is resolved but none of its comments are (anymore) marked
   // resolved - e.g. the resolved comment was unmarked, edited away, or

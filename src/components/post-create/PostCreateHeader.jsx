@@ -53,17 +53,15 @@ export default function PostCreateHeader({
           {selectedCategories.map((title) => (
             <span key={title} className={s.categoryTag}>
               {title}
-              {mode === 'edit' && (
-                <button
-                  type="button"
-                  className={s.categoryTagRemove}
-                  onClick={() => onCategoriesChange(selectedCategories.filter((c) => c !== title))}
-                  aria-label={`Remove category: ${title}`}
-                  title={`Remove category: ${title}`}
-                >
-                  <IconX size={10} />
-                </button>
-              )}
+              <button
+                type="button"
+                className={s.categoryTagRemove}
+                onClick={() => onCategoriesChange(selectedCategories.filter((c) => c !== title))}
+                aria-label={`Remove category: ${title}`}
+                title={`Remove category: ${title}`}
+              >
+                <IconX size={10} />
+              </button>
             </span>
           ))}
         </div>

@@ -116,6 +116,28 @@
   border-bottom-color: var(--accent);
 }
 
+.clearSelectionBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.clearSelectionBtn:hover {
+  color: var(--accent);
+}
+
 .dropdownEmpty {
   padding: 12px;
   font-size: 13px;

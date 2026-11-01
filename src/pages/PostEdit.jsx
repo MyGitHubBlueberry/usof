@@ -109,55 +109,55 @@ function PostEditForm({ post, categories }) {
   }
 
   return (
-    <div className={s.postPage} onKeyDown={handleKeyDown}>
-      <NavRow/>
-      <h1 className={s.pageTitle}>Edit post</h1>
+    <>
+      <NavRow />
+      <div className={s.postPage} onKeyDown={handleKeyDown}>
+        {post.status === 'inactive' && (
+          <p className={s.inactiveNotice}>
+            This post is currently hidden by a moderator. Save your changes to resubmit it for review.
+          </p>
+        )}
 
-      {post.status === 'inactive' && (
-        <p className={s.inactiveNotice}>
-          This post is currently hidden by a moderator. Save your changes to resubmit it for review.
-        </p>
-      )}
+        <PostCreateHeader
+          mode="edit"
+          title={title}
+          onTitleChange={setTitle}
+          titleError={errors.title}
+          selectedCategories={selectedCategories}
+          categoryOptions={categoryOptions}
+          onCategoriesChange={setSelectedCategories}
+        />
 
-      <PostCreateHeader
-        mode="edit"
-        title={title}
-        onTitleChange={setTitle}
-        titleError={errors.title}
-        selectedCategories={selectedCategories}
-        categoryOptions={categoryOptions}
-        onCategoriesChange={setSelectedCategories}
-      />
+        <MarkdownEditor value={content} onChange={setContent} error={errors.content} />
 
-      <MarkdownEditor value={content} onChange={setContent} error={errors.content} />
+        {existingAttachments.length > 0 && (
+          <div className={s.existingAttachments}>
+            <span className={s.existingAttachmentsLabel}>Existing attachments</span>
+            <AttachmentGrid
+              postId={post.id}
+              attachments={existingAttachments}
+              onImageClick={handleImageClick}
+              onRemove={handleRemoveAttachment}
+            />
+          </div>
+        )}
 
-      {existingAttachments.length > 0 && (
-        <div className={s.existingAttachments}>
-          <span className={s.existingAttachmentsLabel}>Existing attachments</span>
-          <AttachmentGrid
-            postId={post.id}
-            attachments={existingAttachments}
-            onImageClick={handleImageClick}
-            onRemove={handleRemoveAttachment}
-          />
+        {lightboxIndex !== null && (
+          <Lightbox images={images} startIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />
+        )}
+
+        <AttachmentUploader files={newAttachments} onChange={setNewAttachments} />
+
+        <div className={s.actions}>
+          <Link to={toPost(post.id)} className={s.cancelBtn}>
+            Cancel
+          </Link>
+          <button type="button" className={s.submitBtn} onClick={handleSubmit} disabled={submitting}>
+            {submitting ? 'Saving…' : 'Save changes'}
+          </button>
         </div>
-      )}
-
-      {lightboxIndex !== null && (
-        <Lightbox images={images} startIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />
-      )}
-
-      <AttachmentUploader files={newAttachments} onChange={setNewAttachments} />
-
-      <div className={s.actions}>
-        <Link to={toPost(post.id)} className={s.cancelBtn}>
-          Cancel
-        </Link>
-        <button type="button" className={s.submitBtn} onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Saving…' : 'Save changes'}
-        </button>
       </div>
-    </div>
+    </>
   )
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { IMAGE_EXTENSIONS, getExtension, getDisplayName, getFileIcon } from '../../utils/attachments'
 import { IconPlus, IconX } from '../ui/Icons'
 import s from './AttachmentUploader.module.css'
+import grid from '../ui/AttachmentGrid.module.css'
 
 const MAX_ATTACHMENTS = 10
 
@@ -56,27 +57,31 @@ export default function AttachmentUploader({ files, onChange }) {
       </div>
 
       {files.length > 0 && (
-        <div className={s.list}>
+        <div className={grid.attachments}>
           {files.map((file, idx) => {
             const extension = getExtension(file.name)
             const isImage = IMAGE_EXTENSIONS.includes(extension)
             return (
-              <div key={`${file.name}-${idx}`} className={s.item}>
+              <div key={`${file.name}-${idx}`} className={grid.imageAttachment}>
                 {isImage ? (
-                  <img src={previewUrls[idx]} alt={file.name} className={s.thumb} />
+                  <img src={previewUrls[idx]} alt={file.name} className={grid.imageThumb} />
                 ) : (
-                  <span className={s.fileIcon}>{getFileIcon(extension, 16)}</span>
+                  <div className={grid.fileContent}>
+                    <span className={grid.fileTypeIcon}>{getFileIcon(extension, 28)}</span>
+                    <span className={grid.fileName}>{getDisplayName(file.name)}</span>
+                  </div>
                 )}
-                <span className={s.fileName}>{getDisplayName(file.name)}</span>
-                <button
-                  type="button"
-                  className={s.removeBtn}
-                  onClick={() => removeFile(idx)}
-                  aria-label={`Remove ${file.name}`}
-                  title="Remove attachment"
-                >
-                  <IconX size={11} />
-                </button>
+                <div className={grid.overlayActions}>
+                  <button
+                    type="button"
+                    className={`${grid.overlayBtn} ${grid.overlayBtnDanger}`}
+                    onClick={() => removeFile(idx)}
+                    aria-label={`Remove ${file.name}`}
+                    title="Remove attachment"
+                  >
+                    <IconX size={13} />
+                  </button>
+                </div>
               </div>
             )
           })}

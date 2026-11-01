@@ -24,15 +24,23 @@
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;
-  color: var(--text);
+  color: var(--text-h);
   background: transparent;
   border: 1px solid var(--border);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
 
+.addBtn svg {
+  color: var(--text)
+}
+
 .addBtn:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--text);
+  color: var(--text-h);
+}
+
+.addBtn:hover:not(:disabled) svg {
   color: var(--accent);
 }
 
@@ -43,61 +51,6 @@
 
 .hiddenInput {
   display: none;
-}
-
-.list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  background: var(--code-bg);
-  max-width: 220px;
-}
-
-.thumb {
-  width: 28px;
-  height: 28px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.fileIcon {
-  display: flex;
-  color: var(--text);
-  flex-shrink: 0;
-}
-
-.fileName {
-  font-size: 12px;
-  color: var(--text-h);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.removeBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  color: var(--text);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.removeBtn:hover {
-  color: #ef4444;
 }
 
 .limitNote {

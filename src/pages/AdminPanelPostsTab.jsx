@@ -352,7 +352,7 @@ export default function PostsTab() {
                           type="button"
                         >
                           <IconTrash size={14} />
-                          Delete
+                          <span className={s.actionBtnLabel}>Delete</span>
                         </button>
                       </div>
                     </td>

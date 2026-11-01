@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { IconDocument, IconStar, IconBell, IconRss } from '../ui/Icons'
+import TabBar from '../ui/TabBar'
 import ProfilePosts from './ProfilePosts'
 import ProfileFavorites from './ProfileFavorites'
 import ProfileNotifications from './ProfileNotifications'
@@ -25,21 +26,7 @@ export default function ProfileTabs({ profile, isOwner, activeTab, onTabChange }
 
   return (
     <div className={s.tabsWrap}>
-      <nav className={s.tabBar} role="tablist">
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={effectiveTab === id}
-            className={`${s.tabBtn} ${effectiveTab === id ? s.tabBtnActive : ''}`}
-            onClick={() => onTabChange(id)}
-          >
-            <Icon size={15} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </nav>
+      <TabBar tabs={tabs} activeTab={effectiveTab} onTabChange={onTabChange} className={s.tabBar} />
 
       <div className={s.tabPanel} role="tabpanel">
         {effectiveTab === 'posts' && <ProfilePosts profile={profile} />}

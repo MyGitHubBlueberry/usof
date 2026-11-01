@@ -447,7 +447,7 @@ export default function UsersTab() {
           type="button"
         >
           <IconArrowUp size={13} />
-          Promote
+          <span className={s.actionBtnLabel}>Promote</span>
         </button>
         <button
           className={s.actionBtn}
@@ -457,7 +457,7 @@ export default function UsersTab() {
           type="button"
         >
           <IconArrowDown size={13} />
-          Demote
+          <span className={s.actionBtnLabel}>Demote</span>
         </button>
         {user.is_banned ? (
           <button
@@ -468,7 +468,7 @@ export default function UsersTab() {
             type="button"
           >
             <IconCheck size={14} />
-            Unban
+            <span className={s.actionBtnLabel}>Unban</span>
           </button>
         ) : (
           <button
@@ -479,7 +479,7 @@ export default function UsersTab() {
             type="button"
           >
             <IconBan size={14} />
-            Ban
+            <span className={s.actionBtnLabel}>Ban</span>
           </button>
         )}
         {canDeleteUser && (
@@ -490,7 +490,7 @@ export default function UsersTab() {
             type="button"
           >
             <IconTrash size={14} />
-            Delete
+            <span className={s.actionBtnLabel}>Delete</span>
           </button>
         )}
       </div>
@@ -769,9 +769,10 @@ export default function UsersTab() {
               className={s.btnPrimary}
               type="button"
               onClick={() => setShowAddUserModal(true)}
+              title="Create user"
             >
               <IconPlus size={14} />
-              Create User
+              <span className={s.actionBtnLabel}>Create User</span>
             </button>
           )
         }

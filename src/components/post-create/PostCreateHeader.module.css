@@ -94,3 +94,9 @@
     font-size: 21px;
   }
 }
+
+@media (max-width: 480px) {
+  .headerLabelWrap {
+    justify-content: center;
+  }
+}

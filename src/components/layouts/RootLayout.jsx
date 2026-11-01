@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, matchPath } from 'react-router-dom'
 import { Suspense } from 'react'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated } from '../../redux/slices/authSlice'
@@ -18,6 +18,8 @@ export default function RootLayout() {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const banned = useSelector((state) => state.auth.banned)
   const isHome = location.pathname === ROUTES.HOME
+  const isPostDetail = !!matchPath({ path: ROUTES.POST, end: true }, location.pathname)
+  const showSidebars = isHome || isPostDetail
   const isFullSpan = location.pathname.startsWith(ROUTES.ADMIN)
 
   if (banned) {
@@ -29,7 +31,7 @@ export default function RootLayout() {
       <Header />
 
       <div className={s.contentArea}>
-        {isHome && (
+        {showSidebars && (
           <aside className={s.leftSidebar}>
             {isAuthenticated ? (
               <>
@@ -37,7 +39,7 @@ export default function RootLayout() {
                 <SubscriptionsWidget />
               </>
             ) : (
-              <CategoriesWidget />
+              isHome && <CategoriesWidget />
             )}
           </aside>
         )}
@@ -51,9 +53,9 @@ export default function RootLayout() {
           </main>
         </div>
 
-        {isHome && (
+        {showSidebars && (
           <aside className={s.rightSidebar}>
-            <LeaderboardWidget />
+            {isHome && <LeaderboardWidget />}
             {isAuthenticated && <FavoritesWidget />}
           </aside>
         )}
