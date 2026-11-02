@@ -16,6 +16,7 @@
 .avatarWrap {
   position: relative;
   flex-shrink: 0;
+  border-radius: 50%;
 }
 
 .avatarEditBtn {
@@ -26,9 +27,9 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  border: 2px solid var(--bg);
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,7 +38,7 @@
 }
 
 .avatarEditBtn:hover:not(:disabled) {
-  background: transparent;
+  border-color: var(--text-h);
   color: var(--accent);
 }
 
@@ -63,8 +64,8 @@
   transition: opacity 0.15s;
 }
 
-.avatarWrap:hover .avatarRemoveOverlay,
-.avatarWrap:focus-within .avatarRemoveOverlay {
+.avatarWrap:hover:not(:has(.avatarEditBtn:hover)) .avatarRemoveOverlay,
+.avatarWrap:focus-within:not(:has(.avatarEditBtn:focus)) .avatarRemoveOverlay {
   opacity: 1;
   pointer-events: auto;
 }

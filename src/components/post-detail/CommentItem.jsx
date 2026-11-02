@@ -83,8 +83,6 @@ export default function CommentItem({
     fetchLikes()
   }, [fetchLikes])
 
-  // Comment-level likes aren't included in the new-comment poll in
-  // CommentsSection, so each comment refreshes its own reaction counts here.
   usePolling(fetchLikes, 30_000, [fetchLikes])
 
   const isTombstone = comment.status === 'inactive'

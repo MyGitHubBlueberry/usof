@@ -10,6 +10,11 @@
   object-fit: cover;
 }
 
+.hasAvatar {
+  border: 1px solid var(--border);
+  background: none;
+}
+
 .small {
   width: 24px;
   height: 24px;

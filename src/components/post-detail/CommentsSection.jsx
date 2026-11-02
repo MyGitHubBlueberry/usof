@@ -149,10 +149,7 @@ export default function CommentsSection({
     [postId]
   )
 
-  // If a post is resolved but none of its comments are (anymore) marked
-  // resolved - e.g. the resolved comment was unmarked, edited away, or
-  // deleted - automatically revert the post back to active. Only an admin
-  // has permission to call the post status endpoint.
+  // revert post to active from resolved if there are no more resolved comments
   useEffect(() => {
     if (!isAdmin || loading || postStatus !== 'resolved' || revertingRef.current) return
     const anyResolved = comments.some((c) => c.status === 'resolved')

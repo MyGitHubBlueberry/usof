@@ -14,7 +14,7 @@ export default function NotificationsWidget() {
   const user = useSelector((state) => state.auth.user)
   const profileRoute = toProfileTab(user?.id, 'notifications')
   const { data: notifications, loading, setData } = useAsyncData(
-    () => notificationsService.getAll({ limit: 4 }),
+    () => notificationsService.getAll({ limit: 10 }),
     [],
     []
   )

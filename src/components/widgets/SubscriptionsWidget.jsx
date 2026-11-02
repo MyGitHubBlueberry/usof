@@ -13,7 +13,7 @@ export default function SubscriptionsWidget() {
       icon={<IconRss size={14} />}
       actionLink={toProfileTab(user?.id, 'subscriptions')}
       actionText="All"
-      fetchFn={() => postsService.getSubscriptions({ limit: 4 })}
+      fetchFn={() => postsService.getSubscriptions({ limit: 10 })}
       emptyMessage="No subscribed posts"
     />
   )

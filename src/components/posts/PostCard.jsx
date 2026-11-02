@@ -42,10 +42,6 @@ export default function PostCard({ post }) {
   useEffect(() => {
     if (!post?.id || !post?.attachment_count) return
     let isMounted = true
-    // The feed list endpoint only returns attachment_count, not filenames, so
-    // finding the first image means fetching the full post. This adds one
-    // extra request per card that has attachments — acceptable since feeds
-    // are paginated to a handful of posts per page.
     postsService
       .getById(post.id)
       .then((res) => {
@@ -73,8 +69,6 @@ export default function PostCard({ post }) {
   const displayLikes =
     post.like_count !== undefined ? Number(post.like_count) : (likes ?? 0)
 
-  // comment_count is a snapshot from the list response and isn't polled live;
-  // it only refreshes when the feed itself refetches (page/filter change).
   const commentCount = Number(post.comment_count ?? 0)
   const attachmentCount = Number(post.attachment_count ?? 0)
   const showStatusBadge = post.status === 'resolved' || post.status === 'inactive'

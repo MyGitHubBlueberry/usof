@@ -13,7 +13,7 @@ export default function FavoritesWidget() {
       icon={<IconStar size={14} />}
       actionLink={toProfileTab(user?.id, 'favorites')}
       actionText="All"
-      fetchFn={() => postsService.getFavorites({ limit: 4 })}
+      fetchFn={() => postsService.getFavorites({ limit: 13 })}
       emptyMessage="No favorited posts"
     />
   )

@@ -27,6 +27,7 @@
 .nested {
   margin-top: 10px;
   margin-left: 20px;
+  padding: 0px;
   padding-left: 12px;
   border-left: 2px solid var(--border);
   border-top: none;
@@ -278,12 +279,13 @@
 }
 
 @media (max-width: 640px) {
-  .nested {
-    margin-left: 10px;
-    padding-left: 8px;
-  }
-
   .comment {
     padding: 10px;
+  }
+
+  .nested {
+    margin-left: 10px;
+    padding: 0px;
+    padding-left: 8px;
   }
 }

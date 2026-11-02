@@ -13,7 +13,7 @@ export default function Avatar({
   const classes = [s.avatar, s[size], className].filter(Boolean).join(' ')
 
   if (src) {
-    return <img src={src} alt={name || 'User avatar'} className={classes} />
+    return <img src={src} alt={name || 'User avatar'} className={[classes, s.hasAvatar].join(' ')} />
   }
 
   return (
