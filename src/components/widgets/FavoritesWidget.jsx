@@ -3,9 +3,19 @@ import { postsService } from '../../services/posts.service'
 import { toProfileTab } from '../../constants/routes'
 import { IconStar } from '../ui/Icons'
 import PostListWidget from './PostListWidget'
+import sw from './SidebarWidget.module.css'
 
 export default function FavoritesWidget() {
   const user = useSelector((state) => state.auth.user)
+
+  function handleUnfavorite(e, post, onRemove) {
+    e.preventDefault()
+    e.stopPropagation()
+    postsService
+      .unfavorite(post.id)
+      .then(onRemove)
+      .catch(() => {})
+  }
 
   return (
     <PostListWidget
@@ -15,6 +25,17 @@ export default function FavoritesWidget() {
       actionText="All"
       fetchFn={() => postsService.getFavorites({ limit: 13 })}
       emptyMessage="No favorited posts"
+      renderItemAction={(post, onRemove) => (
+        <button
+          type="button"
+          className={sw.itemActionBtn}
+          onClick={(e) => handleUnfavorite(e, post, onRemove)}
+          aria-label="Remove from favorites"
+          title="Remove from favorites"
+        >
+          <IconStar filled size={12} />
+        </button>
+      )}
     />
   )
 }

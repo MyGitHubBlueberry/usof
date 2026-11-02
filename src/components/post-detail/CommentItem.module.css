@@ -105,6 +105,36 @@
   color: var(--accent);
 }
 
+.collapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.collapseBtn:hover {
+  color: var(--accent);
+  border-color: var(--text-h);
+}
+
+.collapseBtnActive {
+  color: var(--accent);
+  border-color: var(--text-h);
+}
+
+.collapsedInfo {
+  font-size: 11px;
+  color: var(--text);
+  font-style: italic;
+}
+
 .content {
   font-size: 14px;
   line-height: 1.55;
@@ -156,17 +186,23 @@
   gap: 6px;
   padding: 5px 10px;
   font-size: 12px;
-  font-weight: 600;
   background: transparent;
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--text-h);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
 
-.actionBtn:hover:not(:disabled) {
-  border-color: var(--accent);
+.actionBtn svg {
+  color: var(--text);
+}
+
+.actionBtn:hover:not(:disabled) svg {
   color: var(--accent);
+}
+
+.actionBtn:hover:not(:disabled) {
+  border-color: var(--text-h);
 }
 
 .actionBtn:disabled {

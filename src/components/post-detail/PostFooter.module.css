@@ -82,13 +82,20 @@
   font-family: inherit;
   background: transparent;
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--text-h);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
+.subscribeBtn svg {
+  color: var(--text);
+}
+
 .subscribeBtn:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--text-h);
+}
+
+.subscribeBtn:hover:not(:disabled) svg {
   color: var(--accent);
 }
 
@@ -102,8 +109,9 @@
 }
 
 .subscribeBtnActive {
-  background: var(--active-bg);
-  border-color: var(--accent);
+  border-color: var(--text-h);
+}
+.subscribeBtnActive svg {
   color: var(--accent);
 }
 

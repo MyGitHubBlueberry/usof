@@ -205,7 +205,7 @@
 }
 
 .bellBtn:hover {
-  border-color: var(--accent);
+  border-color: var(--text-h);
   color: var(--accent);
 }
 

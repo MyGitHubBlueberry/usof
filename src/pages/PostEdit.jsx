@@ -93,7 +93,7 @@ function PostEditForm({ post, categories }) {
       .update(post.id, formData)
       .then(() => {
         showFlash('Post updated.', 'success')
-        navigate(toPost(post.id))
+        navigate(toPost(post.id), { replace: true })
       })
       .catch((err) => {
         showFlash(err.message || 'Could not update post.', 'error')

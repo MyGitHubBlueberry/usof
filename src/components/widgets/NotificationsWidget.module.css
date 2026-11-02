@@ -5,7 +5,8 @@
   cursor: pointer;
 }
 
-.deleteBtn {
+.deleteBtn,
+.markReadBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,12 +21,18 @@
 }
 
 .item:hover .deleteBtn,
-.item:focus-within .deleteBtn {
+.item:focus-within .deleteBtn,
+.item:hover .markReadBtn,
+.item:focus-within .markReadBtn {
   opacity: 1;
 }
 
 .deleteBtn:hover {
   color: #e53e3e;
+}
+
+.markReadBtn:hover {
+  color: var(--accent);
 }
 
 .dot {

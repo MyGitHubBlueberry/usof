@@ -13,6 +13,7 @@ import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
 import ExpandableContent from '../ui/ExpandableContent'
 import MarkdownToolbar from '../post-create/MarkdownToolbar'
 import {
+  IconChevron,
   IconCornerDownRight,
   IconCheck,
   IconSend,
@@ -24,6 +25,10 @@ import {
   IconEyeClosed
 } from '../ui/Icons'
 import s from './CommentItem.module.css'
+
+function countDescendants(comment) {
+  return comment.replies.reduce((sum, reply) => sum + 1 + countDescendants(reply), 0)
+}
 
 export default function CommentItem({
   comment,
@@ -67,6 +72,8 @@ export default function CommentItem({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   const fetchLikes = useCallback(() => {
     return commentsService
       .getLikes(comment.id)
@@ -85,16 +92,17 @@ export default function CommentItem({
 
   usePolling(fetchLikes, 30_000, [fetchLikes])
 
-  const isTombstone = comment.status === 'inactive'
+  const isTombstone = !comment.user_id
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
   const isPostOwner = !!currentUser && !!postAuthorId && Number(currentUser.id) === Number(postAuthorId)
   const canReplyOrResolve = isAdmin || (postStatus !== 'resolved' && postStatus !== 'inactive')
-  const canReact = isAdmin || (postStatus !== 'inactive' && !isTombstone)
-  const canEdit = isCommentOwner && canReplyOrResolve
-  const canDelete = (isCommentOwner || isAdmin) && canReplyOrResolve
+  const canReact = isAdmin || (postStatus !== 'inactive' && comment.status !== 'inactive' && !isTombstone)
+  const canEdit = isCommentOwner && canReplyOrResolve && !isTombstone
+  const canDelete = (isCommentOwner || isAdmin) && canReplyOrResolve && !isTombstone
   const canResolve = (isPostOwner || isAdmin) && canReplyOrResolve
   const isResolved = comment.status === 'resolved'
   const replyCount = comment.replies.length
+  const hiddenCount = countDescendants(comment)
 
   function handleReact(type) {
     if (!currentUser) {
@@ -179,8 +187,12 @@ export default function CommentItem({
     setDeleteLoading(true)
     commentsService
       .delete(comment.id)
-      .then(() => {
-        onCommentDeleted(comment.id)
+      .then((res) => {
+        if (res.status === 200 && res.data) {
+          onCommentPatched(res.data)
+        } else {
+          onCommentDeleted(comment.id)
+        }
         showFlash('Comment deleted.', 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not delete comment.', 'error'))
@@ -233,12 +245,12 @@ export default function CommentItem({
             Edit
           </ActionMenuItem>
         )}
-        {isAdmin && postStatus !== 'active' && (
+        {isAdmin && comment.status !== 'active' && (
           <ActionMenuItem icon={<IconEye size={13} />} onClick={() => updateCommentStatus('active')}>
             Set Active
           </ActionMenuItem>
         )}
-        {isAdmin && postStatus !== 'inactive' && (
+        {isAdmin && comment.status !== 'inactive' && (
           <ActionMenuItem icon={<IconEyeClosed size={13} />} onClick={() => updateCommentStatus('inactive')}>
             Set Inactive
           </ActionMenuItem>
@@ -396,7 +408,7 @@ export default function CommentItem({
         title="Delete Comment"
         message={
           replyCount > 0
-            ? `This will also delete ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}. This action cannot be undone.`
+            ? 'This comment has replies, so its text and author will be erased but its place in the thread will stay. This action cannot be undone.'
             : 'This action cannot be undone.'
         }
         confirmText="Delete"
@@ -411,6 +423,17 @@ export default function CommentItem({
   return (
     <div className={`${s.comment} ${depth > 0 ? s.nested : ''} ${isResolved ? s.resolved : ''} ${isTombstone ? s.tombstone : ''}`}>
       <div className={s.header}>
+        {replyCount > 0 && (
+          <button
+            type="button"
+            className={`${s.collapseBtn} ${isCollapsed ? s.collapseBtnActive : ''}`}
+            onClick={() => setIsCollapsed((v) => !v)}
+            aria-label={isCollapsed ? 'Show replies' : 'Hide replies'}
+            title={isCollapsed ? 'Show replies' : 'Hide replies'}
+          >
+            <IconChevron size={13} up={!isCollapsed} />
+          </button>
+        )}
         <Avatar
           userId={isTombstone ? undefined : author?.id}
           avatarPath={isTombstone ? undefined : author?.profile_picture_path}
@@ -428,13 +451,18 @@ export default function CommentItem({
             <span className={s.authorName}>Unknown user</span>
           )}
           <span className={s.date}>{formatFullDate(comment.publish_date)}</span>
+          {isCollapsed && (
+            <span className={s.collapsedInfo}>
+              ({hiddenCount} {hiddenCount === 1 ? 'reply' : 'replies'} hidden)
+            </span>
+          )}
         </div>
         {comment.status !== 'active' && (
           <span className={`${s.statusBadge} ${comment.status === 'resolved' ? s.statusResolved : s.statusInactive}`}>
             {comment.status}
           </span>
         )}
-        {(canEdit || canDelete) && commentActionsDropdown()}
+        {(canEdit || canDelete || isAdmin) && commentActionsDropdown()}
       </div>
 
       {isTombstone ? (
@@ -461,7 +489,7 @@ export default function CommentItem({
 
       {!isTombstone && replying && replyBox()}
 
-      {replyCount > 0 && replies()}
+      {replyCount > 0 && !isCollapsed && replies()}
 
       {!isTombstone && deleteModalOpen && deleteModal()}
     </div>

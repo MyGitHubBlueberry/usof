@@ -3,9 +3,19 @@ import { postsService } from '../../services/posts.service'
 import { toProfileTab } from '../../constants/routes'
 import { IconRss } from '../ui/Icons'
 import PostListWidget from './PostListWidget'
+import sw from './SidebarWidget.module.css'
 
 export default function SubscriptionsWidget() {
   const user = useSelector((state) => state.auth.user)
+
+  function handleUnsubscribe(e, post, onRemove) {
+    e.preventDefault()
+    e.stopPropagation()
+    postsService
+      .unsubscribe(post.id)
+      .then(onRemove)
+      .catch(() => {})
+  }
 
   return (
     <PostListWidget
@@ -15,6 +25,17 @@ export default function SubscriptionsWidget() {
       actionText="All"
       fetchFn={() => postsService.getSubscriptions({ limit: 10 })}
       emptyMessage="No subscribed posts"
+      renderItemAction={(post, onRemove) => (
+        <button
+          type="button"
+          className={sw.itemActionBtn}
+          onClick={(e) => handleUnsubscribe(e, post, onRemove)}
+          aria-label="Unsubscribe"
+          title="Unsubscribe"
+        >
+          <IconRss size={12} />
+        </button>
+      )}
     />
   )
 }

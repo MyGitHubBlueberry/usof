@@ -156,21 +156,26 @@
   overflow-x: auto;
   border: 1px solid var(--border);
   scrollbar-width: thin;
-  scrollbar-color: var(--accent) var(--border);
+  scrollbar-color: var(--border) transparent;
 }
 
 .tableWrap::-webkit-scrollbar {
   height: 6px;
+  width: 6px;
 }
 
 .tableWrap::-webkit-scrollbar-track {
-  background: var(--border);
-  border-radius: 0;
+  background: transparent;
 }
 
 .tableWrap::-webkit-scrollbar-thumb {
-  background: var(--accent);
+  background: var(--border);
   border-radius: 0;
+  transition: background 0.15s;
+}
+
+.tableWrap::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 .table {

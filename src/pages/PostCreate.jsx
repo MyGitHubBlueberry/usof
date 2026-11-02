@@ -12,6 +12,8 @@ import AttachmentUploader from '../components/post-create/AttachmentUploader'
 import NavRow from '../components/ui/NavButtons'
 import s from './PostCreate.module.css'
 
+const DRAFT_KEY = 'usof_post_create_draft'
+
 function validate({ title, content }) {
   const e = {}
   if (!title.trim()) e.title = 'Title is required.'
@@ -19,13 +21,25 @@ function validate({ title, content }) {
   return e
 }
 
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 function PostCreateForm() {
   const navigate = useNavigate()
   const { showFlash } = useFlash()
 
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState([])
+  const [initialDraft] = useState(loadDraft)
+  const [title, setTitle] = useState(initialDraft?.title || '')
+  const [content, setContent] = useState(initialDraft?.content || '')
+  const [selectedCategories, setSelectedCategories] = useState(
+    Array.isArray(initialDraft?.categories) ? initialDraft.categories : []
+  )
   const [categoryOptions, setCategoryOptions] = useState([])
   const [attachments, setAttachments] = useState([])
   const [touched, setTouched] = useState(false)
@@ -40,6 +54,18 @@ function PostCreateForm() {
       })
       .catch(() => setCategoryOptions([]))
   }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, content, categories: selectedCategories }))
+    } catch {
+      // storage unavailable, autosave skipped
+    }
+  }, [title, content, selectedCategories])
+
+  function clearDraft() {
+    localStorage.removeItem(DRAFT_KEY)
+  }
 
   const errors = touched ? validate({ title, content }) : {}
 
@@ -57,8 +83,9 @@ function PostCreateForm() {
     postsService
       .create(formData)
       .then((res) => {
+        clearDraft()
         showFlash('Post created.', 'success')
-        navigate(toPost(res.data.id))
+        navigate(toPost(res.data.id), { replace: true })
       })
       .catch((err) => {
         showFlash(err.message || 'Could not create post.', 'error')
@@ -92,7 +119,7 @@ function PostCreateForm() {
         <AttachmentUploader files={attachments} onChange={setAttachments} />
 
         <div className={s.actions}>
-          <Link to={ROUTES.HOME} className={s.cancelBtn}>
+          <Link to={ROUTES.HOME} className={s.cancelBtn} onClick={clearDraft}>
             Cancel
           </Link>
           <button type="button" className={s.submitBtn} onClick={handleSubmit} disabled={submitting}>

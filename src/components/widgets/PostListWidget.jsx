@@ -12,8 +12,13 @@ export default function PostListWidget({
   actionText = 'All',
   fetchFn,
   emptyMessage = 'No posts found',
+  renderItemAction,
 }) {
-  const { data: posts, loading } = useAsyncData(fetchFn, [], [])
+  const { data: posts, loading, setData } = useAsyncData(fetchFn, [], [])
+
+  function handleRemove(postId) {
+    setData((prev) => prev.filter((p) => p.id !== postId))
+  }
 
   return (
     <SidebarWidget
@@ -27,7 +32,8 @@ export default function PostListWidget({
     >
       <ul className={sw.list}>
         {posts.map((p) => (
-          <li key={p.id}>
+          <li key={p.id} className={renderItemAction ? sw.itemRow : undefined}>
+            {renderItemAction && renderItemAction(p, () => handleRemove(p.id))}
             <Link to={toPost(p.id)} className={sw.itemBlock}>
               <span className={sw.itemTitle}>{p.title}</span>
               <div className={sw.itemMeta}>

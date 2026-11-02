@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import Avatar from '../ui/Avatar'
@@ -8,6 +8,7 @@ import { notificationsService } from '../../services/notifications.service'
 import { postsService } from '../../services/posts.service'
 import { logout } from '../../redux/slices/authSlice'
 import { useFlash } from '../../hooks/useFlash'
+import { usePolling } from '../../hooks/usePolling'
 import { ROUTES } from '../../constants/routes'
 import {
   IconCamera,
@@ -59,21 +60,19 @@ export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNot
     }
   }, [profile.id, profile.login])
 
-  useEffect(() => {
+  const fetchUnreadCount = useCallback(() => {
     if (!isOwner) return
-    let isMounted = true
     notificationsService
       .getUnreadCount()
-      .then((res) => {
-        if (isMounted) setUnreadCount(res.data?.unreadCount ?? 0)
-      })
-      .catch(() => {
-        if (isMounted) setUnreadCount(0)
-      })
-    return () => {
-      isMounted = false
-    }
+      .then((res) => setUnreadCount(res.data?.unreadCount ?? 0))
+      .catch(() => setUnreadCount(0))
   }, [isOwner])
+
+  useEffect(() => {
+    fetchUnreadCount()
+  }, [fetchUnreadCount])
+
+  usePolling(fetchUnreadCount, 25_000, [fetchUnreadCount])
 
   function handleAvatarClick() {
     if (!isOwner || avatarUploading) return

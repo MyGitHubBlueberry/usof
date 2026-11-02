@@ -151,7 +151,7 @@ export default function PostHeader({
       {categories.length > 0 && (
         <div className={s.categories}>
           {categories.map((c) => (
-            <span key={c.id} className={s.categoryTag}>
+            <span key={c.id} className={s.categoryTag} title={c.description || c.title}>
               {c.title}
             </span>
           ))}

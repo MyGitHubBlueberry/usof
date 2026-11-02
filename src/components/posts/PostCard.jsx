@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { toPost, toProfile } from '../../constants/routes'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
+import { useCategoryMap } from '../../hooks/useCategoryMap'
 import { formatFullDate } from '../../utils/format'
 import { MARKDOWN_PLUGINS, MARKDOWN_COMPONENTS } from '../../utils/markdown'
 import { IMAGE_EXTENSIONS, getExtension, getAttachmentUrl } from '../../utils/attachments'
@@ -20,6 +21,7 @@ export default function PostCard({ post }) {
   const [favorited, setFavorited] = useState(!!post?.is_favorited)
   const [shared, setShared] = useState(false)
   const [previewSrc, setPreviewSrc] = useState(null)
+  const categoryMap = useCategoryMap()
 
   useEffect(() => {
     if (!post?.id || post.like_count !== undefined) return
@@ -135,11 +137,11 @@ export default function PostCard({ post }) {
           />
 
           <div className={s.titleGroup}>
-            <h2 className={s.postTitle}>{post.title}</h2>
+            <h2 className={s.postTitle} title={post.title}>{post.title}</h2>
             {categories.length > 0 && (
               <div className={s.categoryRow}>
                 {categories.map((title) => (
-                  <span key={title} className={s.categoryTag}>
+                  <span key={title} className={s.categoryTag} title={categoryMap[title] || title}>
                     {title}
                   </span>
                 ))}

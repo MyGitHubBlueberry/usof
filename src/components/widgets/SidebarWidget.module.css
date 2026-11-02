@@ -111,6 +111,44 @@
   background: var(--code-bg);
 }
 
+.itemRow {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+}
+
+.itemRow:hover {
+  background: var(--code-bg);
+}
+
+.itemRow .itemBlock {
+  border-bottom: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0 0 0 12px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.itemActionBtn:hover {
+  color: var(--accent);
+}
+
 .itemTitle {
   font-size: 12px;
   font-weight: 500;
