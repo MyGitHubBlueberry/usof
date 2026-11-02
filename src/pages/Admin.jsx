@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import CategoriesTab from './AdminPanelCategoriesTab'
 import UsersTab from './AdminPanelUsersTab'
 import PostsTab from './AdminPanelPostsTab'
+import BansTab from './AdminPanelBansTab'
 import { FlashProvider } from '../context/FlashProvider'
 import TabBar from '../components/ui/TabBar'
 import {
@@ -10,6 +11,7 @@ import {
   IconUser,
   IconDocument,
   IconFilter,
+  IconBan,
 } from '../components/ui/Icons'
 import s from './Admin.module.css'
 
@@ -17,6 +19,7 @@ const TABS = [
   { id: 'users', label: 'Users', icon: IconUser },
   { id: 'posts', label: 'Posts', icon: IconDocument },
   { id: 'categories', label: 'Categories', icon: IconFilter },
+  { id: 'bans', label: 'Ban Logs', icon: IconBan },
 ]
 
 export default function Admin() {
@@ -59,6 +62,7 @@ export default function Admin() {
           {activeTab === 'users' && <UsersTab />}
           {activeTab === 'posts' && <PostsTab />}
           {activeTab === 'categories' && <CategoriesTab />}
+          {activeTab === 'bans' && <BansTab />}
         </div>
       </div>
     </FlashProvider>

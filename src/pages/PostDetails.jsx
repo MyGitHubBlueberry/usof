@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
 import { usersService } from '../services/users.service'
 import { usePolling } from '../hooks/usePolling'
+import { POLLING_INTERVALS } from '../constants/polling'
 import { FlashProvider } from '../context/FlashProvider'
 import { PostProvider } from '../context/PostProvider'
 import { ROUTES } from '../constants/routes'
@@ -109,7 +110,7 @@ export default function PostDetails() {
         })
         .catch(() => {})
     },
-    30_000,
+    POLLING_INTERVALS.POST_LIKES,
     [id, post]
   )
 

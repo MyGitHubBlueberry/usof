@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { toPost } from '../../constants/routes'
 import { useAsyncData } from '../../hooks/useAsyncData'
@@ -13,8 +14,23 @@ export default function PostListWidget({
   fetchFn,
   emptyMessage = 'No posts found',
   renderItemAction,
+  refreshEvent,
 }) {
   const { data: posts, loading, setData } = useAsyncData(fetchFn, [], [])
+
+  useEffect(() => {
+    if (!refreshEvent) return
+
+    function handleRefresh() {
+      fetchFn()
+        .then((res) => setData(res.data?.data ?? res.data ?? []))
+        .catch(() => {})
+    }
+
+    window.addEventListener(refreshEvent, handleRefresh)
+    return () => window.removeEventListener(refreshEvent, handleRefresh)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshEvent])
 
   function handleRemove(postId) {
     setData((prev) => prev.filter((p) => p.id !== postId))

@@ -1,0 +1,34 @@
+.sideBySideRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sideBySideRow > * {
+  flex: 1;
+  min-width: 120px;
+}
+
+.searchLikeInput {
+  height: 32px;
+  padding: 0 28px 0 12px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  font-size: 14px;
+  box-shadow: none;
+}
+
+.searchLikeInput:hover {
+  border-color: var(--text);
+}
+
+.searchLikeInput:focus {
+  border-color: var(--text);
+  box-shadow: none;
+}
+
+.searchLikeInput::placeholder {
+  color: var(--text);
+  opacity: 0.6;
+}

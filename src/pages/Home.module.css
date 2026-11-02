@@ -15,6 +15,22 @@
   gap: 14px;
 }
 
+.newItemsBar {
+  composes: btn-base from global;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.newItemsBar:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
 
 .feedState {
   flex: 1;

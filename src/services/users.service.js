@@ -11,6 +11,7 @@ export const usersService = {
   updateRole: (id, role) => api.patch(API.USERS.UPDATE_ROLE(id), { role }),
   ban: (id, data) => api.patch(API.USERS.BAN(id), data),
   getBanHistory: (id) => api.get(API.USERS.BAN_HISTORY(id)),
+  getBanLogs: (params) => api.get(API.USERS.BAN_LOGS, { params }),
   uploadAvatar: (formData) => apiUpload('PATCH', API.USERS.AVATAR, formData),
   deleteAvatar: () => api.delete(API.USERS.AVATAR),
   getAvatar: (id) => api.get(API.USERS.AVATAR_BY_ID(id), { responseType: 'blob' }),

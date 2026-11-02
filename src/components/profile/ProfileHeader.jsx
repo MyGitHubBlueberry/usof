@@ -9,6 +9,7 @@ import { postsService } from '../../services/posts.service'
 import { logout } from '../../redux/slices/authSlice'
 import { useFlash } from '../../hooks/useFlash'
 import { usePolling } from '../../hooks/usePolling'
+import { POLLING_INTERVALS } from '../../constants/polling'
 import { ROUTES } from '../../constants/routes'
 import {
   IconCamera,
@@ -68,7 +69,7 @@ export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNot
     fetchUnreadCount()
   }, [fetchUnreadCount])
 
-  usePolling(fetchUnreadCount, 25_000, [fetchUnreadCount])
+  usePolling(fetchUnreadCount, POLLING_INTERVALS.UNREAD_COUNT, [fetchUnreadCount])
 
   function handleAvatarClick() {
     if (!isOwner || avatarUploading) return

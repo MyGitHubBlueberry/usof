@@ -4,6 +4,7 @@ import { notificationsService } from '../../services/notifications.service'
 import { toProfileTab, toPost } from '../../constants/routes'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { usePolling } from '../../hooks/usePolling'
+import { POLLING_INTERVALS } from '../../constants/polling'
 import { formatDate } from '../../utils/format'
 import { IconBell, IconCheck, IconTrash } from '../ui/Icons'
 import SidebarWidget from './SidebarWidget'
@@ -50,7 +51,7 @@ export default function NotificationsWidget() {
         })
         .catch(() => {})
     },
-    25_000,
+    POLLING_INTERVALS.NOTIFICATIONS,
     [user?.id]
   )
 

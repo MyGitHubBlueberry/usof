@@ -247,6 +247,12 @@
   border: 1px solid color-mix(in srgb, #e53e3e 35%, transparent);
 }
 
+.statusExpired {
+  background: var(--code-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
 .statusSelectWrapper {
   width: min-content;
 }

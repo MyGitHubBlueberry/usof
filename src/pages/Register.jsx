@@ -3,7 +3,10 @@ import { Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerThunk, clearError } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
+import { getRecentLogins, addRecentLogin } from '../utils/recentLogins'
 import Logo from '../components/ui/Logo'
+import Combobox from '../components/ui/Combobox'
+import PasswordInput from '../components/ui/PasswordInput'
 import { IconMail } from '../components/ui/Icons'
 import s from '../components/layouts/auth.module.css'
 
@@ -67,6 +70,7 @@ export default function Register() {
     if (!isFormValid) return
 
     await dispatch(registerThunk(form)).unwrap()
+    addRecentLogin(form.login)
     setSubmitted(true)
   }
 
@@ -117,7 +121,17 @@ export default function Register() {
         <div className={s.row}>
           <div className={s.field}>
             <label className={s.label} htmlFor="reg-login">Login</label>
-            <input {...fieldProps('login')} type="text" autoComplete="username" placeholder="cool_username" />
+            <Combobox
+              id="reg-login"
+              name="login"
+              inputClassName={touched.login && errors.login ? s.invalid : ''}
+              placeholder="cool_username"
+              value={form.login}
+              onChange={(val) => setForm((f) => ({ ...f, login: val }))}
+              onBlur={handleBlur}
+              suggestions={getRecentLogins()}
+              ariaLabel="Login"
+            />
             {touched.login && errors.login && <span className={s.fieldError}>{errors.login}</span>}
           </div>
 
@@ -137,13 +151,31 @@ export default function Register() {
         <div className={s.row}>
           <div className={s.field}>
             <label className={s.label} htmlFor="reg-password">Password</label>
-            <input {...fieldProps('password')} type="password" autoComplete="new-password" placeholder="••••••••" />
+            <PasswordInput
+              id="reg-password"
+              name="password"
+              inputClassName={touched.password && errors.password ? s.invalid : ''}
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
             {touched.password && errors.password && <span className={s.fieldError}>{errors.password}</span>}
           </div>
 
           <div className={s.field}>
             <label className={s.label} htmlFor="reg-confirmed_password">Confirm</label>
-            <input {...fieldProps('confirmed_password')} type="password" autoComplete="new-password" placeholder="••••••••" />
+            <PasswordInput
+              id="reg-confirmed_password"
+              name="confirmed_password"
+              inputClassName={touched.confirmed_password && errors.confirmed_password ? s.invalid : ''}
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={form.confirmed_password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
             {touched.confirmed_password && errors.confirmed_password && (
               <span className={s.fieldError}>{errors.confirmed_password}</span>
             )}

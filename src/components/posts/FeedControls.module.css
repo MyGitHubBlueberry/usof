@@ -18,6 +18,11 @@
   flex-shrink: 0;
 }
 
+.parralelInputs {
+  display: flex;
+  gap: 6px;
+}
+
 .searchInput {
   flex: 1;
   min-width: 0;

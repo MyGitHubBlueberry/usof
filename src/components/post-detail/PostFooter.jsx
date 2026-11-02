@@ -66,6 +66,9 @@ export default function PostFooter({
     action
       .then(() => {
         onSubscribeChange(!isSubscribed)
+        window.dispatchEvent(
+          new CustomEvent('usof:subscriptions-updated', { detail: { postId: post.id, isSubscribed: !isSubscribed } })
+        )
         showFlash(isSubscribed ? 'Unsubscribed from post.' : 'Subscribed to post.', 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not update subscription.', 'error'))

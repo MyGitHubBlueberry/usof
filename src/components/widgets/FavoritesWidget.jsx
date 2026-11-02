@@ -13,7 +13,12 @@ export default function FavoritesWidget() {
     e.stopPropagation()
     postsService
       .unfavorite(post.id)
-      .then(onRemove)
+      .then(() => {
+        onRemove()
+        window.dispatchEvent(
+          new CustomEvent('usof:favorites-updated', { detail: { postId: post.id, isFavorited: false } })
+        )
+      })
       .catch(() => {})
   }
 
@@ -24,6 +29,7 @@ export default function FavoritesWidget() {
       actionLink={toProfileTab(user?.id, 'favorites')}
       actionText="All"
       fetchFn={() => postsService.getFavorites({ limit: 13 })}
+      refreshEvent="usof:favorites-updated"
       emptyMessage="No favorited posts"
       renderItemAction={(post, onRemove) => (
         <button

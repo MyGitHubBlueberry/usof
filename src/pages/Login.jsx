@@ -3,7 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginThunk, clearError } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
+import { getRecentLogins, addRecentLogin } from '../utils/recentLogins'
 import Logo from '../components/ui/Logo'
+import Combobox from '../components/ui/Combobox'
+import PasswordInput from '../components/ui/PasswordInput'
 import s from '../components/layouts/auth.module.css'
 
 export default function Login() {
@@ -43,6 +46,7 @@ export default function Login() {
     if (!isFormValid) return
 
     await dispatch(loginThunk(form)).unwrap()
+    addRecentLogin(form.login)
     navigate(from, { replace: true })
   }
 
@@ -63,16 +67,16 @@ export default function Login() {
       <form className={s.form} onSubmit={handleSubmit} noValidate>
         <div className={s.field}>
           <label className={s.label} htmlFor="login-login">Login</label>
-          <input
+          <Combobox
             id="login-login"
-            className={`${s.input} ${touched.login && errors.login ? s.invalid : ''}`}
-            type="text"
             name="login"
-            autoComplete="username"
+            inputClassName={touched.login && errors.login ? s.invalid : ''}
             placeholder="your_username"
             value={form.login}
-            onChange={handleChange}
+            onChange={(val) => setForm((f) => ({ ...f, login: val }))}
             onBlur={handleBlur}
+            suggestions={getRecentLogins()}
+            ariaLabel="Login"
           />
           {touched.login && errors.login && (
             <span className={s.fieldError}>{errors.login}</span>
@@ -81,11 +85,10 @@ export default function Login() {
 
         <div className={s.field}>
           <label className={s.label} htmlFor="login-password">Password</label>
-          <input
+          <PasswordInput
             id="login-password"
-            className={`${s.input} ${touched.password && errors.password ? s.invalid : ''}`}
-            type="password"
             name="password"
+            inputClassName={touched.password && errors.password ? s.invalid : ''}
             autoComplete="current-password"
             placeholder="••••••••"
             value={form.password}

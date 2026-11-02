@@ -30,6 +30,9 @@ export default function FavoriteButton({
     action
       .then(() => {
         onChange(!isFavorited)
+        window.dispatchEvent(
+          new CustomEvent('usof:favorites-updated', { detail: { postId, isFavorited: !isFavorited } })
+        )
         showFlash(isFavorited ? 'Removed from favorites.' : 'Added to favorites.', 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not update favorites.', 'error'))

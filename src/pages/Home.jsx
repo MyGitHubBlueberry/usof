@@ -1,10 +1,13 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { postsService } from '../services/posts.service'
+import { usePolling } from '../hooks/usePolling'
+import { POLLING_INTERVALS } from '../constants/polling'
 import { FlashProvider } from '../context/FlashProvider'
 import PostCard from '../components/posts/PostCard'
 import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
+import { IconChevron } from '../components/ui/Icons'
 import s from './Home.module.css'
 
 export default function Home() {
@@ -31,6 +34,7 @@ export default function Home() {
   const [loadedKey, setLoadedKey] = useState(null)
   const [error, setError] = useState(null) // null | 'rate_limit' | 'generic'
   const [retryCount, setRetryCount] = useState(0)
+  const [hasNewPosts, setHasNewPosts] = useState(false)
 
   const currentKey = `${search}|${author}|${categories}|${status}|${sort}|${order}|${dateFrom}|${dateTo}|${pageParam}|${retryCount}`
   const isLoading = loadedKey !== currentKey
@@ -56,6 +60,7 @@ export default function Home() {
         setTotalPages(res.data?.pagination?.totalPages || 1)
         setError(null)
         setLoadedKey(currentKey)
+        setHasNewPosts(false)
       })
       .catch((err) => {
         if (!isMounted) return
@@ -97,6 +102,44 @@ export default function Home() {
   }
 
   const handleRetry = () => setRetryCount((c) => c + 1)
+
+  usePolling(
+    () => {
+      if (hasNewPosts || isLoading) return
+      const query = { page: 1, limit: 1 }
+      if (search) query.search = search
+      if (author) query.author = author
+      if (categories) query.categories = categories
+      if (status) query.status = status
+      if (sort) query.sortBy = sort === 'date' ? 'publish_date' : sort
+      if (order) query.order = order
+      if (dateFrom) query.dateFrom = dateFrom
+      if (dateTo) query.dateTo = dateTo
+
+      postsService
+        .getAll(query)
+        .then((res) => {
+          const latest = res.data?.data?.[0]
+          if (!latest) return
+          setPosts((prev) => {
+            const current = prev[0]
+            if (!current || Number(latest.id) !== Number(current.id)) {
+              setHasNewPosts(true)
+            }
+            return prev
+          })
+        })
+        .catch(() => {})
+    },
+    POLLING_INTERVALS.FEED_CHECK,
+    [search, author, categories, status, sort, order, dateFrom, dateTo, hasNewPosts, isLoading]
+  )
+
+  const handleLoadNewPosts = () => {
+    setRetryCount((c) => c + 1)
+    setHasNewPosts(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   function renderFeedBody() {
     if (isLoading) {
@@ -153,6 +196,13 @@ export default function Home() {
     <FlashProvider>
       <div className={s.feedContainer}>
         <FeedControls params={params} onChange={handleControlChange} showSearchType={true} />
+
+        {!isLoading && !error && hasNewPosts && (
+          <button type="button" className={s.newItemsBar} onClick={handleLoadNewPosts}>
+            <IconChevron size={13} up />
+            <span>Load new posts</span>
+          </button>
+        )}
 
         {renderFeedBody()}
 

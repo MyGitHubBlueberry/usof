@@ -4,6 +4,7 @@ import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import { usePolling } from '../../hooks/usePolling'
+import { POLLING_INTERVALS } from '../../constants/polling'
 import { usePost } from '../../hooks/usePost'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
@@ -89,7 +90,7 @@ export default function CommentItem({ comment, depth, usersById }) {
     fetchLikes()
   }, [fetchLikes])
 
-  usePolling(fetchLikes, 30_000, [fetchLikes])
+  usePolling(fetchLikes, POLLING_INTERVALS.COMMENT_LIKES, [fetchLikes])
 
   const isTombstone = !comment.user_id
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
@@ -451,7 +452,7 @@ export default function CommentItem({ comment, depth, usersById }) {
             {comment.status}
           </span>
         )}
-        {(canEdit || canDelete || isAdmin) && commentActionsDropdown()}
+        {!isTombstone && (canEdit || canDelete || isAdmin) && commentActionsDropdown()}
       </div>
 
       {isTombstone ? (
@@ -462,10 +463,10 @@ export default function CommentItem({ comment, depth, usersById }) {
         commentContent()
       )}
 
-      <div className={s.footer}>
-        {reactions()}
+      {!isTombstone && (
+        <div className={s.footer}>
+          {reactions()}
 
-        {!isTombstone && (
           <div>
             {!isResolved && canResolve && resolveButton()}
 
@@ -473,8 +474,8 @@ export default function CommentItem({ comment, depth, usersById }) {
 
             {statusSaving && <span className={s.savingHint}>Saving…</span>}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {!isTombstone && replying && replyBox()}
 

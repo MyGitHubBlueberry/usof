@@ -13,7 +13,12 @@ export default function SubscriptionsWidget() {
     e.stopPropagation()
     postsService
       .unsubscribe(post.id)
-      .then(onRemove)
+      .then(() => {
+        onRemove()
+        window.dispatchEvent(
+          new CustomEvent('usof:subscriptions-updated', { detail: { postId: post.id, isSubscribed: false } })
+        )
+      })
       .catch(() => {})
   }
 
@@ -24,6 +29,7 @@ export default function SubscriptionsWidget() {
       actionLink={toProfileTab(user?.id, 'subscriptions')}
       actionText="All"
       fetchFn={() => postsService.getSubscriptions({ limit: 10 })}
+      refreshEvent="usof:subscriptions-updated"
       emptyMessage="No subscribed posts"
       renderItemAction={(post, onRemove) => (
         <button
