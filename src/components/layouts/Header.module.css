@@ -39,9 +39,8 @@
 .menuBtn,
 .userBtn,
 .loginBtn {
+  composes: btn-base from global;
   height: 42px;
-  display: flex;
-  align-items: center;
   gap: 8px;
   padding: 6px 12px;
   background: transparent;
@@ -49,11 +48,6 @@
   color: var(--text-h);
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
-  text-decoration: none;
-  font-family: inherit;
-  box-sizing: border-box;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .userBtn {
@@ -160,28 +154,9 @@
 }
 
 .registerBtn {
-  display: flex;
-  align-items: center;
+  composes: btn-base btn-primary from global;
   padding: 6px 14px;
   font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  background: var(--accent);
-  text-decoration: none;
-  border: 1px solid var(--accent);
-  box-sizing: border-box;
-  font-family: inherit;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
-}
-
-.registerBtn:hover {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.registerBtn:active {
-  transform: scale(0.98);
 }
 
 @media (max-width: 640px) {

@@ -4,16 +4,8 @@ import FeedControls from '../components/posts/FeedControls'
 import ActionModal from '../components/ui/ActionModal'
 import { useFlash } from '../hooks/useFlash'
 import { useState, useEffect } from 'react'
-import {
-  IconDocument,
-  IconFilter,
-  IconPen,
-  IconTrash,
-  IconCheck,
-  IconX,
-  IconRefresh,
-  IconPlus,
-} from '../components/ui/Icons'
+import { IconFilter, IconRefresh, IconPlus } from '../components/ui/Icons'
+import CategoryRow from './admin/CategoryRow'
 import s from './Admin.module.css'
 
 const CATS_PER_PAGE = 10
@@ -220,84 +212,6 @@ export default function CategoriesTab() {
     )
   }
 
-  function categoryEditRow(cat) {
-    return (
-      <div className={s.categoryEditForm}>
-        <input
-          className={s.input}
-          type="text"
-          value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
-          placeholder="Title"
-        />
-        <input
-          className={s.input}
-          type="text"
-          value={editDesc}
-          onChange={(e) => setEditDesc(e.target.value)}
-          placeholder="Description"
-        />
-        <div className={s.categoryEditActions}>
-          <button
-            className={s.btnPrimary}
-            onClick={() => handleSaveEdit(cat)}
-            disabled={editLoading || !editTitle.trim()}
-            type="button"
-            title="Save category"
-          >
-            <IconCheck size={14} />
-            <span className={s.actionBtnLabel}>{editLoading ? 'Saving…' : 'Save'}</span>
-          </button>
-          <button className={s.btnGhost} onClick={cancelEdit} type="button" title="Cancel editing">
-            <IconX size={14} />
-            <span className={s.actionBtnLabel}>Cancel</span>
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  function categoryRow(cat) {
-    return <>
-      <div className={s.categoryInfo}>
-        <span className={s.categoryTitle}>{cat.title}</span>
-        {cat.description && (
-          <span className={s.categoryDesc}>
-            {cat.description.length > 100
-              ? cat.description.slice(0, 100) + '…'
-              : cat.description}
-          </span>
-        )}
-        {cat.post_count != null && (
-          <span className={s.categoryMeta}>
-            <IconDocument size={12} />
-            {cat.post_count} posts
-          </span>
-        )}
-      </div>
-      <div className={s.actions}>
-        <button
-          className={s.actionBtn}
-          onClick={() => startEdit(cat)}
-          title="Edit category"
-          type="button"
-        >
-          <IconPen size={14} />
-          <span className={s.actionBtnLabel}>Edit</span>
-        </button>
-        <button
-          className={`${s.actionBtn} ${s.actionDangerBtn}`}
-          onClick={() => handleDelete(cat)}
-          title="Delete category"
-          type="button"
-        >
-          <IconTrash size={14} />
-          <span className={s.actionBtnLabel}>Delete</span>
-        </button>
-      </div>
-    </>
-  }
-
   return (
     <div className={s.tabContent}>
       <div className={s.sectionHeader}>
@@ -362,9 +276,19 @@ export default function CategoriesTab() {
         <div className={s.categoryList}>
           {paginated.map((cat) => (
             <div key={cat.id} className={s.categoryRow}>
-              {editingId === cat.id
-                ? categoryEditRow(cat)
-                : categoryRow(cat)}
+              <CategoryRow
+                cat={cat}
+                isEditing={editingId === cat.id}
+                editTitle={editTitle}
+                editDesc={editDesc}
+                editLoading={editLoading}
+                onEditTitleChange={setEditTitle}
+                onEditDescChange={setEditDesc}
+                onSaveEdit={handleSaveEdit}
+                onCancelEdit={cancelEdit}
+                onStartEdit={startEdit}
+                onDelete={handleDelete}
+              />
             </div>
           ))}
         </div>

@@ -22,24 +22,12 @@
 }
 
 .textarea {
-  width: 100%;
+  composes: textarea-base from global;
   min-height: 220px;
   padding: 14px;
   font-size: 15px;
   font-family: var(--mono);
   line-height: 1.6;
-  color: var(--text-h);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  outline: none;
-  resize: vertical;
-  box-sizing: border-box;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
 .textarea.invalid {

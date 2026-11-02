@@ -23,7 +23,6 @@ export default function ProfilePostList({
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [posts, setPosts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   const { search, categories, status, sort, order, dateFrom, dateTo, page } = filters
@@ -41,9 +40,12 @@ export default function ProfilePostList({
     return q
   }, [search, categories, status, sort, order, dateFrom, dateTo, pageParam])
 
+  const [resolved, setResolved] = useState({ fetchFn: null, queryKey: null })
+  const queryKey = JSON.stringify(query)
+  const loading = resolved.fetchFn !== fetchFn || resolved.queryKey !== queryKey
+
   useEffect(() => {
     let isMounted = true
-    setLoading(true)
 
     fetchFn(query)
       .then((res) => {
@@ -58,13 +60,13 @@ export default function ProfilePostList({
         setError(true)
       })
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setResolved({ fetchFn, queryKey })
       })
 
     return () => {
       isMounted = false
     }
-  }, [fetchFn, query])
+  }, [fetchFn, query, queryKey])
 
   function handleControlChange(patch) {
     setFilters((prev) => ({ ...prev, ...patch }))

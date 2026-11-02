@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
+import { usePost } from '../../hooks/usePost'
 import { commentsService } from '../../services/comments.service'
 import { ROUTES, toPostEdit } from '../../constants/routes'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
@@ -11,21 +12,18 @@ import { IconDots, IconShare, IconEye, IconEyeClosed, IconTrash, IconPencil } fr
 import s from './PostHeader.module.css'
 
 export default function PostHeader({
-  post,
   categories,
-  isAuthenticated,
   isFavorited,
-  isAdmin,
-  currentUser,
   onFavoriteChange,
-  onStatusChange,
   onRequireCommentsRefresh,
 }) {
+  const { post, isAdmin, currentUser, onPostStatusChange } = usePost()
   const { showFlash } = useFlash()
   const navigate = useNavigate()
   const [statusSaving, setStatusSaving] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const isAuthenticated = !!currentUser
   const isOwner = !!currentUser && Number(currentUser.id) === Number(post.user_id)
   const canDelete = isAdmin || isOwner;
 
@@ -50,7 +48,7 @@ export default function PostHeader({
     postsService
       .updateStatus(post.id, status)
       .then(() => {
-        onStatusChange(status)
+        onPostStatusChange(status)
         showFlash(`Post status set to ${status}.`, 'success')
 
         if (!wasResolved) return

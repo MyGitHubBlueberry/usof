@@ -6,7 +6,6 @@ export function useAvatarUrl(userId, avatarPath) {
 
   useEffect(() => {
     if (!userId || !avatarPath) {
-      setUrl(null)
       return
     }
 
@@ -30,5 +29,5 @@ export function useAvatarUrl(userId, avatarPath) {
     }
   }, [userId, avatarPath])
 
-  return url
+  return userId && avatarPath ? url : null
 }

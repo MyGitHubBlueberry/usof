@@ -12,8 +12,14 @@ export function MultiSelectDropdown({
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [wasOpen, setWasOpen] = useState(open)
   const ref = useRef(null)
   const searchRef = useRef(null)
+
+  if (wasOpen !== open) {
+    setWasOpen(open)
+    if (!open && query !== '') setQuery('')
+  }
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -26,11 +32,7 @@ export function MultiSelectDropdown({
   }, [open])
 
   useEffect(() => {
-    if (open) {
-      searchRef.current?.focus()
-    } else {
-      setQuery('')
-    }
+    if (open) searchRef.current?.focus()
   }, [open])
 
   function toggleOption(value) {

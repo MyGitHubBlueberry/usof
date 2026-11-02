@@ -6,13 +6,13 @@ import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import { usePolling } from '../../hooks/usePolling'
+import { usePost } from '../../hooks/usePost'
+import { PostProvider } from '../../context/PostProvider'
 import { ROUTES } from '../../constants/routes'
-import Avatar from '../ui/Avatar'
 import Pagination from '../ui/Pagination'
 import CommentItem from './CommentItem'
-import MarkdownToolbar from '../post-create/MarkdownToolbar'
+import CommentComposer from './CommentComposer'
 import { SelectDropdown } from '../ui/SelectDropdown'
-import { IconSend } from '../ui/Icons'
 import s from './CommentsSection.module.css'
 
 const ROOTS_PER_PAGE = 5
@@ -55,22 +55,14 @@ function collectDescendantIds(flatComments, rootId) {
   return toRemove
 }
 
-export default function CommentsSection({
-  postId,
-  postStatus,
-  postAuthorId,
-  isAdmin,
-  currentUser,
-  refreshToken,
-  onPostStatusChange,
-}) {
+export default function CommentsSection({ postId, refreshToken }) {
+  const postContext = usePost()
+  const { postStatus, currentUser, isAdmin, onPostStatusChange } = postContext
   const { showFlash } = useFlash()
 
   const [comments, setComments] = useState([])
-  const [autoRefreshToken, setAutoRefreshToken] = useState(0)
   const [usersById, setUsersById] = useState({})
   const [likeNet, setLikeNet] = useState({})
-  const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [sortMode, setSortMode] = useState('liked')
 
@@ -83,9 +75,11 @@ export default function CommentsSection({
 
   const revertingRef = useRef(false)
 
-  const loadComments = useCallback(() => {
-    setLoading(true)
+  const requestKey = `${postId}:${refreshToken}`
+  const [resolvedKey, setResolvedKey] = useState(null)
+  const loading = resolvedKey !== requestKey
 
+  const loadComments = useCallback(() => {
     postsService
       .getComments(postId, { limit: MAX_COMMENTS })
       .then((res) => {
@@ -123,12 +117,14 @@ export default function CommentsSection({
         setUsersById({})
         setLikeNet({})
       })
-      .finally(() => setLoading(false))
-  }, [postId])
+      .finally(() => {
+        setResolvedKey(requestKey)
+      })
+  }, [postId, requestKey])
 
   useEffect(() => {
     loadComments()
-  }, [loadComments, refreshToken, autoRefreshToken])
+  }, [loadComments])
 
   usePolling(
     () => {
@@ -137,16 +133,14 @@ export default function CommentsSection({
         .then((res) => {
           const freshTotal = res.data?.pagination?.totalItems ?? res.data?.total ?? res.data?.count ?? 0
           setComments((prev) => {
-            if (freshTotal !== prev.length) {
-              setAutoRefreshToken((t) => t + 1)
-            }
+            if (freshTotal !== prev.length) loadComments()
             return prev
           })
         })
         .catch(() => {})
     },
     20_000,
-    [postId]
+    [postId, loadComments]
   )
 
   // revert post to active from resolved if there are no more resolved comments
@@ -226,14 +220,15 @@ export default function CommentsSection({
       .finally(() => setPosting(false))
   }
 
-  function handleKeyDown(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault()
-      handleSubmitComment()
-    }
-  }
-
   const canCreateRootComment = postStatus !== 'inactive'
+
+  const commentContextValue = {
+    ...postContext,
+    onCommentPatched: handleCommentPatched,
+    onCommentDeleted: handleCommentDeleted,
+    onReplyAdded: handleReplyAdded,
+    onLikesChanged: handleLikesChanged,
+  }
 
   return (
     <div className={s.section}>
@@ -252,41 +247,15 @@ export default function CommentsSection({
 
       {currentUser ? (
         canCreateRootComment ? (
-          <div className={s.composer}>
-            <Avatar
-              userId={currentUser.id}
-              avatarPath={currentUser.profile_picture_path}
-              name={currentUser.login}
-              size="small"
-            />
-            <div className={s.composerBody}>
-              <span className={s.composerName}>{currentUser.login}</span>
-              <div className={s.inputGroup}>
-                <MarkdownToolbar onFormat={applyNewCommentFormat} />
-                <textarea
-                  ref={newCommentRef}
-                  className={s.textarea}
-                  placeholder="Share your thoughts..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={posting}
-                  rows={3}
-                />
-              </div>
-              <div className={s.composerActions}>
-                <button
-                  type="button"
-                  className={s.sendBtn}
-                  onClick={handleSubmitComment}
-                  disabled={posting || !newComment.trim()}
-                >
-                  <IconSend size={14} />
-                  <span>Send</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <CommentComposer
+            currentUser={currentUser}
+            value={newComment}
+            onChange={setNewComment}
+            onSubmit={handleSubmitComment}
+            posting={posting}
+            textareaRef={newCommentRef}
+            onFormat={applyNewCommentFormat}
+          />
         ) : (
           <div className={s.noticeMsg}>This post is inactive and not accepting comments.</div>
         )
@@ -302,25 +271,18 @@ export default function CommentsSection({
         <div className={s.noticeMsg}>No comments yet. Be the first to share your thoughts.</div>
       ) : (
         <>
-          <div className={s.list}>
-            {visibleRoots.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                postStatus={postStatus}
-                postAuthorId={postAuthorId}
-                isAdmin={isAdmin}
-                currentUser={currentUser}
-                usersById={usersById}
-                depth={0}
-                onCommentPatched={handleCommentPatched}
-                onCommentDeleted={handleCommentDeleted}
-                onReplyAdded={handleReplyAdded}
-                onPostResolved={onPostStatusChange}
-                onLikesChanged={handleLikesChanged}
-              />
-            ))}
-          </div>
+          <PostProvider value={commentContextValue}>
+            <div className={s.list}>
+              {visibleRoots.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  comment={comment}
+                  usersById={usersById}
+                  depth={0}
+                />
+              ))}
+            </div>
+          </PostProvider>
 
           <Pagination
             currentPage={clampedPage}

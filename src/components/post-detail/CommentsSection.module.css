@@ -50,20 +50,11 @@
 }
 
 .textarea {
-  width: 100%;
-  box-sizing: border-box;
-  font-family: inherit;
-  font-size: 14px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
-  resize: vertical;
+  composes: textarea-base from global;
 }
 
 .textarea:focus {
-  outline: none;
-  border-color: var(--accent);
+  box-shadow: none;
 }
 
 .composerActions {
@@ -72,31 +63,14 @@
 }
 
 .sendBtn {
-  display: inline-flex;
-  align-items: center;
+  composes: btn-base btn-primary from global;
   gap: 7px;
   padding: 8px 16px;
   font-size: 13px;
-  font-weight: 600;
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, transform 0.1s;
-}
-
-.sendBtn:hover:not(:disabled) {
-  background: transparent;
-  color: var(--accent);
-}
-
-.sendBtn:active:not(:disabled) {
-  transform: scale(0.98);
 }
 
 .sendBtn:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .noticeMsg {

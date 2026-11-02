@@ -55,27 +55,9 @@
 }
 
 .notFoundLink {
+  composes: btn-base btn-primary from global;
   margin-top: 10px;
   height: 36px;
-  display: inline-flex;
-  align-items: center;
   padding: 0 20px;
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: #fff;
   font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.notFoundLink:hover {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.notFoundLink:active {
-  transform: scale(0.98);
 }

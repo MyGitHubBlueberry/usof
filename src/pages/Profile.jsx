@@ -23,28 +23,29 @@ export default function Profile() {
   }
 
   const [profile, setProfile] = useState(null)
-  const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+
+  const [resolvedId, setResolvedId] = useState(null)
+  const loading = resolvedId !== id
 
   const isOwner = !!currentUser && String(currentUser.id) === String(id)
 
   useEffect(() => {
     let isMounted = true
-    setLoading(true)
-    setNotFound(false)
 
     usersService
       .getById(id)
       .then((res) => {
         if (!isMounted) return
         setProfile(res.data)
+        setNotFound(false)
       })
       .catch(() => {
         if (!isMounted) return
         setNotFound(true)
       })
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setResolvedId(id)
       })
 
     return () => {
@@ -74,6 +75,7 @@ export default function Profile() {
       <div className={s.profilePage}>
         <NavRow/>
         <ProfileHeader
+          key={profile.id}
           profile={profile}
           isOwner={isOwner}
           onProfileUpdate={handleProfileUpdate}

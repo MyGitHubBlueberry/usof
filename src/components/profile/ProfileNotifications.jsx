@@ -23,15 +23,17 @@ export default function ProfileNotifications() {
 
   const [notifications, setNotifications] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   const [filters, setFilters] = useState({ search: '', status: 'all', page: '1' })
   const pageParam = parseInt(filters.page || '1', 10)
 
+  const requestKey = `${pageParam}|${filters.search}|${filters.status}`
+  const [resolvedKey, setResolvedKey] = useState(null)
+  const loading = resolvedKey !== requestKey
+
   useEffect(() => {
     let isMounted = true
-    setLoading(true)
 
     notificationsService
       .getAll({
@@ -52,13 +54,13 @@ export default function ProfileNotifications() {
         setError(true)
       })
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setResolvedKey(requestKey)
       })
 
     return () => {
       isMounted = false
     }
-  }, [pageParam, filters.search, filters.status])
+  }, [pageParam, filters.search, filters.status, requestKey])
 
   const handleControlChange = (patch) => {
     setFilters((prev) => {

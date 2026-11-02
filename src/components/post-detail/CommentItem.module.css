@@ -88,21 +88,10 @@
 }
 
 .menuTrigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  composes: btn-icon from global;
   width: 24px;
   height: 24px;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: color 0.15s;
   flex-shrink: 0;
-}
-
-.menuTrigger:hover {
-  color: var(--accent);
 }
 
 .collapseBtn {
@@ -181,16 +170,13 @@
 }
 
 .actionBtn {
-  display: inline-flex;
-  align-items: center;
+  composes: btn-base from global;
   gap: 6px;
   padding: 5px 10px;
   font-size: 12px;
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-h);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
 }
 
 .actionBtn svg {
@@ -207,7 +193,6 @@
 
 .actionBtn:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .dangerBtn {
@@ -259,16 +244,11 @@
 }
 
 .replyTextarea {
+  composes: textarea-base from global;
   flex: 1;
   min-width: 0;
-  box-sizing: border-box;
-  font-family: inherit;
   font-size: 13px;
   padding: 8px 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
-  resize: vertical;
 }
 
 /* .editBox and .replyBox are column flex containers, so the shared
@@ -280,36 +260,27 @@
 }
 
 .replyTextarea:focus {
-  outline: none;
-  border-color: var(--accent);
+  box-shadow: none;
 }
 
 .sendBtn {
-  display: inline-flex;
-  align-items: center;
+  composes: btn-base btn-primary from global;
   gap: 6px;
   padding: 7px 12px;
   font-size: 12px;
-  font-weight: 600;
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: #fff;
-  cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
-}
-
-.sendBtn:hover:not(:disabled) {
-  background: transparent;
-  color: var(--accent);
 }
 
 .sendBtn:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .repliesWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.textareaWithMd {
   display: flex;
   flex-direction: column;
 }

@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react'
 
 export function useAsyncData(asyncFn, deps = [], defaultData = []) {
   const [data, setData] = useState(defaultData)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [resolvedKey, setResolvedKey] = useState(null)
+
+  const requestKey = JSON.stringify(deps)
+  const loading = resolvedKey !== requestKey
 
   useEffect(() => {
     let isMounted = true
-    setLoading(true)
-    setError(null)
 
     asyncFn()
       .then((res) => {
         if (!isMounted) return
         const result = res.data?.data ?? res.data ?? defaultData
         setData(result)
+        setError(null)
       })
       .catch((err) => {
         if (!isMounted) return
@@ -22,7 +24,7 @@ export function useAsyncData(asyncFn, deps = [], defaultData = []) {
         setData(defaultData)
       })
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setResolvedKey(requestKey)
       })
 
     return () => {

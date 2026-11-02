@@ -6,19 +6,12 @@ import ActionModal from '../components/ui/ActionModal'
 import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
 import { SelectDropdown } from '../components/ui/SelectDropdown'
-import Avatar from '../components/ui/Avatar'
+import UserTableRow from './admin/UserTableRow'
+import AddUserModal from './admin/AddUserModal'
+import BanUserModal from './admin/BanUserModal'
 import s from './Admin.module.css'
 
-import {
-  IconUser,
-  IconTrash,
-  IconBan,
-  IconCheck,
-  IconRefresh,
-  IconArrowUp,
-  IconArrowDown,
-  IconPlus,
-} from '../components/ui/Icons'
+import { IconUser, IconRefresh, IconPlus } from '../components/ui/Icons'
 
 const USERS_PER_PAGE = 10
 
@@ -46,12 +39,6 @@ const USER_ORDER_OPTIONS = [
   { value: 'desc', label: 'Descending (Z–A)' },
 ]
 
-const CREATE_ROLE_OPTIONS = [
-  { value: 'user', label: 'User' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'superadmin', label: 'Superadmin' },
-]
-
 const MIN_PASSWORD = 8
 
 function validateNewUser(form) {
@@ -73,11 +60,6 @@ function validateNewUser(form) {
 
   return e
 }
-
-const BAN_DURATION_UNIT_OPTIONS = [
-  { value: 'hours', label: 'Hours' },
-  { value: 'days', label: 'Days' },
-]
 
 const ROLE_LEVELS = {
   user: 1,
@@ -395,283 +377,6 @@ export default function UsersTab() {
     )
   }
 
-  function rowActionButtons(user) {
-    const isSelf = Number(currentUser?.id) === Number(user.id)
-    const isSuper = user.role === 'superadmin'
-    const isAdmin = user.role === 'admin'
-    const isUser = user.role === 'user'
-    const isRoleBusy = roleLoadingId === user.id
-    const targetLevel = ROLE_LEVELS[user.role] ?? 0
-
-    const canPromote = isSuperadmin && !isSelf && isUser && !isRoleBusy
-    const canDemote = isSuperadmin && !isSelf && isAdmin && !isRoleBusy
-
-    let promoteTitle = 'Promote to admin'
-    if (!isSuperadmin) {
-      promoteTitle = 'Only superadmins can change user roles'
-    } else if (isSelf) {
-      promoteTitle = 'Cannot modify your own role'
-    } else if (isSuper) {
-      promoteTitle = 'Cannot promote superadmin'
-    } else if (isAdmin) {
-      promoteTitle = 'User is already an admin'
-    }
-
-    let demoteTitle = 'Demote to user'
-    if (!isSuperadmin) {
-      demoteTitle = 'Only superadmins can change user roles'
-    } else if (isSelf) {
-      demoteTitle = 'Cannot modify your own role'
-    } else if (isSuper) {
-      demoteTitle = 'Cannot demote superadmin'
-    } else if (isUser) {
-      demoteTitle = 'User is already at the lowest role'
-    }
-
-    const canBanUser = !isSelf && issuerLevel > targetLevel
-    let banTitle = user.is_banned ? 'Unban user' : 'Ban user'
-    if (isSelf) {
-      banTitle = 'Cannot ban or unban your own account'
-    } else if (issuerLevel <= targetLevel) {
-      banTitle = 'Cannot ban or unban an account with equal or higher authority'
-    }
-
-    const canDeleteUser = isSuperadmin && !isSelf
-    return (
-      <div className={s.actions}>
-        <button
-          className={s.actionBtn}
-          title={promoteTitle}
-          disabled={!canPromote}
-          onClick={() => setPromoteTargetUser(user)}
-          type="button"
-        >
-          <IconArrowUp size={13} />
-          <span className={s.actionBtnLabel}>Promote</span>
-        </button>
-        <button
-          className={s.actionBtn}
-          title={demoteTitle}
-          disabled={!canDemote}
-          onClick={() => setDemoteTargetUser(user)}
-          type="button"
-        >
-          <IconArrowDown size={13} />
-          <span className={s.actionBtnLabel}>Demote</span>
-        </button>
-        {user.is_banned ? (
-          <button
-            className={`${s.actionBtn} ${s.actionBanBtn}`}
-            title={banTitle}
-            disabled={!canBanUser}
-            onClick={() => setUnbanTargetUser(user)}
-            type="button"
-          >
-            <IconCheck size={14} />
-            <span className={s.actionBtnLabel}>Unban</span>
-          </button>
-        ) : (
-          <button
-            className={`${s.actionBtn} ${s.actionBanBtn}`}
-            title={banTitle}
-            disabled={!canBanUser}
-            onClick={() => openBanModal(user)}
-            type="button"
-          >
-            <IconBan size={14} />
-            <span className={s.actionBtnLabel}>Ban</span>
-          </button>
-        )}
-        {canDeleteUser && (
-          <button
-            className={`${s.actionBtn} ${s.actionDangerBtn}`}
-            title="Delete user"
-            onClick={() => setDeleteTargetUser(user)}
-            type="button"
-          >
-            <IconTrash size={14} />
-            <span className={s.actionBtnLabel}>Delete</span>
-          </button>
-        )}
-      </div>
-    )
-  }
-
-  function rowFromUser(user) {
-    return (
-      <tr key={user.id} className={user.is_banned ? s.bannedRow : ''}>
-        <td className={s.colAvatar}>
-          <Avatar
-            userId={user.id}
-            avatarPath={user.profile_picture_path}
-            name={user.login || user.full_name}
-            size="medium"
-          />
-        </td>
-        <td className={s.loginCell}>{user.login}</td>
-        <td className={`${s.dimCell} ${s.colRating}`}>{user.rating ?? 0}</td>
-        <td className={`${s.dimCell} ${s.colFullName}`}>{user.full_name ?? '—'}</td>
-        <td className={`${s.dimCell} ${s.colEmail}`}>{user.email}</td>
-        <td>
-          <span className={`${s.roleBadge} ${s[`role_${user.role}`]}`}>
-            {user.role}
-          </span>
-        </td>
-        <td>
-          <span className={`${s.statusBadge} ${user.is_banned ? s.statusBanned : s.statusActive}`}>
-            {user.is_banned ? 'Banned' : 'Active'}
-          </span>
-        </td>
-        <td>
-          {rowActionButtons(user)}
-        </td>
-      </tr>
-    )
-  }
-
-  function addUserModal() {
-    return (
-      <ActionModal
-        title="Create User"
-        confirmText="Create User"
-        isLoading={addUserLoading}
-        onConfirm={handleAddUserSubmit}
-        onClose={closeAddUserModal}
-      >
-        <label className={s.formLabel}>
-          Login <span className={s.required}>*</span>
-          <input
-            className={s.input}
-            type="text"
-            placeholder="cool_username"
-            value={addUserForm.login}
-            onChange={handleAddUserChange('login')}
-            autoFocus
-            required
-          />
-          {addUserErrors.login && <span className={s.fieldError}>{addUserErrors.login}</span>}
-        </label>
-
-        <label className={s.formLabel}>
-          Full name <span className={s.required}>*</span>
-          <input
-            className={s.input}
-            type="text"
-            placeholder="John Doe"
-            value={addUserForm.full_name}
-            onChange={handleAddUserChange('full_name')}
-            required
-          />
-          {addUserErrors.full_name && <span className={s.fieldError}>{addUserErrors.full_name}</span>}
-        </label>
-
-        <label className={s.formLabel}>
-          Email <span className={s.required}>*</span>
-          <input
-            className={s.input}
-            type="email"
-            placeholder="you@example.com"
-            value={addUserForm.email}
-            onChange={handleAddUserChange('email')}
-            required
-          />
-          {addUserErrors.email && <span className={s.fieldError}>{addUserErrors.email}</span>}
-        </label>
-
-        <label className={s.formLabel}>
-          Password <span className={s.required}>*</span>
-          <input
-            className={s.input}
-            type="password"
-            placeholder="••••••••"
-            value={addUserForm.password}
-            onChange={handleAddUserChange('password')}
-            required
-          />
-          {addUserErrors.password && <span className={s.fieldError}>{addUserErrors.password}</span>}
-        </label>
-
-        <label className={s.formLabel}>
-          Confirm password <span className={s.required}>*</span>
-          <input
-            className={s.input}
-            type="password"
-            placeholder="••••••••"
-            value={addUserForm.confirmed_password}
-            onChange={handleAddUserChange('confirmed_password')}
-            required
-          />
-          {addUserErrors.confirmed_password && (
-            <span className={s.fieldError}>{addUserErrors.confirmed_password}</span>
-          )}
-        </label>
-
-        <label className={s.formLabel}>
-          Role
-          <SelectDropdown
-            value={addUserForm.role}
-            options={CREATE_ROLE_OPTIONS}
-            onChange={(val) => setAddUserForm((prev) => ({ ...prev, role: val }))}
-            ariaLabel="New user role"
-          />
-        </label>
-      </ActionModal>
-    )
-  }
-
-  function banModal() {
-    return (
-      <ActionModal
-        title={`Ban User: ${banTargetUser.login}`}
-        details={[
-          { label: 'User', value: banTargetUser.login },
-          { label: 'Email', value: banTargetUser.email },
-          { label: 'Role', value: banTargetUser.role },
-        ]}
-        confirmText="Ban User"
-        isDanger={true}
-        isLoading={banLoading}
-        disabled={!banReason.trim()}
-        onConfirm={handleBanSubmit}
-        onClose={closeBanModal}
-      >
-        <label className={s.formLabel}>
-          Reason <span className={s.required}>*</span>
-          <input
-            className={s.input}
-            type="text"
-            placeholder="State the reason for this ban..."
-            value={banReason}
-            onChange={(e) => setBanReason(e.target.value)}
-            autoFocus
-            required
-          />
-        </label>
-
-        <label className={s.formLabel}>
-          Duration
-          <div className={s.durationRow}>
-            <input
-              className={`${s.input} ${s.durationInput}`}
-              type="number"
-              placeholder="Leave blank for permanent ban"
-              value={banDuration}
-              onChange={(e) => setBanDuration(e.target.value)}
-              min={1}
-            />
-            <SelectDropdown
-              className={s.durationUnit}
-              value={banDurationUnit}
-              options={BAN_DURATION_UNIT_OPTIONS}
-              onChange={setBanDurationUnit}
-              ariaLabel="Ban duration unit"
-            />
-          </div>
-        </label>
-      </ActionModal>
-    )
-  }
-
   function promoteModal() {
     return (
       <ActionModal
@@ -778,7 +483,17 @@ export default function UsersTab() {
         }
       />
 
-      {showAddUserModal && addUserModal()}
+      {showAddUserModal && (
+        <AddUserModal
+          form={addUserForm}
+          errors={addUserErrors}
+          loading={addUserLoading}
+          onChange={handleAddUserChange}
+          onRoleChange={(val) => setAddUserForm((prev) => ({ ...prev, role: val }))}
+          onSubmit={handleAddUserSubmit}
+          onClose={closeAddUserModal}
+        />
+      )}
 
       {isLoading && (
         <div className={s.feedState}>
@@ -838,13 +553,40 @@ export default function UsersTab() {
               </tr>
             </thead>
             <tbody>
-              {users.map(rowFromUser)}
+              {users.map((user) => (
+                <UserTableRow
+                  key={user.id}
+                  user={user}
+                  currentUser={currentUser}
+                  isSuperadmin={isSuperadmin}
+                  issuerLevel={issuerLevel}
+                  roleLoadingId={roleLoadingId}
+                  onPromote={setPromoteTargetUser}
+                  onDemote={setDemoteTargetUser}
+                  onBanOpen={openBanModal}
+                  onUnbanOpen={setUnbanTargetUser}
+                  onDeleteOpen={setDeleteTargetUser}
+                />
+              ))}
             </tbody>
           </table>
         </div>
       )}
 
-      {banTargetUser && banModal()}
+      {banTargetUser && (
+        <BanUserModal
+          user={banTargetUser}
+          reason={banReason}
+          duration={banDuration}
+          durationUnit={banDurationUnit}
+          loading={banLoading}
+          onReasonChange={setBanReason}
+          onDurationChange={setBanDuration}
+          onDurationUnitChange={setBanDurationUnit}
+          onSubmit={handleBanSubmit}
+          onClose={closeBanModal}
+        />
+      )}
 
       {promoteTargetUser && promoteModal()}
 

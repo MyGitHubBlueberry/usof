@@ -1,22 +1,23 @@
-import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { ROUTES } from './constants/routes'
 import RootLayout from './components/layouts/RootLayout.jsx'
 import AuthLayout from './components/layouts/AuthLayout.jsx'
 import Home from './pages/Home'
-const UserPosts = lazy(() => import('./pages/UserPosts'))
-const PostDetails = lazy(() => import('./pages/PostDetails'))
-const PostCreate = lazy(() => import('./pages/PostCreate'))
-const PostEdit = lazy(() => import('./pages/PostEdit'))
-const Profile = lazy(() => import('./pages/Profile'))
-const Leaderboard = lazy(() => import('./pages/Leaderboard'))
-const Admin = lazy(() => import('./pages/Admin'))
-const Login = lazy(() => import('./pages/Login'))
-const Register = lazy(() => import('./pages/Register'))
-const EmailConfirm = lazy(() => import('./pages/EmailConfirm'))
-const PasswordResetRequest = lazy(() => import('./pages/PasswordResetRequest'))
-const PasswordResetConfirm = lazy(() => import('./pages/PasswordResetConfirm'))
-const NotFound = lazy(() => import('./pages/NotFound'))
+import {
+  UserPosts,
+  PostDetails,
+  PostCreate,
+  PostEdit,
+  Profile,
+  Leaderboard,
+  Admin,
+  Login,
+  Register,
+  EmailConfirm,
+  PasswordResetRequest,
+  PasswordResetConfirm,
+  NotFound,
+} from './lazyPages'
 
 export const router = createBrowserRouter([
   {

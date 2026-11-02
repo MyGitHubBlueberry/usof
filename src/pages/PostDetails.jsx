@@ -5,6 +5,7 @@ import { postsService } from '../services/posts.service'
 import { usersService } from '../services/users.service'
 import { usePolling } from '../hooks/usePolling'
 import { FlashProvider } from '../context/FlashProvider'
+import { PostProvider } from '../context/PostProvider'
 import { ROUTES } from '../constants/routes'
 import { IconXCircle } from '../components/ui/Icons'
 import PostHeader from '../components/post-detail/PostHeader'
@@ -25,14 +26,15 @@ export default function PostDetails() {
   const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0, myReaction: null })
   const [isFavorited, setIsFavorited] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [commentsRefreshToken, setCommentsRefreshToken] = useState(0)
 
+  const [resolvedKey, setResolvedKey] = useState(null)
+  const requestKey = `${id}:${currentUser?.id ?? ''}`
+  const loading = resolvedKey !== requestKey
+
   const loadPost = useCallback(() => {
     let isMounted = true
-    setLoading(true)
-    setNotFound(false)
 
     postsService
       .getById(id)
@@ -40,6 +42,7 @@ export default function PostDetails() {
         if (!isMounted) return
         const data = res.data
         setPost(data)
+        setNotFound(false)
 
         const tasks = [
           usersService.getById(data.user_id).catch(() => null),
@@ -76,13 +79,13 @@ export default function PostDetails() {
         if (isMounted) setNotFound(true)
       })
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setResolvedKey(requestKey)
       })
 
     return () => {
       isMounted = false
     }
-  }, [id, currentUser])
+  }, [id, currentUser, requestKey])
 
   useEffect(() => loadPost(), [loadPost])
 
@@ -129,42 +132,40 @@ export default function PostDetails() {
     )
   }
 
+  const postContextValue = {
+    post,
+    postStatus: post.status,
+    postAuthorId: post.user_id,
+    isAdmin,
+    currentUser,
+    onPostStatusChange: (status) => setPost((prev) => (prev ? { ...prev, status } : prev)),
+  }
+
   return (
     <FlashProvider>
-      <NavRow />
-      <div className={s.postPage}>
-        <PostHeader
-          post={post}
-          categories={categories}
-          isAuthenticated={!!currentUser}
-          isFavorited={isFavorited}
-          isAdmin={isAdmin}
-          currentUser={currentUser}
-          onFavoriteChange={setIsFavorited}
-          onStatusChange={(status) => setPost((prev) => (prev ? { ...prev, status } : prev))}
-          onRequireCommentsRefresh={() => setCommentsRefreshToken((v) => v + 1)}
-        />
-        <PostBody post={post} />
-        <PostFooter
-          post={post}
-          author={author}
-          likeCounts={likeCounts}
-          isAuthenticated={!!currentUser}
-          isAdmin={isAdmin}
-          isSubscribed={isSubscribed}
-          onLikeCountsChange={setLikeCounts}
-          onSubscribeChange={setIsSubscribed}
-        />
-        <CommentsSection
-          postId={post.id}
-          postStatus={post.status}
-          postAuthorId={post.user_id}
-          isAdmin={isAdmin}
-          currentUser={currentUser}
-          refreshToken={commentsRefreshToken}
-          onPostStatusChange={(status) => setPost((prev) => (prev ? { ...prev, status } : prev))}
-        />
-      </div>
+      <PostProvider value={postContextValue}>
+        <NavRow />
+        <div className={s.postPage}>
+          <PostHeader
+            categories={categories}
+            isFavorited={isFavorited}
+            onFavoriteChange={setIsFavorited}
+            onRequireCommentsRefresh={() => setCommentsRefreshToken((v) => v + 1)}
+          />
+          <PostBody post={post} />
+          <PostFooter
+            author={author}
+            likeCounts={likeCounts}
+            isSubscribed={isSubscribed}
+            onLikeCountsChange={setLikeCounts}
+            onSubscribeChange={setIsSubscribed}
+          />
+          <CommentsSection
+            postId={post.id}
+            refreshToken={commentsRefreshToken}
+          />
+        </div>
+      </PostProvider>
     </FlashProvider>
   )
 }

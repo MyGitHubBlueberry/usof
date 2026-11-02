@@ -73,18 +73,12 @@
 }
 
 .subscribeBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  composes: btn-base from global;
   padding: 6px 12px;
   font-size: 12px;
-  font-weight: 600;
-  font-family: inherit;
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-h);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
 .subscribeBtn svg {
@@ -99,13 +93,8 @@
   color: var(--accent);
 }
 
-.subscribeBtn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
 .subscribeBtn:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .subscribeBtnActive {

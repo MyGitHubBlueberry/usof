@@ -68,26 +68,18 @@
 }
 
 .retryBtn {
+  composes: btn-base from global;
   margin-top: 6px;
   height: 34px;
   padding: 0 20px;
   background: transparent;
   border: 1px solid var(--accent);
   color: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
 }
 
-.retryBtn:hover {
+.retryBtn:hover:not(:disabled) {
   background: var(--accent);
   color: #fff;
-}
-
-.retryBtn:active {
-  transform: scale(0.98);
 }
 
 .paginationWrapper {

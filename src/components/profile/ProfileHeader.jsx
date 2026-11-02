@@ -42,10 +42,6 @@ export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNot
   const [deleteLoading, setDeleteLoading] = useState(false)
 
   useEffect(() => {
-    setNameInput(profile.full_name || '')
-  }, [profile.full_name])
-
-  useEffect(() => {
     let isMounted = true
     postsService
       .getAll({ author: profile.login, limit: 1 })

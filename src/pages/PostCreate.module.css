@@ -23,52 +23,24 @@
 }
 
 .cancelBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  composes: btn-base from global;
   padding: 0 20px;
   height: 38px;
   color: var(--text);
   border: 1px solid var(--border);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  transition: border-color 0.15s, color 0.15s;
+  background: transparent;
 }
 
-.cancelBtn:hover {
+.cancelBtn:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
 
 .submitBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  composes: btn-base btn-primary from global;
   height: 38px;
   padding: 0 22px;
-  background: var(--accent);
-  color: #fff;
   font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  border: 1px solid var(--accent);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
-}
-
-.submitBtn:hover:not(:disabled) {
-  background: transparent;
-  color: var(--accent);
-}
-
-.submitBtn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.submitBtn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .inactiveNotice {

@@ -4,6 +4,7 @@ import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
 import { usePolling } from '../../hooks/usePolling'
+import { usePost } from '../../hooks/usePost'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
@@ -30,20 +31,18 @@ function countDescendants(comment) {
   return comment.replies.reduce((sum, reply) => sum + 1 + countDescendants(reply), 0)
 }
 
-export default function CommentItem({
-  comment,
-  postStatus,
-  postAuthorId,
-  isAdmin,
-  currentUser,
-  usersById,
-  depth,
-  onCommentPatched,
-  onCommentDeleted,
-  onReplyAdded,
-  onPostResolved,
-  onLikesChanged,
-}) {
+export default function CommentItem({ comment, depth, usersById }) {
+  const {
+    postStatus,
+    postAuthorId,
+    isAdmin,
+    currentUser,
+    onCommentPatched,
+    onCommentDeleted,
+    onReplyAdded,
+    onPostStatusChange: onPostResolved,
+    onLikesChanged,
+  } = usePost()
   const { showFlash } = useFlash()
   const author = usersById[comment.user_id]
 
@@ -74,7 +73,7 @@ export default function CommentItem({
 
   const [isCollapsed, setIsCollapsed] = useState(false)
 
-  const fetchLikes = useCallback(() => {
+  const fetchLikes = useCallback(async () => {
     return commentsService
       .getLikes(comment.id)
       .then((res) => {
@@ -267,17 +266,19 @@ export default function CommentItem({
   function commentEdit() {
     return (
       <div className={s.editBox}>
-        <MarkdownToolbar onFormat={applyEditFormat} />
-        <textarea
-          ref={editTextareaRef}
-          className={s.replyTextarea}
-          value={editText}
-          onChange={(e) => setEditText(e.target.value)}
-          onKeyDown={handleEditKeyDown}
-          disabled={editSaving}
-          rows={3}
-          autoFocus
-        />
+        <div className={s.textareaWithMd}>
+          <MarkdownToolbar onFormat={applyEditFormat} />
+          <textarea
+            ref={editTextareaRef}
+            className={s.replyTextarea}
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onKeyDown={handleEditKeyDown}
+            disabled={editSaving}
+            rows={3}
+            autoFocus
+          />
+        </div>
         {editError && <span className={s.editError}>{editError}</span>}
         <div className={s.editActions}>
           <button
@@ -351,18 +352,20 @@ export default function CommentItem({
   function replyBox() {
     return (
       <div className={s.replyBox}>
-        <MarkdownToolbar onFormat={applyReplyFormat} />
-        <textarea
-          ref={replyTextareaRef}
-          className={s.replyTextarea}
-          placeholder="Write a reply..."
-          value={replyText}
-          onChange={(e) => setReplyText(e.target.value)}
-          onKeyDown={handleReplyKeyDown}
-          disabled={replyPosting}
-          rows={2}
-          autoFocus
-        />
+        <div className={s.textareaWithMd}>
+          <MarkdownToolbar onFormat={applyReplyFormat} />
+          <textarea
+            ref={replyTextareaRef}
+            className={s.replyTextarea}
+            placeholder="Write a reply..."
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            onKeyDown={handleReplyKeyDown}
+            disabled={replyPosting}
+            rows={2}
+            autoFocus
+          />
+        </div>
         <div className={s.replyActions}>
           <button
             type="button"
@@ -382,21 +385,7 @@ export default function CommentItem({
     return (
       <div className={s.repliesWrap}>
         {comment.replies.map((reply) => (
-          <CommentItem
-            key={reply.id}
-            comment={reply}
-            postStatus={postStatus}
-            postAuthorId={postAuthorId}
-            isAdmin={isAdmin}
-            currentUser={currentUser}
-            usersById={usersById}
-            depth={depth + 1}
-            onCommentPatched={onCommentPatched}
-            onCommentDeleted={onCommentDeleted}
-            onReplyAdded={onReplyAdded}
-            onPostResolved={onPostResolved}
-            onLikesChanged={onLikesChanged}
-          />
+          <CommentItem key={reply.id} comment={reply} usersById={usersById} depth={depth + 1} />
         ))}
       </div>
     )

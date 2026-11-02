@@ -1,0 +1,15 @@
+import { lazy } from 'react'
+
+export const UserPosts = lazy(() => import('./pages/UserPosts'))
+export const PostDetails = lazy(() => import('./pages/PostDetails'))
+export const PostCreate = lazy(() => import('./pages/PostCreate'))
+export const PostEdit = lazy(() => import('./pages/PostEdit'))
+export const Profile = lazy(() => import('./pages/Profile'))
+export const Leaderboard = lazy(() => import('./pages/Leaderboard'))
+export const Admin = lazy(() => import('./pages/Admin'))
+export const Login = lazy(() => import('./pages/Login'))
+export const Register = lazy(() => import('./pages/Register'))
+export const EmailConfirm = lazy(() => import('./pages/EmailConfirm'))
+export const PasswordResetRequest = lazy(() => import('./pages/PasswordResetRequest'))
+export const PasswordResetConfirm = lazy(() => import('./pages/PasswordResetConfirm'))
+export const NotFound = lazy(() => import('./pages/NotFound'))

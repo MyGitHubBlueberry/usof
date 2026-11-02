@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
+import { usePost } from '../../hooks/usePost'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
@@ -16,20 +17,20 @@ const STATUS_CLASSES = {
 }
 
 export default function PostFooter({
-  post,
   author,
   likeCounts,
-  isAuthenticated,
   isSubscribed,
   onLikeCountsChange,
   onSubscribeChange,
 }) {
+  const { post, currentUser } = usePost()
+  const isAuthenticated = !!currentUser
   const { showFlash } = useFlash()
   const [reacting, setReacting] = useState(false)
   const [subscribeLoading, setSubscribeLoading] = useState(false)
   const myReaction = likeCounts.myReaction ?? null
 
-  function refreshCounts() {
+  async function refreshCounts() {
     return postsService
       .getLikes(post.id)
       .then((res) => onLikeCountsChange(res.data ?? { likes: 0, dislikes: 0, myReaction: null }))
@@ -48,7 +49,7 @@ export default function PostFooter({
       myReaction === type ? postsService.removeLike(post.id) : postsService.like(post.id, type)
 
     action
-      .then(() => refreshCounts())
+      .then(async () => await refreshCounts())
       .catch((err) => showFlash(err.message || 'Could not save your reaction.', 'error'))
       .finally(() => setReacting(false))
   }

@@ -77,21 +77,7 @@
 }
 
 .input {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--text-h);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  box-sizing: border-box;
-}
-
-.input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
+  composes: input-base from global;
 }
 
 .input.invalid {
@@ -105,38 +91,12 @@
 }
 
 .submit {
+  composes: btn-base btn-primary from global;
   width: 100%;
   padding: 11px;
   margin-top: 4px;
-  background: var(--accent);
-  color: #fff;
   font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  border: 1px solid var(--accent);
-  border-radius: 0;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 8px;
-  box-sizing: border-box;
-}
-
-.submit:hover:not(:disabled) {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.submit:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.submit:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .banner {

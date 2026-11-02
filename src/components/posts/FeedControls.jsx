@@ -78,7 +78,12 @@ export default function FeedControls({
   const curSearch = params.search || ''
   const curAuthor = params.author || ''
 
-  useEffect(() => {
+  const [syncedSearch, setSyncedSearch] = useState(curSearch)
+  const [syncedAuthor, setSyncedAuthor] = useState(curAuthor)
+
+  if (curSearch !== syncedSearch || curAuthor !== syncedAuthor) {
+    setSyncedSearch(curSearch)
+    setSyncedAuthor(curAuthor)
     if (curAuthor && !curSearch) {
       setSearchMode('user')
       setSearchInput(curAuthor)
@@ -88,7 +93,7 @@ export default function FeedControls({
     } else {
       setSearchInput('')
     }
-  }, [curSearch, curAuthor])
+  }
 
   const selectedCats = params.categories
     ? params.categories.split(',').filter(Boolean)

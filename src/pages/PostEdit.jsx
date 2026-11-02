@@ -167,19 +167,20 @@ export default function PostEdit() {
 
   const [post, setPost] = useState(null)
   const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+
+  const [resolvedId, setResolvedId] = useState(null)
+  const loading = resolvedId !== id
 
   const loadPost = useCallback(() => {
     let isMounted = true
-    setLoading(true)
-    setNotFound(false)
 
     postsService
       .getById(id)
       .then((res) => {
         if (!isMounted) return
         setPost(res.data)
+        setNotFound(false)
         return postsService.getCategories(id).catch(() => ({ data: [] }))
       })
       .then((categoriesRes) => {
@@ -190,7 +191,7 @@ export default function PostEdit() {
         if (isMounted) setNotFound(true)
       })
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setResolvedId(id)
       })
 
     return () => {

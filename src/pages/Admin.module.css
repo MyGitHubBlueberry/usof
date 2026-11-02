@@ -127,8 +127,7 @@
 }
 
 .retryBtn {
-  display: inline-flex;
-  align-items: center;
+  composes: btn-base from global;
   gap: 6px;
   margin-top: 6px;
   height: 34px;
@@ -136,20 +135,11 @@
   background: transparent;
   border: 1px solid var(--accent);
   color: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
 }
 
-.retryBtn:hover {
+.retryBtn:hover:not(:disabled) {
   background: var(--accent);
   color: #fff;
-}
-
-.retryBtn:active {
-  transform: scale(0.98);
 }
 
 .tableWrap {
@@ -357,34 +347,24 @@
 }
 
 .actionBtn {
-  display: inline-flex;
-  align-items: center;
+  composes: btn-base from global;
   gap: 5px;
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 500;
-  font-family: inherit;
   color: var(--text);
   background: var(--code-bg);
   border: 1px solid var(--border);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.actionBtn:hover {
+.actionBtn:hover:not(:disabled) {
   background: var(--active-bg);
   color: var(--text-h);
   border-color: var(--text);
 }
 
-.actionBtn:active {
-  transform: scale(0.98);
-}
-
 .actionBtn:disabled {
   opacity: 0.4;
-  cursor: not-allowed;
   pointer-events: auto;
 }
 
@@ -457,26 +437,15 @@
 }
 
 .searchInput {
-  width: 100%;
+  composes: input-base from global;
   height: 34px;
   padding: 0 12px 0 32px;
   font-size: 13px;
-  font-family: inherit;
-  background: var(--bg);
   color: var(--text);
-  border: 1px solid var(--border);
-  box-sizing: border-box;
-  transition: border-color 0.15s;
 }
 
 .searchInput:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.searchInput::placeholder {
-  color: var(--text);
-  opacity: 0.45;
+  box-shadow: none;
 }
 
 /* padding-right when clear button is visible */
@@ -512,75 +481,43 @@
 }
 
 .select {
+  composes: input-base from global;
+  width: auto;
   height: 34px;
   padding: 0 10px;
   font-size: 13px;
-  font-family: inherit;
-  background: var(--bg);
   color: var(--text);
-  border: 1px solid var(--border);
   cursor: pointer;
   min-width: 140px;
 }
 
 .select:focus {
-  outline: none;
-  border-color: var(--accent);
+  box-shadow: none;
 }
 
 .input {
+  composes: input-base from global;
+  width: auto;
   height: 34px;
   padding: 0 12px;
   font-size: 13px;
-  font-family: inherit;
-  background: var(--bg);
   color: var(--text);
-  border: 1px solid var(--border);
-  box-sizing: border-box;
   min-width: 160px;
   flex: 1;
-  transition: border-color 0.15s;
 }
 
 .input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.input::placeholder {
-  color: var(--text);
-  opacity: 0.45;
+  box-shadow: none;
 }
 
 .btnPrimary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  composes: btn-base btn-primary from global;
   height: 32px;
   padding: 0 18px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  background: var(--accent);
-  color: #fff;
-  border: 1px solid var(--accent);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
-}
-
-.btnPrimary:hover {
-  background: transparent;
-  color: var(--accent);
-}
-
-.btnPrimary:active {
-  transform: scale(0.98);
 }
 
 .btnPrimary:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .btnPrimary:disabled:hover {
@@ -590,29 +527,18 @@
 }
 
 .btnGhost {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  composes: btn-base from global;
   height: 34px;
   padding: 0 14px;
-  font-size: 13px;
   font-weight: 500;
-  font-family: inherit;
   background: transparent;
   color: var(--text);
   border: 1px solid var(--border);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
 }
 
-.btnGhost:hover {
+.btnGhost:hover:not(:disabled) {
   background: var(--active-bg);
   color: var(--text-h);
-}
-
-.btnGhost:active {
-  transform: scale(0.98);
 }
 
 .linkBtn {
