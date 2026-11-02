@@ -1,0 +1,80 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.tabBar {
+  padding: 0 24px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.feedState {
+  composes: feedState from '../components/ui/DataState.module.css';
+}
+
+.spinner {
+  composes: spinner from '../components/ui/DataState.module.css';
+}
+
+.errorTitle {
+  composes: errorTitle from '../components/ui/DataState.module.css';
+}
+
+.errorMsg {
+  composes: errorMsg from '../components/ui/DataState.module.css';
+}
+
+.retryBtn {
+  composes: retryBtn from '../components/ui/DataState.module.css';
+}
+
+.paginationWrapper {
+  composes: paginationWrapper from '../components/ui/DataState.module.css';
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 16px 16px 12px;
+  }
+
+  .tabBar {
+    padding: 0 16px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+    .header {
+        justify-content: center;
+    }
+}

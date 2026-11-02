@@ -83,63 +83,23 @@
 }
 
 .feedState {
-  flex: 1;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 24px;
-  text-align: center;
-  border: 1px dashed var(--border);
-  color: var(--text);
-  font-size: 14px;
-  box-sizing: border-box;
-  gap: 12px;
+  composes: feedState from '../components/ui/DataState.module.css';
 }
 
 .spinner {
-  width: 26px;
-  height: 26px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+  composes: spinner from '../components/ui/DataState.module.css';
 }
 
 .errorTitle {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-h);
-  margin: 0;
+  composes: errorTitle from '../components/ui/DataState.module.css';
 }
 
 .errorMsg {
-  font-size: 13px;
-  color: var(--text);
-  margin: 0;
-  max-width: 380px;
-  line-height: 1.5;
+  composes: errorMsg from '../components/ui/DataState.module.css';
 }
 
 .retryBtn {
-  composes: btn-base from global;
-  gap: 6px;
-  margin-top: 6px;
-  height: 34px;
-  padding: 0 18px;
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-}
-
-.retryBtn:hover:not(:disabled) {
-  background: var(--accent);
-  color: #fff;
+  composes: retryBtn from '../components/ui/DataState.module.css';
 }
 
 .tableWrap {
@@ -565,9 +525,7 @@
 }
 
 .paginationWrapper {
-  display: flex;
-  justify-content: center;
-  padding: 8px 0 4px;
+  composes: paginationWrapper from '../components/ui/DataState.module.css';
 }
 
 .modalActions {

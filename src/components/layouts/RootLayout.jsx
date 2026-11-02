@@ -19,7 +19,8 @@ export default function RootLayout() {
   const banned = useSelector((state) => state.auth.banned)
   const isHome = location.pathname === ROUTES.HOME
   const isPostDetail = !!matchPath({ path: ROUTES.POST, end: true }, location.pathname)
-  const showSidebars = isHome || isPostDetail
+  const isLeaderboard = location.pathname === ROUTES.LEADERBOARD
+  const showSidebars = isHome || isPostDetail || isLeaderboard
   const isFullSpan = location.pathname.startsWith(ROUTES.ADMIN)
 
   if (banned) {
@@ -39,7 +40,7 @@ export default function RootLayout() {
                 <SubscriptionsWidget />
               </>
             ) : (
-              isHome && <CategoriesWidget />
+              (isHome || isLeaderboard) && <CategoriesWidget />
             )}
           </aside>
         )}

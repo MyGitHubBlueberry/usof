@@ -4,6 +4,7 @@
 }
 
 .toolbarBtn {
+  composes: btn-secondary from global;
   display: inline-flex;
   align-items: center;
   gap: 6px;
