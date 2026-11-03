@@ -115,4 +115,8 @@ const authSlice = createSlice({
 
 export const { logout, updateUser, clearError, setBanned, clearBanned } = authSlice.actions;
 export const selectIsAuthenticated = (state) => !!state.auth.token;
+export const selectIsAdmin = (state) => {
+  const role = state.auth.user?.role;
+  return role === 'admin' || role === 'superadmin';
+};
 export default authSlice.reducer;

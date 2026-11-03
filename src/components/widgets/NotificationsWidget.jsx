@@ -1,11 +1,11 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { notificationsService } from '../../services/notifications.service'
+import { useDispatch, useSelector } from 'react-redux'
 import { toProfileTab, toPost } from '../../constants/routes'
-import { useAsyncData } from '../../hooks/useAsyncData'
 import { usePolling } from '../../hooks/usePolling'
 import { POLLING_INTERVALS } from '../../constants/polling'
 import { formatDate } from '../../utils/format'
+import { fetchNotifications, markNotificationRead, deleteNotification } from '../../redux/slices/notificationsSlice'
 import { IconBell, IconCheck, IconTrash } from '../ui/Icons'
 import SidebarWidget from './SidebarWidget'
 import sw from './SidebarWidget.module.css'
@@ -13,18 +13,19 @@ import s from './NotificationsWidget.module.css'
 
 export default function NotificationsWidget() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
+  const { items: notifications, status } = useSelector((state) => state.notifications)
+  const loading = status === 'idle' || (status === 'pending' && notifications.length === 0)
   const profileRoute = toProfileTab(user?.id, 'notifications')
-  const { data: notifications, loading, setData } = useAsyncData(
-    () => notificationsService.getAll({ limit: 10 }),
-    [],
-    []
-  )
+
+  useEffect(() => {
+    dispatch(fetchNotifications({ limit: 10 }))
+  }, [dispatch])
 
   function handleClick(n) {
     if (!n.is_read) {
-      notificationsService.read(n.id).catch(() => {})
-      setData((prev) => prev.map((item) => (item.id === n.id ? { ...item, is_read: true } : item)))
+      dispatch(markNotificationRead(n.id))
     }
     navigate(n.post_id ? toPost(n.post_id) : profileRoute)
   }
@@ -37,36 +38,19 @@ export default function NotificationsWidget() {
   }
 
   usePolling(
-    () => {
-      notificationsService
-        .getAll({ limit: 10 })
-        .then((res) => {
-          const fresh = res.data?.data ?? []
-          setData((prev) => {
-            const changed =
-              fresh.length !== prev.length ||
-              fresh.some((n, i) => prev[i]?.id !== n.id || prev[i]?.is_read !== n.is_read)
-            return changed ? fresh : prev
-          })
-        })
-        .catch(() => {})
-    },
+    () => dispatch(fetchNotifications({ limit: 10 })),
     POLLING_INTERVALS.NOTIFICATIONS,
-    [user?.id]
+    [dispatch]
   )
 
   function handleMarkRead(e, id) {
     e.stopPropagation()
-    notificationsService.read(id).catch(() => {})
-    setData((prev) => prev.map((item) => (item.id === id ? { ...item, is_read: true } : item)))
+    dispatch(markNotificationRead(id))
   }
 
   function handleDelete(e, id) {
     e.stopPropagation()
-    notificationsService
-      .delete(id)
-      .then(() => setData((prev) => prev.filter((n) => n.id !== id)))
-      .catch(() => {})
+    dispatch(deleteNotification(id))
   }
 
   return (

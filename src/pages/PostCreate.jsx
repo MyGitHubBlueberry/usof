@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
 import { categoriesService } from '../services/categories.service'
 import { useFlash } from '../hooks/useFlash'
-import { FlashProvider } from '../context/FlashProvider'
 import { ROUTES, toPost } from '../constants/routes'
 import PostCreateHeader from '../components/post-create/PostCreateHeader'
 import MarkdownEditor from '../components/post-create/MarkdownEditor'
@@ -144,9 +143,5 @@ export default function PostCreate() {
     )
   }
 
-  return (
-    <FlashProvider>
-      <PostCreateForm />
-    </FlashProvider>
-  )
+  return <PostCreateForm />
 }

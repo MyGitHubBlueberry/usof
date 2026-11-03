@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
-import { usersService } from '../services/users.service'
 import { usePostEvents } from '../hooks/usePostEvents'
-import { FlashProvider } from '../context/FlashProvider'
-import { PostProvider } from '../context/PostProvider'
+import { fetchPostDetail, postPatched, likeCountsUpdated } from '../redux/slices/postDetailSlice'
+import { likeNetUpdated } from '../redux/slices/commentsSlice'
 import { ROUTES } from '../constants/routes'
 import { IconXCircle } from '../components/ui/Icons'
 import PostHeader from '../components/post-detail/PostHeader'
@@ -24,92 +23,61 @@ function isNotFound(error) {
 
 export default function PostDetails() {
   const { id } = useParams()
+  const dispatch = useDispatch()
   const currentUser = useSelector((state) => state.auth.user)
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin'
+  const { post, author, categories, status, error } = useSelector((state) => state.postDetail)
+  const loading = status === 'idle' || status === 'pending'
 
-  const [post, setPost] = useState(null)
-  const [author, setAuthor] = useState(null)
-  const [categories, setCategories] = useState([])
-  const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0, myReaction: null })
   const [isFavorited, setIsFavorited] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [error, setError] = useState(null)
-  const [retryCount, setRetryCount] = useState(0)
   const [commentsRefreshToken, setCommentsRefreshToken] = useState(0)
 
-  const [resolvedKey, setResolvedKey] = useState(null)
-  const requestKey = `${id}:${currentUser?.id ?? ''}:${retryCount}`
-  const loading = resolvedKey !== requestKey
+  useEffect(() => {
+    dispatch(fetchPostDetail(id))
+  }, [dispatch, id])
 
-  const loadPost = useCallback(() => {
+  useEffect(() => {
     let isMounted = true
 
-    postsService
-      .getById(id)
-      .then((res) => {
-        if (!isMounted) return
-        const data = res.data
-        setPost(data)
-        setError(null)
+    const task = currentUser
+      ? Promise.all([
+          postsService.getFavorites({ limit: 100 }).catch(() => null),
+          postsService.getSubscriptions({ limit: 100 }).catch(() => null),
+        ])
+      : Promise.resolve([null, null])
 
-        const tasks = [
-          usersService.getById(data.user_id).catch(() => null),
-          postsService.getCategories(id).catch(() => ({ data: [] })),
-          postsService.getLikes(id).catch(() => ({ data: { likes: 0, dislikes: 0, myReaction: null } })),
-          currentUser ? postsService.getFavorites({ limit: 100 }).catch(() => null) : Promise.resolve(null),
-          currentUser ? postsService.getSubscriptions({ limit: 100 }).catch(() => null) : Promise.resolve(null),
-        ]
-
-        return Promise.all(tasks).then(
-          ([authorRes, categoriesRes, likesRes, favoritesRes, subscriptionsRes]) => {
-            if (!isMounted) return
-            setAuthor(authorRes?.data ?? null)
-            setCategories(categoriesRes.data ?? [])
-            setLikeCounts(likesRes.data ?? { likes: 0, dislikes: 0, myReaction: null })
-
-            if (favoritesRes) {
-              const favs = favoritesRes.data?.data ?? []
-              setIsFavorited(favs.some((p) => Number(p.id) === Number(id)))
-            } else {
-              setIsFavorited(false)
-            }
-
-            if (subscriptionsRes) {
-              const subs = subscriptionsRes.data?.data ?? []
-              setIsSubscribed(subs.some((p) => Number(p.id) === Number(id)))
-            } else {
-              setIsSubscribed(false)
-            }
-          }
-        )
-      })
-      .catch((err) => {
-        if (isMounted) setError(err)
-      })
-      .finally(() => {
-        if (isMounted) setResolvedKey(requestKey)
-      })
+    task.then(([favoritesRes, subscriptionsRes]) => {
+      if (!isMounted) return
+      const favs = favoritesRes?.data?.data ?? []
+      setIsFavorited(favs.some((p) => Number(p.id) === Number(id)))
+      const subs = subscriptionsRes?.data?.data ?? []
+      setIsSubscribed(subs.some((p) => Number(p.id) === Number(id)))
+    })
 
     return () => {
       isMounted = false
     }
-  }, [id, currentUser, requestKey])
+  }, [id, currentUser])
 
-  useEffect(() => loadPost(), [loadPost])
-
-  const handleRetry = () => setRetryCount((c) => c + 1)
+  const handleRetry = () => dispatch(fetchPostDetail(id))
 
   usePostEvents(post?.id, {
     likes_updated: (counts) => {
       if (!counts) return
-      setLikeCounts((prev) => ({ ...prev, likes: counts.likes, dislikes: counts.dislikes }))
+      dispatch(likeCountsUpdated({ likes: counts.likes, dislikes: counts.dislikes }))
     },
     post_updated: (updated) => {
       if (!updated) return
-      setPost((prev) => (prev ? { ...prev, ...updated } : prev))
+      dispatch(postPatched(updated))
     },
     comments_updated: () => {
       setCommentsRefreshToken((v) => v + 1)
+    },
+    comment_like_updated: (payload) => {
+      if (!payload) return
+      dispatch(
+        likeNetUpdated({ commentId: payload.commentId, likes: payload.likes ?? 0, dislikes: payload.dislikes ?? 0 })
+      )
     },
   })
 
@@ -136,40 +104,27 @@ export default function PostDetails() {
     return <ErrorState error={error} message="Could not load this post." onRetry={handleRetry} />
   }
 
-  const postContextValue = {
-    post,
-    postStatus: post.status,
-    postAuthorId: post.user_id,
-    isAdmin,
-    currentUser,
-    onPostStatusChange: (status) => setPost((prev) => (prev ? { ...prev, status } : prev)),
-  }
-
   return (
-    <FlashProvider>
-      <PostProvider value={postContextValue}>
-        <NavRow />
-        <div className={s.postPage}>
-          <PostHeader
-            categories={categories}
-            isFavorited={isFavorited}
-            onFavoriteChange={setIsFavorited}
-            onRequireCommentsRefresh={() => setCommentsRefreshToken((v) => v + 1)}
-          />
-          <PostBody post={post} />
-          <PostFooter
-            author={author}
-            likeCounts={likeCounts}
-            isSubscribed={isSubscribed}
-            onLikeCountsChange={setLikeCounts}
-            onSubscribeChange={setIsSubscribed}
-          />
-          <CommentsSection
-            postId={post.id}
-            refreshToken={commentsRefreshToken}
-          />
-        </div>
-      </PostProvider>
-    </FlashProvider>
+    <>
+      <NavRow />
+      <div className={s.postPage}>
+        <PostHeader
+          categories={categories}
+          isFavorited={isFavorited}
+          onFavoriteChange={setIsFavorited}
+          onRequireCommentsRefresh={() => setCommentsRefreshToken((v) => v + 1)}
+        />
+        <PostBody post={post} />
+        <PostFooter
+          author={author}
+          isSubscribed={isSubscribed}
+          onSubscribeChange={setIsSubscribed}
+        />
+        <CommentsSection
+          postId={post.id}
+          refreshToken={commentsRefreshToken}
+        />
+      </div>
+    </>
   )
 }

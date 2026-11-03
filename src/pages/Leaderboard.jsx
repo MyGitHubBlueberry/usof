@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { leaderboardService } from '../services/leaderboard.service'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchLeaderboard } from '../redux/slices/leaderboardSlice'
 import TabBar from '../components/ui/TabBar'
 import Pagination from '../components/ui/Pagination'
 import LeaderboardList from '../components/leaderboard/LeaderboardList'
@@ -17,45 +18,23 @@ const TABS = [
 ]
 
 export default function Leaderboard() {
+  const dispatch = useDispatch()
   const [activeTab, setActiveTab] = useState('overall')
   const [page, setPage] = useState(1)
-  const [users, setUsers] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [error, setError] = useState(null)
-  const [retryCount, setRetryCount] = useState(0)
-
-  const requestKey = `${activeTab}:${page}:${retryCount}`
-  const [resolvedKey, setResolvedKey] = useState(null)
-  const loading = resolvedKey !== requestKey
+  const { items: users, totalPages, status, error } = useSelector((state) => state.leaderboard[activeTab])
+  const loading = status === 'idle' || status === 'pending'
 
   useEffect(() => {
-    let isMounted = true
-    const fetchPage = activeTab === 'weekly' ? leaderboardService.getWeekly : leaderboardService.getOverall
-
-    fetchPage({ page, limit: LEADERS_PER_PAGE })
-      .then((res) => {
-        if (!isMounted) return
-        setUsers(res.data?.data ?? [])
-        setTotalPages(res.data?.pagination?.totalPages ?? 1)
-        setError(null)
-      })
-      .catch((err) => {
-        if (!isMounted) return
-        setUsers([])
-        setError(err)
-      })
-      .finally(() => {
-        if (isMounted) setResolvedKey(requestKey)
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [activeTab, page, retryCount, requestKey])
+    dispatch(fetchLeaderboard({ mode: activeTab, page, limit: LEADERS_PER_PAGE }))
+  }, [dispatch, activeTab, page])
 
   function handleTabChange(tab) {
     setActiveTab(tab)
     setPage(1)
+  }
+
+  function handleRetry() {
+    dispatch(fetchLeaderboard({ mode: activeTab, page, limit: LEADERS_PER_PAGE }))
   }
 
   function renderBody() {
@@ -68,7 +47,7 @@ export default function Leaderboard() {
         <ErrorState
           error={error}
           message="Could not load the leaderboard."
-          onRetry={() => setRetryCount((c) => c + 1)}
+          onRetry={handleRetry}
         />
       )
     }

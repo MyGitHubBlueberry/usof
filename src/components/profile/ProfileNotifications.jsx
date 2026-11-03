@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { notificationsService } from '../../services/notifications.service'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  fetchNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification,
+  deleteAllNotifications,
+} from '../../redux/slices/notificationsSlice'
 import { useFlash } from '../../hooks/useFlash'
 import { toPost } from '../../constants/routes'
 import { formatDate } from '../../utils/format'
@@ -21,49 +28,25 @@ const STATUS_OPTIONS = [
 
 export default function ProfileNotifications() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { showFlash } = useFlash()
+  const { items: notifications, totalPages, status, error } = useSelector((state) => state.notifications)
+  const loading = status === 'pending'
 
-  const [notifications, setNotifications] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [error, setError] = useState(null)
   const [retryCount, setRetryCount] = useState(0)
-
   const [filters, setFilters] = useState({ search: '', status: 'all', page: '1' })
   const pageParam = parseInt(filters.page || '1', 10)
 
-  const requestKey = `${pageParam}|${filters.search}|${filters.status}|${retryCount}`
-  const [resolvedKey, setResolvedKey] = useState(null)
-  const loading = resolvedKey !== requestKey
-
   useEffect(() => {
-    let isMounted = true
-
-    notificationsService
-      .getAll({
+    dispatch(
+      fetchNotifications({
         page: pageParam,
         limit: 10,
         search: filters.search || undefined,
         status: filters.status === 'all' ? undefined : filters.status,
       })
-      .then((res) => {
-        if (!isMounted) return
-        setNotifications(res.data?.data || [])
-        setTotalPages(res.data?.pagination?.totalPages || 1)
-        setError(null)
-      })
-      .catch((err) => {
-        if (!isMounted) return
-        setNotifications([])
-        setError(err)
-      })
-      .finally(() => {
-        if (isMounted) setResolvedKey(requestKey)
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [pageParam, filters.search, filters.status, requestKey])
+    )
+  }, [dispatch, pageParam, filters.search, filters.status, retryCount])
 
   const handleRetry = () => setRetryCount((c) => c + 1)
 
@@ -80,47 +63,29 @@ export default function ProfileNotifications() {
   }
 
   function markRead(id) {
-    notificationsService
-      .read(id)
-      .then(() => {
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-        )
-      })
-      .catch(() => { })
+    dispatch(markNotificationRead(id))
   }
 
   function markAllRead() {
-    notificationsService
-      .readAll()
-      .then(() => {
-        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
-      })
-      .catch(() => { })
+    dispatch(markAllNotificationsRead())
   }
 
   function deleteOne(id) {
-    notificationsService
-      .delete(id)
-      .then(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id))
-      })
-      .catch((err) => showFlash(err.message || 'Could not delete notification.', 'error'))
+    dispatch(deleteNotification(id))
+      .unwrap()
+      .catch(() => showFlash('Could not delete notification.', 'error'))
   }
 
   function deleteAll() {
-    notificationsService
-      .deleteAll()
-      .then(() => {
-        setNotifications([])
-        showFlash('All notifications deleted.', 'success')
-      })
-      .catch((err) => showFlash(err.message || 'Could not delete notifications.', 'error'))
+    dispatch(deleteAllNotifications())
+      .unwrap()
+      .then(() => showFlash('All notifications deleted.', 'success'))
+      .catch(() => showFlash('Could not delete notifications.', 'error'))
   }
 
   function handleNotificationClick(n) {
     if (!n.is_read) {
-      notificationsService.read(n.id).catch(() => { })
+      dispatch(markNotificationRead(n.id))
     }
     if (n.post_id) {
       navigate(toPost(n.post_id))

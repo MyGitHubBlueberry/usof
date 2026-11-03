@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
 import { categoriesService } from '../services/categories.service'
 import { useFlash } from '../hooks/useFlash'
-import { FlashProvider } from '../context/FlashProvider'
 import { ROUTES, toPost } from '../constants/routes'
 import { IMAGE_EXTENSIONS, getExtension, getDisplayName, getAttachmentUrl } from '../utils/attachments'
 import PostCreateHeader from '../components/post-create/PostCreateHeader'
@@ -248,9 +247,5 @@ export default function PostEdit() {
     )
   }
 
-  return (
-    <FlashProvider>
-      <PostEditForm post={post} categories={categories} />
-    </FlashProvider>
-  )
+  return <PostEditForm post={post} categories={categories} />
 }

@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { ROUTES, toProfile, toProfileTab } from '../../constants/routes'
 import { selectIsAuthenticated, logoutThunk } from '../../redux/slices/authSlice'
-import { useTheme } from '../../hooks/useTheme'
+import { toggleTheme } from '../../redux/slices/themeSlice'
 import Logo from '../ui/Logo'
 import Avatar from '../ui/Avatar'
 import ActionMenu, { ActionMenuItem, ActionMenuDivider, ActionMenuHeader } from '../ui/ActionMenu'
@@ -28,7 +28,7 @@ export default function Header() {
   const navigate = useNavigate()
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const user = useSelector((state) => state.auth.user)
-  const { theme, toggleTheme } = useTheme()
+  const theme = useSelector((state) => state.theme.mode)
 
   const handleLogout = async () => {
     await dispatch(logoutThunk())
@@ -83,7 +83,7 @@ export default function Header() {
           <ActionMenuDivider />
           <ActionMenuItem
             icon={theme === 'dark' ? <IconSun className={s.itemIcon} /> : <IconMoon className={s.itemIcon} />}
-            onClick={toggleTheme}
+            onClick={() => dispatch(toggleTheme())}
           >
             {theme === 'dark' ? 'Switch to Light mode' : 'Switch to Dark mode'}
           </ActionMenuItem>

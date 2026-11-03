@@ -1,7 +1,8 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { leaderboardService } from '../../services/leaderboard.service'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchLeaderboard } from '../../redux/slices/leaderboardSlice'
 import { ROUTES, toProfile } from '../../constants/routes'
-import { useAsyncData } from '../../hooks/useAsyncData'
 import { IconTrophy } from '../ui/Icons'
 import Avatar from '../ui/Avatar'
 import SidebarWidget from './SidebarWidget'
@@ -9,11 +10,13 @@ import sw from './SidebarWidget.module.css'
 import s from './LeaderboardWidget.module.css'
 
 export default function LeaderboardWidget() {
-  const { data: users, loading } = useAsyncData(
-    () => leaderboardService.getOverall(),
-    [],
-    []
-  )
+  const dispatch = useDispatch()
+  const { items: users, status } = useSelector((state) => state.leaderboard.overall)
+  const loading = status === 'idle' || status === 'pending'
+
+  useEffect(() => {
+    dispatch(fetchLeaderboard({ mode: 'overall', page: 1, limit: 10 }))
+  }, [dispatch])
 
   const topUsers = users.slice(0, 5)
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-const EVENT_NAMES = ['likes_updated', 'post_updated', 'comments_updated']
+const EVENT_NAMES = ['likes_updated', 'post_updated', 'comments_updated', 'comment_like_updated']
 
 export function usePostEvents(postId, handlers) {
   const handlersRef = useRef(handlers)

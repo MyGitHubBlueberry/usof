@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { postsService } from '../../services/posts.service'
-import { usersService } from '../../services/users.service'
-import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
-import { usePost } from '../../hooks/usePost'
-import { PostProvider } from '../../context/PostProvider'
+import { fetchComments, commentAdded, userSeeded, sortModeChanged, pageChanged } from '../../redux/slices/commentsSlice'
+import { postStatusChanged } from '../../redux/slices/postDetailSlice'
+import { selectIsAdmin } from '../../redux/slices/authSlice'
 import { ROUTES } from '../../constants/routes'
 import Pagination from '../ui/Pagination'
 import CommentItem from './CommentItem'
@@ -16,7 +16,6 @@ import Loading from '../ui/Loading'
 import s from './CommentsSection.module.css'
 
 const ROOTS_PER_PAGE = 5
-const MAX_COMMENTS = 100
 
 const SORT_OPTIONS = [
   { value: 'liked', label: 'Most Liked' },
@@ -40,31 +39,14 @@ function buildCommentTree(flatComments) {
   return roots
 }
 
-function collectDescendantIds(flatComments, rootId) {
-  const toRemove = new Set([rootId])
-  let changed = true
-  while (changed) {
-    changed = false
-    flatComments.forEach((c) => {
-      if (c.parent_comment_id && toRemove.has(c.parent_comment_id) && !toRemove.has(c.id)) {
-        toRemove.add(c.id)
-        changed = true
-      }
-    })
-  }
-  return toRemove
-}
-
 export default function CommentsSection({ postId, refreshToken }) {
-  const postContext = usePost()
-  const { postStatus, currentUser, isAdmin, onPostStatusChange } = postContext
+  const dispatch = useDispatch()
+  const postStatus = useSelector((state) => state.postDetail.post?.status)
+  const currentUser = useSelector((state) => state.auth.user)
+  const isAdmin = useSelector(selectIsAdmin)
+  const { items: comments, usersById, likeNet, status, page, sortMode } = useSelector((state) => state.comments)
+  const loading = status === 'pending'
   const { showFlash } = useFlash()
-
-  const [comments, setComments] = useState([])
-  const [usersById, setUsersById] = useState({})
-  const [likeNet, setLikeNet] = useState({})
-  const [page, setPage] = useState(1)
-  const [sortMode, setSortMode] = useState('liked')
 
   const [newComment, setNewComment] = useState('')
   const [posting, setPosting] = useState(false)
@@ -75,56 +57,9 @@ export default function CommentsSection({ postId, refreshToken }) {
 
   const revertingRef = useRef(false)
 
-  const requestKey = `${postId}:${refreshToken}`
-  const [resolvedKey, setResolvedKey] = useState(null)
-  const loading = resolvedKey !== requestKey
-
-  const loadComments = useCallback(() => {
-    postsService
-      .getComments(postId, { limit: MAX_COMMENTS })
-      .then((res) => {
-        const data = res.data?.data ?? []
-        setComments(data)
-
-        const uniqueUserIds = [...new Set(data.map((c) => c.user_id).filter(Boolean))]
-        const usersPromise = Promise.all(
-          uniqueUserIds.map((userId) =>
-            usersService
-              .getById(userId)
-              .then((userRes) => [userId, userRes.data])
-              .catch(() => [userId, null])
-          )
-        )
-
-        const rootIds = data.filter((c) => !c.parent_comment_id).map((c) => c.id)
-        const likesPromise = Promise.all(
-          rootIds.map((id) =>
-            commentsService
-              .getLikes(id)
-              .then((r) => [id, (r.data?.likes ?? 0) - (r.data?.dislikes ?? 0)])
-              .catch(() => [id, 0])
-          )
-        )
-
-        return Promise.all([usersPromise, likesPromise])
-      })
-      .then(([userEntries, likeEntries]) => {
-        setUsersById(Object.fromEntries(userEntries))
-        setLikeNet(Object.fromEntries(likeEntries))
-      })
-      .catch(() => {
-        setComments([])
-        setUsersById({})
-        setLikeNet({})
-      })
-      .finally(() => {
-        setResolvedKey(requestKey)
-      })
-  }, [postId, requestKey])
-
   useEffect(() => {
-    loadComments()
-  }, [loadComments])
+    dispatch(fetchComments(postId))
+  }, [dispatch, postId, refreshToken])
 
   // revert post to active from resolved if there are no more resolved comments
   useEffect(() => {
@@ -135,33 +70,12 @@ export default function CommentsSection({ postId, refreshToken }) {
     revertingRef.current = true
     postsService
       .updateStatus(postId, 'active')
-      .then(() => onPostStatusChange('active'))
+      .then(() => dispatch(postStatusChanged('active')))
       .catch(() => showFlash('Could not automatically revert post status.', 'error'))
       .finally(() => {
         revertingRef.current = false
       })
-  }, [comments, postStatus, isAdmin, loading, postId, onPostStatusChange, showFlash])
-
-  function ensureAuthorKnown(userId) {
-    if (!currentUser || Number(userId) !== Number(currentUser.id)) return
-    setUsersById((prev) => (prev[userId] ? prev : { ...prev, [userId]: currentUser }))
-  }
-
-  function handleCommentPatched(updated) {
-    setComments((prev) => prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)))
-  }
-
-  function handleCommentDeleted(commentId) {
-    setComments((prev) => {
-      const toRemove = collectDescendantIds(prev, commentId)
-      return prev.filter((c) => !toRemove.has(c.id))
-    })
-  }
-
-  function handleReplyAdded(newReply) {
-    ensureAuthorKnown(newReply.user_id)
-    setComments((prev) => [...prev, { status: 'active', publish_date: new Date().toISOString(), ...newReply }])
-  }
+  }, [comments, postStatus, isAdmin, loading, postId, dispatch, showFlash])
 
   const roots = useMemo(() => buildCommentTree(comments), [comments])
 
@@ -169,12 +83,9 @@ export default function CommentsSection({ postId, refreshToken }) {
     if (sortMode === 'chrono') {
       return [...roots].sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date))
     }
-    return [...roots].sort((a, b) => (likeNet[b.id] ?? 0) - (likeNet[a.id] ?? 0))
+    const net = (id) => (likeNet[id]?.likes ?? 0) - (likeNet[id]?.dislikes ?? 0)
+    return [...roots].sort((a, b) => net(b.id) - net(a.id))
   }, [roots, sortMode, likeNet])
-
-  const handleLikesChanged = useCallback((commentId, counts) => {
-    setLikeNet((prev) => ({ ...prev, [commentId]: (counts.likes ?? 0) - (counts.dislikes ?? 0) }))
-  }, [])
 
   const totalRootPages = Math.max(1, Math.ceil(sortedRoots.length / ROOTS_PER_PAGE))
   const clampedPage = Math.min(page, totalRootPages)
@@ -184,8 +95,7 @@ export default function CommentsSection({ postId, refreshToken }) {
   )
 
   function handleSortChange(value) {
-    setSortMode(value)
-    setPage(1)
+    dispatch(sortModeChanged(value))
   }
 
   function handleSubmitComment() {
@@ -196,7 +106,10 @@ export default function CommentsSection({ postId, refreshToken }) {
     postsService
       .addComment(postId, trimmed)
       .then((res) => {
-        handleReplyAdded(res.data)
+        if (currentUser && Number(res.data.user_id) === Number(currentUser.id) && !usersById[res.data.user_id]) {
+          dispatch(userSeeded({ userId: res.data.user_id, user: currentUser }))
+        }
+        dispatch(commentAdded(res.data))
         setNewComment('')
       })
       .catch((err) => showFlash(err.message || 'Could not post comment.', 'error'))
@@ -204,15 +117,6 @@ export default function CommentsSection({ postId, refreshToken }) {
   }
 
   const canCreateRootComment = postStatus !== 'inactive'
-
-  const commentContextValue = {
-    ...postContext,
-    onCommentPatched: handleCommentPatched,
-    onCommentDeleted: handleCommentDeleted,
-    onReplyAdded: handleReplyAdded,
-    onLikesChanged: handleLikesChanged,
-    commentsRefreshToken: refreshToken,
-  }
 
   return (
     <div className={s.section}>
@@ -249,7 +153,7 @@ export default function CommentsSection({ postId, refreshToken }) {
         </div>
       )}
 
-      {loading ? (
+      {loading && comments.length === 0 ? (
         <div className={s.noticeMsg}>
           <Loading inline message="Loading comments…" />
         </div>
@@ -257,23 +161,22 @@ export default function CommentsSection({ postId, refreshToken }) {
         <div className={s.noticeMsg}>No comments yet. Be the first to share your thoughts.</div>
       ) : (
         <>
-          <PostProvider value={commentContextValue}>
-            <div className={s.list}>
-              {visibleRoots.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  usersById={usersById}
-                  depth={0}
-                />
-              ))}
-            </div>
-          </PostProvider>
+          <div className={s.list}>
+            {visibleRoots.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                usersById={usersById}
+                depth={0}
+                refreshToken={refreshToken}
+              />
+            ))}
+          </div>
 
           <Pagination
             currentPage={clampedPage}
             totalPages={totalRootPages}
-            onPageChange={setPage}
+            onPageChange={(p) => dispatch(pageChanged(p))}
             hideOnSinglePage
           />
         </>

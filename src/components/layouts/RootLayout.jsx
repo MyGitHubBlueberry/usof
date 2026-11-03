@@ -1,5 +1,5 @@
 import { Outlet, useLocation, matchPath } from 'react-router-dom'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated } from '../../redux/slices/authSlice'
 import { ROUTES } from '../../constants/routes'
@@ -12,12 +12,20 @@ import NotificationsWidget from '../widgets/NotificationsWidget'
 import SubscriptionsWidget from '../widgets/SubscriptionsWidget'
 import FavoritesWidget from '../widgets/FavoritesWidget'
 import Loading from '../ui/Loading'
+import Flash from '../ui/Flash'
 import s from './RootLayout.module.css'
 
 export default function RootLayout() {
   const location = useLocation()
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const banned = useSelector((state) => state.auth.banned)
+  const theme = useSelector((state) => state.theme.mode)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
   const isHome = location.pathname === ROUTES.HOME
   const isPostDetail = !!matchPath({ path: ROUTES.POST, end: true }, location.pathname)
   const isLeaderboard = location.pathname === ROUTES.LEADERBOARD
@@ -30,6 +38,7 @@ export default function RootLayout() {
 
   return (
     <div className={s.appShell}>
+      <Flash />
       <Header />
 
       <div className={s.contentArea}>

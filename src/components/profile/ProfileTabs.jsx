@@ -29,7 +29,7 @@ export default function ProfileTabs({ profile, isOwner, activeTab, onTabChange }
       <TabBar tabs={tabs} activeTab={effectiveTab} onTabChange={onTabChange} className={s.tabBar} />
 
       <div className={s.tabPanel} role="tabpanel">
-        {effectiveTab === 'posts' && <ProfilePosts profile={profile} />}
+        {effectiveTab === 'posts' && <ProfilePosts profile={profile} isOwner={isOwner} />}
         {effectiveTab === 'favorites' && isOwner && <ProfileFavorites />}
         {effectiveTab === 'notifications' && isOwner && <ProfileNotifications />}
         {effectiveTab === 'subscriptions' && isOwner && <ProfileSubscriptions />}

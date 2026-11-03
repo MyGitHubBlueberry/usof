@@ -1,0 +1,39 @@
+.wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.input {
+  composes: searchInput from './FeedControls.module.css';
+  width: 100%;
+}
+
+.menu {
+  composes: dropdownMenu from '../ui/SelectDropdown.module.css';
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  composes: dropdownOption from '../ui/SelectDropdown.module.css';
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.highlighted {
+  composes: selectedOption from '../ui/SelectDropdown.module.css';
+}
+
+.login {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  composes: dropdownEmpty from '../ui/SelectDropdown.module.css';
+}

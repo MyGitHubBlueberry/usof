@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
-import { usePost } from '../../hooks/usePost'
+import { postStatusChanged } from '../../redux/slices/postDetailSlice'
+import { selectIsAdmin } from '../../redux/slices/authSlice'
 import { commentsService } from '../../services/comments.service'
 import { ROUTES, toPostEdit } from '../../constants/routes'
 import ActionMenu, { ActionMenuItem } from '../ui/ActionMenu'
@@ -17,7 +19,10 @@ export default function PostHeader({
   onFavoriteChange,
   onRequireCommentsRefresh,
 }) {
-  const { post, isAdmin, currentUser, onPostStatusChange } = usePost()
+  const dispatch = useDispatch()
+  const post = useSelector((state) => state.postDetail.post)
+  const currentUser = useSelector((state) => state.auth.user)
+  const isAdmin = useSelector(selectIsAdmin)
   const { showFlash } = useFlash()
   const navigate = useNavigate()
   const [statusSaving, setStatusSaving] = useState(false)
@@ -48,7 +53,7 @@ export default function PostHeader({
     postsService
       .updateStatus(post.id, status)
       .then(() => {
-        onPostStatusChange(status)
+        dispatch(postStatusChanged(status))
         showFlash(`Post status set to ${status}.`, 'success')
 
         if (!wasResolved) return

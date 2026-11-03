@@ -20,6 +20,7 @@ export const API = {
     BAN: (id) => `/users/${id}/ban`,
     BAN_HISTORY: (id) => `/users/${id}/ban`,
     BAN_LOGS: '/users/bans/log',
+    SEARCH: '/users/search',
     AVATAR: '/users/avatar/',
     AVATAR_BY_ID: (id) => `/users/${id}/avatar`,
   },

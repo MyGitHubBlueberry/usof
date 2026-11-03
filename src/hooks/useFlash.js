@@ -1,16 +1,18 @@
-import { useContext } from 'react'
-import { FlashContext } from '../context/FlashContext'
+import { useDispatch, useSelector } from 'react-redux'
+import { showFlash as showFlashThunk, flashCleared } from '../redux/slices/flashSlice'
 
 export function useFlash() {
-  const context = useContext(FlashContext)
-  if (!context) {
-    throw new Error('useFlash must be used within a FlashProvider')
-  }
+  const dispatch = useDispatch()
+  const flashState = useSelector((state) => state.flash)
+  const flash = flashState.msg ? flashState : null
 
-  const result = [context.flash, context.showFlash]
-  result.flash = context.flash
-  result.showFlash = context.showFlash
-  result.clearFlash = context.clearFlash
+  const showFlash = (msg, type = 'success') => dispatch(showFlashThunk(msg, type))
+  const clearFlash = () => dispatch(flashCleared())
+
+  const result = [flash, showFlash]
+  result.flash = flash
+  result.showFlash = showFlash
+  result.clearFlash = clearFlash
   return result
 }
 

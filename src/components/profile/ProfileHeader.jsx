@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Avatar from '../ui/Avatar'
 import EditableAvatar from '../ui/EditableAvatar'
 import EditProfileModal from './EditProfileModal'
-import { notificationsService } from '../../services/notifications.service'
 import { postsService } from '../../services/posts.service'
+import { fetchUnreadCount } from '../../redux/slices/notificationsSlice'
 import { usePolling } from '../../hooks/usePolling'
 import { POLLING_INTERVALS } from '../../constants/polling'
 import {
@@ -13,8 +14,9 @@ import {
 import s from './ProfileHeader.module.css'
 
 export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNotificationsClick }) {
+  const dispatch = useDispatch()
+  const unreadCount = useSelector((state) => state.notifications.unreadCount)
   const [postCount, setPostCount] = useState(null)
-  const [unreadCount, setUnreadCount] = useState(0)
 
   const [editModalOpen, setEditModalOpen] = useState(false)
 
@@ -33,19 +35,17 @@ export default function ProfileHeader({ profile, isOwner, onProfileUpdate, onNot
     }
   }, [profile.id, profile.login])
 
-  const fetchUnreadCount = useCallback(() => {
-    if (!isOwner) return
-    notificationsService
-      .getUnreadCount()
-      .then((res) => setUnreadCount(res.data?.unreadCount ?? 0))
-      .catch(() => setUnreadCount(0))
-  }, [isOwner])
-
   useEffect(() => {
-    fetchUnreadCount()
-  }, [fetchUnreadCount])
+    if (isOwner) dispatch(fetchUnreadCount())
+  }, [dispatch, isOwner])
 
-  usePolling(fetchUnreadCount, POLLING_INTERVALS.UNREAD_COUNT, [fetchUnreadCount])
+  usePolling(
+    () => {
+      if (isOwner) dispatch(fetchUnreadCount())
+    },
+    POLLING_INTERVALS.UNREAD_COUNT,
+    [dispatch, isOwner]
+  )
 
   return (
     <div className={s.header}>

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
-import { usePost } from '../../hooks/usePost'
+import { likeCountsUpdated } from '../../redux/slices/postDetailSlice'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
@@ -19,12 +20,13 @@ const STATUS_CLASSES = {
 
 export default function PostFooter({
   author,
-  likeCounts,
   isSubscribed,
-  onLikeCountsChange,
   onSubscribeChange,
 }) {
-  const { post, currentUser } = usePost()
+  const dispatch = useDispatch()
+  const post = useSelector((state) => state.postDetail.post)
+  const likeCounts = useSelector((state) => state.postDetail.likeCounts)
+  const currentUser = useSelector((state) => state.auth.user)
   const isAuthenticated = !!currentUser
   const { showFlash } = useFlash()
   const [reacting, setReacting] = useState(false)
@@ -34,7 +36,7 @@ export default function PostFooter({
   async function refreshCounts() {
     return postsService
       .getLikes(post.id)
-      .then((res) => onLikeCountsChange(res.data ?? { likes: 0, dislikes: 0, myReaction: null }))
+      .then((res) => dispatch(likeCountsUpdated(res.data ?? { likes: 0, dislikes: 0, myReaction: null })))
       .catch(() => { })
   }
 

@@ -6,6 +6,7 @@ import { useDebouncedCallback } from '../../hooks/useDebounce'
 import { IconChevron, IconFilter } from '../ui/Icons.jsx'
 import { SelectDropdown } from '../ui/SelectDropdown.jsx'
 import { MultiSelectDropdown } from '../ui/MultiSelectDropdown.jsx'
+import UserSearchCombobox from './UserSearchCombobox.jsx'
 import s from './FeedControls.module.css'
 
 const BASE_STATUS_OPTIONS = [
@@ -129,14 +130,23 @@ export default function FeedControls({
       .catch(() => { })
   }, [])
 
-  function handleSearch(e) {
-    const value = e.target.value
+  function handleSearchValueChange(value) {
     setSearchInput(value)
     if (showSearchType && searchMode === 'user') {
       debouncedUpdate({ author: value, search: '', page: '1' })
     } else {
       debouncedUpdate({ search: value, author: '', page: '1' })
     }
+  }
+
+  function handleSearch(e) {
+    handleSearchValueChange(e.target.value)
+  }
+
+  function handleSelectUser(login) {
+    cancelUpdate()
+    setSearchInput(login)
+    onChange({ author: login, search: '', page: '1' })
   }
 
   function handleSearchModeChange(mode) {
@@ -215,11 +225,11 @@ export default function FeedControls({
 
   function renderSearchBar() {
     const computedPlaceholder = showSearchType
-      ? (searchMode === 'user' ? 'Search by username or email…' : 'Search posts…')
+      ? (searchMode === 'user' ? 'Search by username…' : 'Search posts…')
       : placeholder
 
     const computedAriaLabel = showSearchType
-      ? (searchMode === 'user' ? 'Search by username or email' : searchAriaLabel)
+      ? (searchMode === 'user' ? 'Search by username' : searchAriaLabel)
       : searchAriaLabel
 
     return (
@@ -234,15 +244,25 @@ export default function FeedControls({
           />
         )}
 
-        <input
-          type="search"
-          className={s.searchInput}
-          placeholder={computedPlaceholder}
-          value={searchInput}
-          onChange={handleSearch}
-          onKeyDown={handleSearchKey}
-          aria-label={computedAriaLabel}
-        />
+        {showSearchType && searchMode === 'user' ? (
+          <UserSearchCombobox
+            value={searchInput}
+            onChange={handleSearchValueChange}
+            onSelect={handleSelectUser}
+            placeholder={computedPlaceholder}
+            ariaLabel={computedAriaLabel}
+          />
+        ) : (
+          <input
+            type="search"
+            className={s.searchInput}
+            placeholder={computedPlaceholder}
+            value={searchInput}
+            onChange={handleSearch}
+            onKeyDown={handleSearchKey}
+            aria-label={computedAriaLabel}
+          />
+        )}
 
         {showFiltersToggle && (
           <button

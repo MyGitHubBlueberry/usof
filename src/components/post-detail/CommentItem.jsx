@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
-import { usePost } from '../../hooks/usePost'
+import {
+  commentPatched,
+  commentDeleted,
+  commentAdded,
+  likeNetUpdated,
+} from '../../redux/slices/commentsSlice'
+import { postStatusChanged } from '../../redux/slices/postDetailSlice'
+import { selectIsAdmin } from '../../redux/slices/authSlice'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
@@ -30,23 +38,16 @@ function countDescendants(comment) {
   return comment.replies.reduce((sum, reply) => sum + 1 + countDescendants(reply), 0)
 }
 
-export default function CommentItem({ comment, depth, usersById }) {
-  const {
-    postStatus,
-    postAuthorId,
-    isAdmin,
-    currentUser,
-    onCommentPatched,
-    onCommentDeleted,
-    onReplyAdded,
-    onPostStatusChange: onPostResolved,
-    onLikesChanged,
-    commentsRefreshToken,
-  } = usePost()
+export default function CommentItem({ comment, depth, usersById, refreshToken }) {
+  const dispatch = useDispatch()
+  const postStatus = useSelector((state) => state.postDetail.post?.status)
+  const postAuthorId = useSelector((state) => state.postDetail.post?.user_id)
+  const isAdmin = useSelector(selectIsAdmin)
+  const currentUser = useSelector((state) => state.auth.user)
+  const likeCounts = useSelector((state) => state.comments.likeNet[comment.id]) ?? { likes: 0, dislikes: 0 }
   const { showFlash } = useFlash()
   const author = usersById[comment.user_id]
 
-  const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0 })
   const [myReaction, setMyReaction] = useState(null)
   const [reacting, setReacting] = useState(false)
   const [resolving, setResolving] = useState(false)
@@ -78,16 +79,15 @@ export default function CommentItem({ comment, depth, usersById }) {
       .getLikes(comment.id)
       .then((res) => {
         const data = res.data ?? { likes: 0, dislikes: 0, myReaction: null }
-        setLikeCounts(data)
         setMyReaction(data.myReaction ?? null)
-        onLikesChanged?.(comment.id, data)
+        dispatch(likeNetUpdated({ commentId: comment.id, likes: data.likes ?? 0, dislikes: data.dislikes ?? 0 }))
       })
       .catch(() => { })
-  }, [comment.id, onLikesChanged])
+  }, [comment.id, dispatch])
 
   useEffect(() => {
     fetchLikes()
-  }, [fetchLikes, commentsRefreshToken])
+  }, [fetchLikes, refreshToken])
 
   const isTombstone = !comment.user_id
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)
@@ -123,8 +123,8 @@ export default function CommentItem({ comment, depth, usersById }) {
     commentsService
       .resolve(comment.id)
       .then((res) => {
-        onCommentPatched(res.data?.comment ?? { ...comment, status: 'resolved' })
-        onPostResolved?.(res.data?.post?.status ?? 'resolved')
+        dispatch(commentPatched(res.data?.comment ?? { ...comment, status: 'resolved' }))
+        dispatch(postStatusChanged(res.data?.post?.status ?? 'resolved'))
         showFlash('Marked as resolved.', 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not resolve comment.', 'error'))
@@ -136,7 +136,7 @@ export default function CommentItem({ comment, depth, usersById }) {
     commentsService
       .updateStatus(comment.id, status)
       .then((res) => {
-        onCommentPatched(res.data)
+        dispatch(commentPatched(res.data))
         showFlash(`Comment status set to ${status}.`, 'success')
       })
       .catch((err) => showFlash(err.message || 'Could not update status.', 'error'))
@@ -165,7 +165,7 @@ export default function CommentItem({ comment, depth, usersById }) {
     commentsService
       .update(comment.id, trimmed)
       .then((res) => {
-        onCommentPatched(res.data)
+        dispatch(commentPatched(res.data))
         setEditing(false)
       })
       .catch((err) => setEditError(err.message || 'Could not update comment.'))
@@ -186,9 +186,9 @@ export default function CommentItem({ comment, depth, usersById }) {
       .delete(comment.id)
       .then((res) => {
         if (res.status === 200 && res.data) {
-          onCommentPatched(res.data)
+          dispatch(commentPatched(res.data))
         } else {
-          onCommentDeleted(comment.id)
+          dispatch(commentDeleted(comment.id))
         }
         showFlash('Comment deleted.', 'success')
       })
@@ -207,7 +207,7 @@ export default function CommentItem({ comment, depth, usersById }) {
     commentsService
       .reply(comment.id, trimmed)
       .then((res) => {
-        onReplyAdded(res.data)
+        dispatch(commentAdded(res.data))
         setReplyText('')
         setReplying(false)
       })
@@ -383,7 +383,13 @@ export default function CommentItem({ comment, depth, usersById }) {
     return (
       <div className={s.repliesWrap}>
         {comment.replies.map((reply) => (
-          <CommentItem key={reply.id} comment={reply} usersById={usersById} depth={depth + 1} />
+          <CommentItem
+            key={reply.id}
+            comment={reply}
+            usersById={usersById}
+            depth={depth + 1}
+            refreshToken={refreshToken}
+          />
         ))}
       </div>
     )

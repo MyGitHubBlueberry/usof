@@ -1,0 +1,6 @@
+.createBtn {
+  composes: btn-base btn-primary from global;
+  height: 36px;
+  padding: 0 20px;
+  font-size: 13px;
+}

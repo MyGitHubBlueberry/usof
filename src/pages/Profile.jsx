@@ -3,7 +3,6 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { usersService } from '../services/users.service'
 import { updateUser } from '../redux/slices/authSlice'
-import { FlashProvider } from '../context/FlashProvider'
 import NavRow from '../components/ui/NavButtons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import ProfileTabs from '../components/profile/ProfileTabs'
@@ -87,23 +86,21 @@ export default function Profile() {
   }
 
   return (
-    <FlashProvider>
-      <div className={s.profilePage}>
-        <NavRow/>
-        <ProfileHeader
-          key={profile.id}
-          profile={profile}
-          isOwner={isOwner}
-          onProfileUpdate={handleProfileUpdate}
-          onNotificationsClick={() => setActiveTab('notifications')}
-        />
-        <ProfileTabs
-          profile={profile}
-          isOwner={isOwner}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-      </div>
-    </FlashProvider>
+    <div className={s.profilePage}>
+      <NavRow/>
+      <ProfileHeader
+        key={profile.id}
+        profile={profile}
+        isOwner={isOwner}
+        onProfileUpdate={handleProfileUpdate}
+        onNotificationsClick={() => setActiveTab('notifications')}
+      />
+      <ProfileTabs
+        profile={profile}
+        isOwner={isOwner}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+    </div>
   )
 }

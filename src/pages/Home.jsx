@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { postsService } from '../services/posts.service'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchPosts, checkForNewPosts, newPostsDismissed } from '../redux/slices/postsFeedSlice'
 import { usePolling } from '../hooks/usePolling'
 import { POLLING_INTERVALS } from '../constants/polling'
-import { FlashProvider } from '../context/FlashProvider'
 import PostCard from '../components/posts/PostCard'
 import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
@@ -13,6 +13,7 @@ import { IconChevron } from '../components/ui/Icons'
 import s from './Home.module.css'
 
 export default function Home() {
+  const dispatch = useDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const search = searchParams.get('search') || ''
@@ -31,60 +32,27 @@ export default function Home() {
     [search, author, categories, status, sort, order, dateFrom, dateTo, page]
   )
 
-  const [posts, setPosts] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [loadedKey, setLoadedKey] = useState(null)
-  const [error, setError] = useState(null)
-  const [retryCount, setRetryCount] = useState(0)
-  const [hasNewPosts, setHasNewPosts] = useState(false)
+  const { items: posts, totalPages, status: fetchStatus, error, hasNewPosts } = useSelector(
+    (state) => state.postsFeed
+  )
+  const isLoading = fetchStatus === 'idle' || fetchStatus === 'pending'
 
-  const currentKey = `${search}|${author}|${categories}|${status}|${sort}|${order}|${dateFrom}|${dateTo}|${pageParam}|${retryCount}`
-  const isLoading = loadedKey !== currentKey
+  const query = useMemo(() => {
+    const q = { page: pageParam, limit: 5 }
+    if (search) q.search = search
+    if (author) q.author = author
+    if (categories) q.categories = categories
+    if (status) q.status = status
+    if (sort) q.sortBy = sort === 'date' ? 'publish_date' : sort
+    if (order) q.order = order
+    if (dateFrom) q.dateFrom = dateFrom
+    if (dateTo) q.dateTo = dateTo
+    return q
+  }, [pageParam, search, author, categories, status, sort, order, dateFrom, dateTo])
 
   useEffect(() => {
-    let isMounted = true
-
-    const query = { page: pageParam, limit: 5 }
-    if (search) query.search = search
-    if (author) query.author = author
-    if (categories) query.categories = categories
-    if (status) query.status = status
-    if (sort) query.sortBy = sort === 'date' ? 'publish_date' : sort
-    if (order) query.order = order
-    if (dateFrom) query.dateFrom = dateFrom
-    if (dateTo) query.dateTo = dateTo
-
-    postsService
-      .getAll(query)
-      .then((res) => {
-        if (!isMounted) return
-        setPosts(res.data?.data || [])
-        setTotalPages(res.data?.pagination?.totalPages || 1)
-        setError(null)
-        setLoadedKey(currentKey)
-        setHasNewPosts(false)
-      })
-      .catch((err) => {
-        if (!isMounted) return
-        setPosts([])
-        setTotalPages(1)
-        setError(err)
-        setLoadedKey(currentKey)
-      })
-
-    return () => { isMounted = false }
-  }, [
-    currentKey,
-    pageParam,
-    search,
-    author,
-    categories,
-    status,
-    sort,
-    order,
-    dateFrom,
-    dateTo,
-  ])
+    dispatch(fetchPosts(query))
+  }, [dispatch, query])
 
   const handleControlChange = (patch) => {
     const next = new URLSearchParams(searchParams)
@@ -102,43 +70,20 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleRetry = () => setRetryCount((c) => c + 1)
+  const handleRetry = () => dispatch(fetchPosts(query))
 
   usePolling(
     () => {
       if (hasNewPosts || isLoading) return
-      const query = { page: 1, limit: 1 }
-      if (search) query.search = search
-      if (author) query.author = author
-      if (categories) query.categories = categories
-      if (status) query.status = status
-      if (sort) query.sortBy = sort === 'date' ? 'publish_date' : sort
-      if (order) query.order = order
-      if (dateFrom) query.dateFrom = dateFrom
-      if (dateTo) query.dateTo = dateTo
-
-      postsService
-        .getAll(query)
-        .then((res) => {
-          const latest = res.data?.data?.[0]
-          if (!latest) return
-          setPosts((prev) => {
-            const current = prev[0]
-            if (!current || Number(latest.id) !== Number(current.id)) {
-              setHasNewPosts(true)
-            }
-            return prev
-          })
-        })
-        .catch(() => {})
+      dispatch(checkForNewPosts(query))
     },
     POLLING_INTERVALS.FEED_CHECK,
-    [search, author, categories, status, sort, order, dateFrom, dateTo, hasNewPosts, isLoading]
+    [dispatch, query, hasNewPosts, isLoading]
   )
 
   const handleLoadNewPosts = () => {
-    setRetryCount((c) => c + 1)
-    setHasNewPosts(false)
+    dispatch(fetchPosts(query))
+    dispatch(newPostsDismissed())
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -171,29 +116,27 @@ export default function Home() {
   }
 
   return (
-    <FlashProvider>
-      <div className={s.feedContainer}>
-        <FeedControls params={params} onChange={handleControlChange} showSearchType={true} />
+    <div className={s.feedContainer}>
+      <FeedControls params={params} onChange={handleControlChange} showSearchType={true} />
 
-        {!isLoading && !error && hasNewPosts && (
-          <button type="button" className={s.newItemsBar} onClick={handleLoadNewPosts}>
-            <IconChevron size={13} up />
-            <span>Load new posts</span>
-          </button>
-        )}
+      {!isLoading && !error && hasNewPosts && (
+        <button type="button" className={s.newItemsBar} onClick={handleLoadNewPosts}>
+          <IconChevron size={13} up />
+          <span>Load new posts</span>
+        </button>
+      )}
 
-        {renderFeedBody()}
+      {renderFeedBody()}
 
-        {!isLoading && !error && posts.length > 0 && (
-          <div className={s.paginationWrapper}>
-            <Pagination
-              currentPage={pageParam}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        )}
-      </div>
-    </FlashProvider>
+      {!isLoading && !error && posts.length > 0 && (
+        <div className={s.paginationWrapper}>
+          <Pagination
+            currentPage={pageParam}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+    </div>
   )
 }

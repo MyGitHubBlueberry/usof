@@ -4,7 +4,6 @@ import CategoriesTab from './AdminPanelCategoriesTab'
 import UsersTab from './AdminPanelUsersTab'
 import PostsTab from './AdminPanelPostsTab'
 import BansTab from './AdminPanelBansTab'
-import { FlashProvider } from '../context/FlashProvider'
 import TabBar from '../components/ui/TabBar'
 import {
   IconShield,
@@ -44,27 +43,25 @@ export default function Admin() {
   }
 
   return (
-    <FlashProvider>
-      <div className={s.adminPage}>
-        <div className={s.adminHeader}>
-          <div className={s.adminHeaderInner}>
-            <IconShield size={18} />
-            <h1 className={s.adminTitle}>Admin Panel</h1>
-            {user?.role === 'superadmin' && (
-              <span className={s.superadminBadge}>Superadmin</span>
-            )}
-          </div>
-        </div>
-
-        <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} className={s.tabBar} />
-
-        <div className={s.tabPanel} role="tabpanel">
-          {activeTab === 'users' && <UsersTab />}
-          {activeTab === 'posts' && <PostsTab />}
-          {activeTab === 'categories' && <CategoriesTab />}
-          {activeTab === 'bans' && <BansTab />}
+    <div className={s.adminPage}>
+      <div className={s.adminHeader}>
+        <div className={s.adminHeaderInner}>
+          <IconShield size={18} />
+          <h1 className={s.adminTitle}>Admin Panel</h1>
+          {user?.role === 'superadmin' && (
+            <span className={s.superadminBadge}>Superadmin</span>
+          )}
         </div>
       </div>
-    </FlashProvider>
+
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} className={s.tabBar} />
+
+      <div className={s.tabPanel} role="tabpanel">
+        {activeTab === 'users' && <UsersTab />}
+        {activeTab === 'posts' && <PostsTab />}
+        {activeTab === 'categories' && <CategoriesTab />}
+        {activeTab === 'bans' && <BansTab />}
+      </div>
+    </div>
   )
 }
