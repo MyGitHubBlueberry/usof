@@ -10,8 +10,10 @@ lerna-debug.log*
 .env.local
 .env.*.local
 
-**/node_modules
-**/uploads
+node_modules/
+API/uploads/
+API/node_modules/
+API/.env
 dist
 dist-ssr
 *.local

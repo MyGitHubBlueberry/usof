@@ -44,8 +44,14 @@ For the full Challenge-Based-Learning documentation (Engage/Investigate/Act refl
 ```bash
 cd API
 cp .env.example .env   # fill in real values — see API/README.md for details
+```
+```
 npm install
-npm run db:recreate    # creates + seeds the database (may need sudo on Linux)
+```
+```
+sudo npm run db:recreate    # creates + seeds the database (may need sudo on Linux)
+```
+```
 npm start               # starts at http://localhost:3000
 ```
 
@@ -57,7 +63,11 @@ From the repository root:
 
 ```bash
 cp .env.example .env   # VITE_API_URL=http://localhost:3000/api by default
+```
+```
 npm install
+```
+```
 npm run dev
 ```
 
