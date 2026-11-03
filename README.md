@@ -12,9 +12,9 @@ For the full Challenge-Based-Learning documentation (Engage/Investigate/Act refl
 | Home feed — sorting, filtering, and post previews | Post detail — markdown content, reactions, nested comments |
 | ![Mobile home feed](docs/screenshots/home-mobile.png) | ![Mobile Post detail with comments](docs/screenshots/post-mobile.png) |
 | Mobile Home feed | Mobile Post detail |
-| ![Profile page](docs/screenshots/profile.png) | ![Admin panel](docs/screenshots/admin.png) |
+| ![Profile page](docs/screenshots/profile.png) | ![Admin panel](docs/screenshots/admin-panel.png) |
 | User profile — posts, favorites, notifications tabs | Admin panel — user/post moderation, category management |
-| ![Mobile Profile page](docs/screenshots/profile-mobile.png) | ![Mobile Admin panel](docs/screenshots/admin-mobile.png) |
+| ![Mobile Profile page](docs/screenshots/profile-mobile.png) | ![Mobile Admin panel](docs/screenshots/admin-panel-mobile.png) |
 | Mobile User profile | Admin panel |
 
 ## Requirements & Dependencies
