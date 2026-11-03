@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { postsService } from '../../services/posts.service'
 import { useFlash } from '../../hooks/useFlash'
 import { IconStar } from './Icons'
+import Loading from './Loading'
 import s from './FavoriteButton.module.css'
 
 export default function FavoriteButton({
@@ -47,7 +48,7 @@ export default function FavoriteButton({
       aria-label="Favorite post"
       disabled={loading}
     >
-      <IconStar size={size} filled={isFavorited} />
+      {loading ? <Loading inline size="small" /> : <IconStar size={size} filled={isFavorited} />}
     </button>
   )
 }

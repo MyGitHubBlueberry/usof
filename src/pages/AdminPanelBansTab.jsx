@@ -7,7 +7,9 @@ import { useFlash } from '../hooks/useFlash'
 import { useDebouncedCallback } from '../hooks/useDebounce'
 import BanLogFilterRow from './admin/BanLogFilterRow'
 import BanLogRow from './admin/BanLogRow'
-import { IconBan, IconRefresh } from '../components/ui/Icons'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
+import { IconBan } from '../components/ui/Icons'
 import s from './Admin.module.css'
 
 const BANS_PER_PAGE = 10
@@ -83,7 +85,7 @@ export default function AdminPanelBansTab() {
         if (!isMounted) return
         setBans([])
         setTotal(0)
-        setError(err?.message ?? 'Failed to load ban logs')
+        setError(err)
         setLoadedKey(currentKey)
       })
 
@@ -200,21 +202,14 @@ export default function AdminPanelBansTab() {
           }
         />
 
-        {isLoading && (
-          <div className={s.feedState}>
-            <div className={s.spinner} />
-            <span>Loading ban logs…</span>
-          </div>
-        )}
+        {isLoading && <Loading message="Loading ban logs…" />}
 
         {!isLoading && error && (
-          <div className={s.feedState}>
-            <p className={s.errorTitle}>Error</p>
-            <p className={s.errorMsg}>{error}</p>
-            <button className={s.retryBtn} onClick={() => setRetryCount((c) => c + 1)}>
-              <IconRefresh size={14} /> Retry
-            </button>
-          </div>
+          <ErrorState
+            error={error}
+            message="Failed to load ban logs."
+            onRetry={() => setRetryCount((c) => c + 1)}
+          />
         )}
 
         {!isLoading && !error && bans.length === 0 && (

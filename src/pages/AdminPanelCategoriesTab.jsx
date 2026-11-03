@@ -4,8 +4,10 @@ import FeedControls from '../components/posts/FeedControls'
 import ActionModal from '../components/ui/ActionModal'
 import { useFlash } from '../hooks/useFlash'
 import { useState, useEffect } from 'react'
-import { IconFilter, IconRefresh, IconPlus } from '../components/ui/Icons'
+import { IconFilter, IconPlus } from '../components/ui/Icons'
 import CategoryRow from './admin/CategoryRow'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
 import s from './Admin.module.css'
 
 const CATS_PER_PAGE = 10
@@ -51,7 +53,7 @@ export default function CategoriesTab() {
       .catch((err) => {
         if (!isMounted) return
         setAllCats([])
-        setError(err?.message ?? 'Failed to load categories')
+        setError(err)
         setLoadedKey(currentKey)
       })
 
@@ -248,21 +250,14 @@ export default function CategoriesTab() {
 
       {deleteTargetCat && deleteModal()}
 
-      {isLoading && (
-        <div className={s.feedState}>
-          <div className={s.spinner} />
-          <span>Loading categories…</span>
-        </div>
-      )}
+      {isLoading && <Loading message="Loading categories…" />}
 
       {!isLoading && error && (
-        <div className={s.feedState}>
-          <p className={s.errorTitle}>Error</p>
-          <p className={s.errorMsg}>{error}</p>
-          <button className={s.retryBtn} onClick={() => setRetryCount((c) => c + 1)}>
-            <IconRefresh size={14} /> Retry
-          </button>
-        </div>
+        <ErrorState
+          error={error}
+          message="Failed to load categories."
+          onRetry={() => setRetryCount((c) => c + 1)}
+        />
       )}
 
       {!isLoading && !error && filtered.length === 0 && (

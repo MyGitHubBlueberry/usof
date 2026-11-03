@@ -1,4 +1,5 @@
 import { IconDocument, IconPen, IconTrash, IconCheck, IconX } from '../../components/ui/Icons'
+import Loading from '../../components/ui/Loading'
 import s from '../Admin.module.css'
 
 export default function CategoryRow({
@@ -39,8 +40,14 @@ export default function CategoryRow({
             type="button"
             title="Save category"
           >
-            <IconCheck size={14} />
-            <span className={s.actionBtnLabel}>{editLoading ? 'Saving…' : 'Save'}</span>
+            {editLoading ? (
+              <Loading inline size="small" variant="light" message="Saving…" />
+            ) : (
+              <>
+                <IconCheck size={14} />
+                <span className={s.actionBtnLabel}>Save</span>
+              </>
+            )}
           </button>
           <button className={s.btnGhost} onClick={onCancelEdit} type="button" title="Cancel editing">
             <IconX size={14} />

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { authService } from '../services/auth.service'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
+import DevConfirmationLink from '../components/ui/DevConfirmationLink'
 import { IconMail } from '../components/ui/Icons'
+import Loading from '../components/ui/Loading'
 import s from '../components/layouts/auth.module.css'
 
 export default function PasswordResetRequest() {
@@ -12,6 +14,7 @@ export default function PasswordResetRequest() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [devLink, setDevLink] = useState(null)
 
   const emailError = !email.trim()
     ? 'Email is required'
@@ -28,7 +31,8 @@ export default function PasswordResetRequest() {
     setError('')
 
     try {
-      await authService.requestPasswordReset(email.trim())
+      const res = await authService.requestPasswordReset(email.trim())
+      setDevLink(res.data?.dev_link ?? null)
       setSubmitted(true)
     } catch (err) {
       setError(err.message ?? 'Failed to send password reset email.')
@@ -49,6 +53,7 @@ export default function PasswordResetRequest() {
           <p className={s.msg}>
             If an account is associated with <strong>{email}</strong>, we've sent a link to reset your password.
           </p>
+          <DevConfirmationLink link={devLink} label="Dev: Reset Password Now" />
           <Link to={ROUTES.LOGIN} className={`${s.submit} ${s.submitLink}`}>
             Back to sign in
           </Link>
@@ -88,7 +93,7 @@ export default function PasswordResetRequest() {
         </div>
 
         <button className={s.submit} type="submit" disabled={loading}>
-          {loading ? <><span className={s.spinner} /> Sending link…</> : 'Send reset link'}
+          {loading ? <Loading inline size="small" variant="light" message="Sending link…" /> : 'Send reset link'}
         </button>
       </form>
 

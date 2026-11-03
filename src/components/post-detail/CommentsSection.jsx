@@ -5,8 +5,6 @@ import { usersService } from '../../services/users.service'
 import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
-import { usePolling } from '../../hooks/usePolling'
-import { POLLING_INTERVALS } from '../../constants/polling'
 import { usePost } from '../../hooks/usePost'
 import { PostProvider } from '../../context/PostProvider'
 import { ROUTES } from '../../constants/routes'
@@ -14,7 +12,7 @@ import Pagination from '../ui/Pagination'
 import CommentItem from './CommentItem'
 import CommentComposer from './CommentComposer'
 import { SelectDropdown } from '../ui/SelectDropdown'
-import { IconChevron } from '../ui/Icons'
+import Loading from '../ui/Loading'
 import s from './CommentsSection.module.css'
 
 const ROOTS_PER_PAGE = 5
@@ -76,7 +74,6 @@ export default function CommentsSection({ postId, refreshToken }) {
   )
 
   const revertingRef = useRef(false)
-  const [hasNewComments, setHasNewComments] = useState(false)
 
   const requestKey = `${postId}:${refreshToken}`
   const [resolvedKey, setResolvedKey] = useState(null)
@@ -128,29 +125,6 @@ export default function CommentsSection({ postId, refreshToken }) {
   useEffect(() => {
     loadComments()
   }, [loadComments])
-
-  usePolling(
-    () => {
-      if (hasNewComments) return
-      postsService
-        .getComments(postId, { limit: 1 })
-        .then((res) => {
-          const freshTotal = res.data?.pagination?.totalItems ?? res.data?.total ?? res.data?.count ?? 0
-          setComments((prev) => {
-            if (freshTotal !== prev.length) setHasNewComments(true)
-            return prev
-          })
-        })
-        .catch(() => {})
-    },
-    POLLING_INTERVALS.COMMENTS_CHECK,
-    [postId, hasNewComments]
-  )
-
-  function handleLoadNewComments() {
-    loadComments()
-    setHasNewComments(false)
-  }
 
   // revert post to active from resolved if there are no more resolved comments
   useEffect(() => {
@@ -237,6 +211,7 @@ export default function CommentsSection({ postId, refreshToken }) {
     onCommentDeleted: handleCommentDeleted,
     onReplyAdded: handleReplyAdded,
     onLikesChanged: handleLikesChanged,
+    commentsRefreshToken: refreshToken,
   }
 
   return (
@@ -274,15 +249,10 @@ export default function CommentsSection({ postId, refreshToken }) {
         </div>
       )}
 
-      {!loading && hasNewComments && (
-        <button type="button" className={s.newItemsBar} onClick={handleLoadNewComments}>
-          <IconChevron size={13} />
-          <span>Load new comments</span>
-        </button>
-      )}
-
       {loading ? (
-        <div className={s.noticeMsg}>Loading comments…</div>
+        <div className={s.noticeMsg}>
+          <Loading inline message="Loading comments…" />
+        </div>
       ) : roots.length === 0 ? (
         <div className={s.noticeMsg}>No comments yet. Be the first to share your thoughts.</div>
       ) : (

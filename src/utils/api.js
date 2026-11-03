@@ -52,6 +52,7 @@ api.interceptors.response.use(
       status,
       message: extractErrorMessage(data, errs) || error.message || 'An unexpected error occurred.',
       errors: errs,
+      dev_link: data.dev_link ?? null,
       raw: error,
     };
 

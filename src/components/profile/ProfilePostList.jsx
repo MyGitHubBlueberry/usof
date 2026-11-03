@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import PostCard from '../posts/PostCard'
 import FeedControls from '../posts/FeedControls'
 import Pagination from '../ui/Pagination'
+import ErrorState from '../ui/ErrorState'
+import Loading from '../ui/Loading'
 import s from './ProfileTabContent.module.css'
 
 const DEFAULT_FILTERS = {
@@ -23,7 +25,8 @@ export default function ProfilePostList({
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [posts, setPosts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   const { search, categories, status, sort, order, dateFrom, dateTo, page } = filters
   const pageParam = parseInt(page, 10) || 1
@@ -41,7 +44,7 @@ export default function ProfilePostList({
   }, [search, categories, status, sort, order, dateFrom, dateTo, pageParam])
 
   const [resolved, setResolved] = useState({ fetchFn: null, queryKey: null })
-  const queryKey = JSON.stringify(query)
+  const queryKey = `${JSON.stringify(query)}:${retryCount}`
   const loading = resolved.fetchFn !== fetchFn || resolved.queryKey !== queryKey
 
   useEffect(() => {
@@ -52,12 +55,12 @@ export default function ProfilePostList({
         if (!isMounted) return
         setPosts(res.data?.data || [])
         setTotalPages(res.data?.pagination?.totalPages || 1)
-        setError(false)
+        setError(null)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!isMounted) return
         setPosts([])
-        setError(true)
+        setError(err)
       })
       .finally(() => {
         if (isMounted) setResolved({ fetchFn, queryKey })
@@ -76,13 +79,17 @@ export default function ProfilePostList({
     setFilters((prev) => ({ ...prev, page: String(newPage) }))
   }
 
+  function handleRetry() {
+    setRetryCount((c) => c + 1)
+  }
+
   function renderBody() {
     if (loading) {
-      return <div className={s.state}>Loading…</div>
+      return <Loading message="Loading posts…" />
     }
 
     if (error) {
-      return <div className={s.state}>Could not load posts.</div>
+      return <ErrorState error={error} message="Could not load posts." onRetry={handleRetry} />
     }
 
     if (posts.length === 0) {

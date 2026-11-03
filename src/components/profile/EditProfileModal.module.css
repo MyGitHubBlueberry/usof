@@ -1,0 +1,98 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.avatarSection {
+  display: flex;
+  justify-content: center;
+}
+
+.input {
+  composes: input-base from global;
+}
+
+.passwordRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notice {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.error {
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-size: 13px;
+  color: #ef4444;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.actions * {
+  flex: 1;
+}
+
+.submitBtn {
+  composes: btn-base btn-primary from global;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.cancelBtn {
+  composes: btn-base from global;
+  padding: 10px;
+  font-size: 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.cancelBtn:hover:not(:disabled) {
+  color: var(--text-h);
+  border-color: var(--text);
+}
+
+.dangerZone {
+  display: flex;
+  justify-content: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.deleteAccountBtn {
+  composes: btn-base from global;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+}
+
+.deleteAccountBtn:hover:not(:disabled) {
+  background: #e53e3e;
+  color: #fff;
+}

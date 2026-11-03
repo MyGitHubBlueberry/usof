@@ -8,6 +8,7 @@ import { formatFullDate } from '../../utils/format'
 import Avatar from '../ui/Avatar'
 import Rating from '../ui/Rating'
 import { IconRss } from '../ui/Icons'
+import Loading from '../ui/Loading'
 import s from './PostFooter.module.css'
 
 const STATUS_CLASSES = {
@@ -110,8 +111,14 @@ export default function PostFooter({
           aria-label={isSubscribed ? 'Unsubscribe from post' : 'Subscribe to post'}
           title={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
         >
-          <IconRss size={14} />
-          <span>{isSubscribed ? 'Subscribed' : 'Subscribe'}</span>
+          {subscribeLoading ? (
+            <Loading inline size="small" message={isSubscribed ? 'Unsubscribing…' : 'Subscribing…'} />
+          ) : (
+            <>
+              <IconRss size={14} />
+              <span>{isSubscribed ? 'Subscribed' : 'Subscribe'}</span>
+            </>
+          )}
         </button>
         <Rating counts={likeCounts} myReaction={myReaction} onReact={handleReact} disabled={reacting} size="md" />
       </div>

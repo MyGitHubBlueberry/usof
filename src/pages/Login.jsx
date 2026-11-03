@@ -3,17 +3,18 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginThunk, clearError } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
-import { getRecentLogins, addRecentLogin } from '../utils/recentLogins'
 import Logo from '../components/ui/Logo'
-import Combobox from '../components/ui/Combobox'
 import PasswordInput from '../components/ui/PasswordInput'
+import DevConfirmationLink from '../components/ui/DevConfirmationLink'
+import { validateLogin, validatePassword } from '../utils/validators'
+import Loading from '../components/ui/Loading'
 import s from '../components/layouts/auth.module.css'
 
 export default function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const { loading, error } = useSelector((state) => state.auth)
+  const { loading, error, devLink } = useSelector((state) => state.auth)
 
   useEffect(() => {
     dispatch(clearError())
@@ -25,8 +26,8 @@ export default function Login() {
   const [touched, setTouched] = useState({})
 
   const errors = {
-    login: !form.login.trim() ? 'Login is required' : '',
-    password: !form.password ? 'Password is required' : '',
+    login: validateLogin(form.login),
+    password: validatePassword(form.password),
   }
 
   const isFormValid = !Object.values(errors).some(Boolean)
@@ -46,7 +47,6 @@ export default function Login() {
     if (!isFormValid) return
 
     await dispatch(loginThunk(form)).unwrap()
-    addRecentLogin(form.login)
     navigate(from, { replace: true })
   }
 
@@ -63,20 +63,21 @@ export default function Login() {
       </p>
 
       {error && <div className={s.banner}>{error}</div>}
+      <DevConfirmationLink link={devLink} />
 
       <form className={s.form} onSubmit={handleSubmit} noValidate>
         <div className={s.field}>
           <label className={s.label} htmlFor="login-login">Login</label>
-          <Combobox
+          <input
             id="login-login"
             name="login"
-            inputClassName={touched.login && errors.login ? s.invalid : ''}
+            type="text"
+            autoComplete="username"
+            className={`${s.input} ${touched.login && errors.login ? s.invalid : ''}`}
             placeholder="your_username"
             value={form.login}
-            onChange={(val) => setForm((f) => ({ ...f, login: val }))}
+            onChange={handleChange}
             onBlur={handleBlur}
-            suggestions={getRecentLogins()}
-            ariaLabel="Login"
           />
           {touched.login && errors.login && (
             <span className={s.fieldError}>{errors.login}</span>
@@ -107,7 +108,7 @@ export default function Login() {
         </div>
 
         <button className={s.submit} type="submit" disabled={loading}>
-          {loading ? <><span className={s.spinner} /> Signing in…</> : 'Sign in'}
+          {loading ? <Loading inline size="small" variant="light" message="Signing in…" /> : 'Sign in'}
         </button>
       </form>
     </div>

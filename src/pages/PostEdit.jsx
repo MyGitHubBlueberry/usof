@@ -13,6 +13,7 @@ import AttachmentUploader from '../components/post-create/AttachmentUploader'
 import AttachmentGrid from '../components/ui/AttachmentGrid'
 import Lightbox from '../components/ui/Lightbox'
 import NavRow from '../components/ui/NavButtons'
+import Loading from '../components/ui/Loading'
 import s from './PostCreate.module.css'
 
 function validate({ title, content }) {
@@ -153,7 +154,7 @@ function PostEditForm({ post, categories }) {
             Cancel
           </Link>
           <button type="button" className={s.submitBtn} onClick={handleSubmit} disabled={submitting}>
-            {submitting ? 'Saving…' : 'Save changes'}
+            {submitting ? <Loading inline size="small" variant="light" message="Saving…" /> : 'Save changes'}
           </button>
         </div>
       </div>
@@ -202,7 +203,7 @@ export default function PostEdit() {
   useEffect(() => loadPost(), [loadPost])
 
   if (loading) {
-    return <div className={s.stateMsg}>Loading post…</div>
+    return <Loading message="Loading post for editing…" size="large" />
   }
 
   if (notFound || !post) {

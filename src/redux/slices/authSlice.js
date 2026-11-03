@@ -17,8 +17,8 @@ export const loginThunk = createAsyncThunk(API.AUTH.LOGIN, async (credentials, {
     const response = await authService.login(credentials);
     return response.data;
   } catch (err) {
-    const { status, message, errors } = err;
-    return rejectWithValue({ status, message, errors });
+    const { status, message, errors, dev_link } = err;
+    return rejectWithValue({ status, message, errors, dev_link });
   }
 });
 
@@ -52,6 +52,7 @@ const authSlice = createSlice({
     token: localStorage.getItem('token') || null,
     loading: false,
     error: null,
+    devLink: null,
     banned: null
   },
   reducers: {
@@ -68,6 +69,7 @@ const authSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+      state.devLink = null;
     },
     setBanned: (state, action) => {
       state.banned = action.payload;
@@ -81,6 +83,7 @@ const authSlice = createSlice({
       .addCase(loginThunk.pending, (state) => {
         state.loading = true
         state.error = null
+        state.devLink = null
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false
@@ -94,6 +97,7 @@ const authSlice = createSlice({
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload?.message ?? action.error.message
+        state.devLink = action.payload?.dev_link ?? null
       })
       .addCase(registerThunk.pending, (state) => {
         state.loading = true

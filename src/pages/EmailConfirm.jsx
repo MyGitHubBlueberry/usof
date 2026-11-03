@@ -4,6 +4,7 @@ import { authService } from '../services/auth.service'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
 import { IconCheckCircle, IconXCircle } from '../components/ui/Icons'
+import Loading from '../components/ui/Loading'
 import s from '../components/layouts/auth.module.css'
 
 export default function EmailConfirm() {
@@ -24,7 +25,7 @@ export default function EmailConfirm() {
     loading: {
       icon: (
         <div className={s.spinnerWrapper}>
-          <span className={s.spinnerLg} />
+          <Loading inline size="large" />
         </div>
       ),
       title: 'Confirming your email…',

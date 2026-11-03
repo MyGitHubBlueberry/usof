@@ -1,0 +1,13 @@
+.devLink {
+  composes: btn-base from global;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: transparent;
+  border: 1px dashed var(--accent);
+  color: var(--accent);
+}
+
+.devLink:hover {
+  background: var(--accent-bg);
+}

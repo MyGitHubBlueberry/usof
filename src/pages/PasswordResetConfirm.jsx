@@ -4,6 +4,7 @@ import { authService } from '../services/auth.service'
 import { ROUTES } from '../constants/routes'
 import Logo from '../components/ui/Logo'
 import { IconCheckCircle } from '../components/ui/Icons'
+import Loading from '../components/ui/Loading'
 import s from '../components/layouts/auth.module.css'
 
 const MIN_PASSWORD = 8
@@ -127,7 +128,7 @@ export default function PasswordResetConfirm() {
         </div>
 
         <button className={s.submit} type="submit" disabled={loading}>
-          {loading ? <><span className={s.spinner} /> Updating password…</> : 'Update password'}
+          {loading ? <Loading inline size="small" variant="light" message="Updating password…" /> : 'Update password'}
         </button>
       </form>
 

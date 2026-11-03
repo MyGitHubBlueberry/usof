@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import { commentsService } from '../../services/comments.service'
 import { useFlash } from '../../hooks/useFlash'
 import { useMarkdownFormatting } from '../../hooks/useMarkdownFormatting'
-import { usePolling } from '../../hooks/usePolling'
-import { POLLING_INTERVALS } from '../../constants/polling'
 import { usePost } from '../../hooks/usePost'
 import { toProfile } from '../../constants/routes'
 import { formatFullDate } from '../../utils/format'
@@ -43,6 +41,7 @@ export default function CommentItem({ comment, depth, usersById }) {
     onReplyAdded,
     onPostStatusChange: onPostResolved,
     onLikesChanged,
+    commentsRefreshToken,
   } = usePost()
   const { showFlash } = useFlash()
   const author = usersById[comment.user_id]
@@ -88,9 +87,7 @@ export default function CommentItem({ comment, depth, usersById }) {
 
   useEffect(() => {
     fetchLikes()
-  }, [fetchLikes])
-
-  usePolling(fetchLikes, POLLING_INTERVALS.COMMENT_LIKES, [fetchLikes])
+  }, [fetchLikes, commentsRefreshToken])
 
   const isTombstone = !comment.user_id
   const isCommentOwner = !!currentUser && Number(currentUser.id) === Number(comment.user_id)

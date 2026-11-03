@@ -7,6 +7,8 @@ import { formatDate } from '../../utils/format'
 import Pagination from '../ui/Pagination'
 import FeedControls from '../posts/FeedControls'
 import { SelectDropdown } from '../ui/SelectDropdown'
+import ErrorState from '../ui/ErrorState'
+import Loading from '../ui/Loading'
 import { IconCheck, IconTrash } from '../ui/Icons'
 import s from './ProfileTabContent.module.css'
 import sn from './ProfileNotifications.module.css'
@@ -23,12 +25,13 @@ export default function ProfileNotifications() {
 
   const [notifications, setNotifications] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   const [filters, setFilters] = useState({ search: '', status: 'all', page: '1' })
   const pageParam = parseInt(filters.page || '1', 10)
 
-  const requestKey = `${pageParam}|${filters.search}|${filters.status}`
+  const requestKey = `${pageParam}|${filters.search}|${filters.status}|${retryCount}`
   const [resolvedKey, setResolvedKey] = useState(null)
   const loading = resolvedKey !== requestKey
 
@@ -46,12 +49,12 @@ export default function ProfileNotifications() {
         if (!isMounted) return
         setNotifications(res.data?.data || [])
         setTotalPages(res.data?.pagination?.totalPages || 1)
-        setError(false)
+        setError(null)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!isMounted) return
         setNotifications([])
-        setError(true)
+        setError(err)
       })
       .finally(() => {
         if (isMounted) setResolvedKey(requestKey)
@@ -61,6 +64,8 @@ export default function ProfileNotifications() {
       isMounted = false
     }
   }, [pageParam, filters.search, filters.status, requestKey])
+
+  const handleRetry = () => setRetryCount((c) => c + 1)
 
   const handleControlChange = (patch) => {
     setFilters((prev) => {
@@ -123,11 +128,11 @@ export default function ProfileNotifications() {
   }
 
   if (loading) {
-    return <div className={s.state}>Loading notifications…</div>
+    return <Loading message="Loading notifications…" />
   }
 
   if (error) {
-    return <div className={s.state}>Could not load notifications.</div>
+    return <ErrorState error={error} message="Could not load notifications." onRetry={handleRetry} />
   }
 
   const hasUnread = notifications.some((n) => !n.is_read)

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { IconChevronRight } from '../ui/Icons'
+import Loading from '../ui/Loading'
 import s from './SidebarWidget.module.css'
 
 export default function SidebarWidget({
@@ -30,7 +31,9 @@ export default function SidebarWidget({
 
       <div className={s.body}>
         {loading ? (
-          <div className={s.loading}>Loading...</div>
+          <div className={s.loading}>
+            <Loading inline size="small" />
+          </div>
         ) : empty ? (
           <div className={s.empty}>{emptyMessage}</div>
         ) : (

@@ -7,7 +7,14 @@ import { FlashProvider } from '../context/FlashProvider'
 import NavRow from '../components/ui/NavButtons'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import ProfileTabs from '../components/profile/ProfileTabs'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
 import s from './Profile.module.css'
+
+function isNotFound(error) {
+  const status = error?.status ?? error?.response?.status ?? error?.raw?.response?.status
+  return status === 404
+}
 
 export default function Profile() {
   const { id } = useParams()
@@ -23,10 +30,12 @@ export default function Profile() {
   }
 
   const [profile, setProfile] = useState(null)
-  const [notFound, setNotFound] = useState(false)
+  const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
 
-  const [resolvedId, setResolvedId] = useState(null)
-  const loading = resolvedId !== id
+  const requestKey = `${id}:${retryCount}`
+  const [resolvedKey, setResolvedKey] = useState(null)
+  const loading = resolvedKey !== requestKey
 
   const isOwner = !!currentUser && String(currentUser.id) === String(id)
 
@@ -38,20 +47,23 @@ export default function Profile() {
       .then((res) => {
         if (!isMounted) return
         setProfile(res.data)
-        setNotFound(false)
+        setError(null)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!isMounted) return
-        setNotFound(true)
+        setProfile(null)
+        setError(err)
       })
       .finally(() => {
-        if (isMounted) setResolvedId(id)
+        if (isMounted) setResolvedKey(requestKey)
       })
 
     return () => {
       isMounted = false
     }
-  }, [id])
+  }, [id, requestKey])
+
+  const handleRetry = () => setRetryCount((c) => c + 1)
 
   const handleProfileUpdate = (patch) => {
     setProfile((prev) => (prev ? { ...prev, ...patch } : prev))
@@ -59,15 +71,19 @@ export default function Profile() {
   }
 
   if (loading) {
-    return <div className={s.stateMsg}>Loading profile…</div>
+    return <Loading message="Loading profile…" size="large" />
   }
 
-  if (notFound || !profile) {
+  if (isNotFound(error)) {
     return (
       <div className={s.stateMsg}>
         <p>This user could not be found.</p>
       </div>
     )
+  }
+
+  if (error || !profile) {
+    return <ErrorState className={s.error} error={error} message="Could not load this profile." onRetry={handleRetry} />
   }
 
   return (

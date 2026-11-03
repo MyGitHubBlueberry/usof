@@ -3,31 +3,29 @@ import { Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerThunk, clearError } from '../redux/slices/authSlice'
 import { ROUTES } from '../constants/routes'
-import { getRecentLogins, addRecentLogin } from '../utils/recentLogins'
 import Logo from '../components/ui/Logo'
-import Combobox from '../components/ui/Combobox'
 import PasswordInput from '../components/ui/PasswordInput'
+import DevConfirmationLink from '../components/ui/DevConfirmationLink'
 import { IconMail } from '../components/ui/Icons'
+import { validateLogin, validatePassword, validateConfirmedPassword } from '../utils/validators'
+import Loading from '../components/ui/Loading'
 import s from '../components/layouts/auth.module.css'
-
-const MIN_PASSWORD = 8
 
 function validate(form) {
   const e = {}
-  if (!form.login.trim()) e.login = 'Login is required'
-  else if (form.login.trim().length < 3) e.login = 'At least 3 characters'
-  else if (!/^[a-zA-Z0-9_]+$/.test(form.login)) e.login = 'Letters, numbers and _ only'
+  const loginError = validateLogin(form.login)
+  if (loginError) e.login = loginError
 
   if (!form.full_name.trim()) e.full_name = 'Full name is required'
 
   if (!form.email.trim()) e.email = 'Email is required'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email address'
 
-  if (!form.password) e.password = 'Password is required'
-  else if (form.password.length < MIN_PASSWORD) e.password = `At least ${MIN_PASSWORD} characters`
+  const passwordError = validatePassword(form.password)
+  if (passwordError) e.password = passwordError
 
-  if (!form.confirmed_password) e.confirmed_password = 'Please confirm your password'
-  else if (form.password !== form.confirmed_password) e.confirmed_password = 'Passwords do not match'
+  const confirmedPasswordError = validateConfirmedPassword(form.password, form.confirmed_password)
+  if (confirmedPasswordError) e.confirmed_password = confirmedPasswordError
 
   return e
 }
@@ -50,6 +48,7 @@ export default function Register() {
   })
   const [touched, setTouched] = useState({})
   const [submitted, setSubmitted] = useState(false)
+  const [devLink, setDevLink] = useState(null)
 
   const errors = validate(form)
   const isFormValid = !Object.keys(errors).length
@@ -69,8 +68,8 @@ export default function Register() {
     setTouched(allTouched)
     if (!isFormValid) return
 
-    await dispatch(registerThunk(form)).unwrap()
-    addRecentLogin(form.login)
+    const result = await dispatch(registerThunk(form)).unwrap()
+    setDevLink(result?.dev_link ?? null)
     setSubmitted(true)
   }
 
@@ -96,6 +95,7 @@ export default function Register() {
             We sent a verification link to <strong>{form.email}</strong>.
             <br />Click it to activate your account.
           </p>
+          <DevConfirmationLink link={devLink} />
         </div>
         <p className={`${s.sub} ${s.footerLinks}`}>
           Already verified?{' '}
@@ -121,17 +121,7 @@ export default function Register() {
         <div className={s.row}>
           <div className={s.field}>
             <label className={s.label} htmlFor="reg-login">Login</label>
-            <Combobox
-              id="reg-login"
-              name="login"
-              inputClassName={touched.login && errors.login ? s.invalid : ''}
-              placeholder="cool_username"
-              value={form.login}
-              onChange={(val) => setForm((f) => ({ ...f, login: val }))}
-              onBlur={handleBlur}
-              suggestions={getRecentLogins()}
-              ariaLabel="Login"
-            />
+            <input {...fieldProps('login')} type="text" autoComplete="username" placeholder="cool_username" />
             {touched.login && errors.login && <span className={s.fieldError}>{errors.login}</span>}
           </div>
 
@@ -183,7 +173,7 @@ export default function Register() {
         </div>
 
         <button className={s.submit} type="submit" disabled={loading}>
-          {loading ? <><span className={s.spinner} /> Creating account…</> : 'Create account'}
+          {loading ? <Loading inline size="small" variant="light" message="Creating account…" /> : 'Create account'}
         </button>
       </form>
     </div>

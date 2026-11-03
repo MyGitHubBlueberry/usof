@@ -1,4 +1,5 @@
 import Modal from './Modal'
+import Loading from './Loading'
 import s from './ActionModal.module.css'
 
 export default function ActionModal({
@@ -45,7 +46,7 @@ export default function ActionModal({
             type="submit"
             disabled={isLoading || disabled}
           >
-            {isLoading ? 'Processing…' : confirmText}
+            {isLoading ? <Loading inline size="small" variant="light" message="Processing…" /> : confirmText}
           </button>
           <button
             className={s.btnGhost}

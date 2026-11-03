@@ -11,6 +11,7 @@ import CategoriesWidget from '../widgets/CategoriesWidget'
 import NotificationsWidget from '../widgets/NotificationsWidget'
 import SubscriptionsWidget from '../widgets/SubscriptionsWidget'
 import FavoritesWidget from '../widgets/FavoritesWidget'
+import Loading from '../ui/Loading'
 import s from './RootLayout.module.css'
 
 export default function RootLayout() {
@@ -47,7 +48,7 @@ export default function RootLayout() {
 
         <div className={`${s.centerColumn} ${isFullSpan ? s.fullSpan : ''}`}>
           <main className={s.main}>
-            <Suspense fallback={<div className={s.pageFallback}>Loading…</div>}>
+            <Suspense fallback={<Loading size="large" />}>
               <Outlet />
             </Suspense>
             <Footer />

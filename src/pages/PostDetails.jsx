@@ -3,8 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { postsService } from '../services/posts.service'
 import { usersService } from '../services/users.service'
-import { usePolling } from '../hooks/usePolling'
-import { POLLING_INTERVALS } from '../constants/polling'
+import { usePostEvents } from '../hooks/usePostEvents'
 import { FlashProvider } from '../context/FlashProvider'
 import { PostProvider } from '../context/PostProvider'
 import { ROUTES } from '../constants/routes'
@@ -14,7 +13,14 @@ import PostBody from '../components/post-detail/PostBody'
 import PostFooter from '../components/post-detail/PostFooter'
 import CommentsSection from '../components/post-detail/CommentsSection'
 import NavRow from '../components/ui/NavButtons'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
 import s from './PostDetails.module.css'
+
+function isNotFound(error) {
+  const status = error?.status ?? error?.response?.status ?? error?.raw?.response?.status
+  return status === 404
+}
 
 export default function PostDetails() {
   const { id } = useParams()
@@ -27,11 +33,12 @@ export default function PostDetails() {
   const [likeCounts, setLikeCounts] = useState({ likes: 0, dislikes: 0, myReaction: null })
   const [isFavorited, setIsFavorited] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [notFound, setNotFound] = useState(false)
+  const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
   const [commentsRefreshToken, setCommentsRefreshToken] = useState(0)
 
   const [resolvedKey, setResolvedKey] = useState(null)
-  const requestKey = `${id}:${currentUser?.id ?? ''}`
+  const requestKey = `${id}:${currentUser?.id ?? ''}:${retryCount}`
   const loading = resolvedKey !== requestKey
 
   const loadPost = useCallback(() => {
@@ -43,7 +50,7 @@ export default function PostDetails() {
         if (!isMounted) return
         const data = res.data
         setPost(data)
-        setNotFound(false)
+        setError(null)
 
         const tasks = [
           usersService.getById(data.user_id).catch(() => null),
@@ -76,8 +83,8 @@ export default function PostDetails() {
           }
         )
       })
-      .catch(() => {
-        if (isMounted) setNotFound(true)
+      .catch((err) => {
+        if (isMounted) setError(err)
       })
       .finally(() => {
         if (isMounted) setResolvedKey(requestKey)
@@ -90,35 +97,27 @@ export default function PostDetails() {
 
   useEffect(() => loadPost(), [loadPost])
 
-  usePolling(
-    () => {
-      if (!post) return
-      postsService
-        .getLikes(id)
-        .then((res) => {
-          const fresh = res.data ?? { likes: 0, dislikes: 0, myReaction: null }
-          setLikeCounts((prev) => {
-            if (
-              prev.likes !== fresh.likes ||
-              prev.dislikes !== fresh.dislikes ||
-              prev.myReaction !== fresh.myReaction
-            ) {
-              return fresh
-            }
-            return prev
-          })
-        })
-        .catch(() => {})
+  const handleRetry = () => setRetryCount((c) => c + 1)
+
+  usePostEvents(post?.id, {
+    likes_updated: (counts) => {
+      if (!counts) return
+      setLikeCounts((prev) => ({ ...prev, likes: counts.likes, dislikes: counts.dislikes }))
     },
-    POLLING_INTERVALS.POST_LIKES,
-    [id, post]
-  )
+    post_updated: (updated) => {
+      if (!updated) return
+      setPost((prev) => (prev ? { ...prev, ...updated } : prev))
+    },
+    comments_updated: () => {
+      setCommentsRefreshToken((v) => v + 1)
+    },
+  })
 
   if (loading) {
-    return <div className={s.stateMsg}>Loading post…</div>
+    return <Loading message="Loading post…" size="large" />
   }
 
-  if (notFound || !post) {
+  if (isNotFound(error)) {
     return (
       <div className={s.notFoundState}>
         <IconXCircle size={48} className={s.notFoundIcon} />
@@ -131,6 +130,10 @@ export default function PostDetails() {
         </Link>
       </div>
     )
+  }
+
+  if (error || !post) {
+    return <ErrorState error={error} message="Could not load this post." onRetry={handleRetry} />
   }
 
   const postContextValue = {

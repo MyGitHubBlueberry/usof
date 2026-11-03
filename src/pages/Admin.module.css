@@ -53,6 +53,7 @@
   padding: 24px;
   gap: 16px;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .sectionHeader {
@@ -84,22 +85,6 @@
 
 .feedState {
   composes: feedState from '../components/ui/DataState.module.css';
-}
-
-.spinner {
-  composes: spinner from '../components/ui/DataState.module.css';
-}
-
-.errorTitle {
-  composes: errorTitle from '../components/ui/DataState.module.css';
-}
-
-.errorMsg {
-  composes: errorMsg from '../components/ui/DataState.module.css';
-}
-
-.retryBtn {
-  composes: retryBtn from '../components/ui/DataState.module.css';
 }
 
 .tableWrap {

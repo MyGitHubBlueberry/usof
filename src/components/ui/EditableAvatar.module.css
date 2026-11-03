@@ -1,0 +1,64 @@
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.avatarEditBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.avatarEditBtn:hover:not(:disabled) {
+  border-color: var(--text-h);
+  color: var(--accent);
+}
+
+.avatarEditBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.avatarRemoveOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.avatarWrap:hover:not(:has(.avatarEditBtn:hover)) .avatarRemoveOverlay,
+.avatarWrap:focus-within:not(:has(.avatarEditBtn:focus)) .avatarRemoveOverlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.avatarRemoveOverlay:disabled {
+  cursor: not-allowed;
+}
+
+.hiddenFileInput {
+  display: none;
+}

@@ -8,9 +8,10 @@ import { toPost } from '../constants/routes'
 import Pagination from "../components/ui/Pagination"
 import FeedControls from "../components/posts/FeedControls"
 import PostModerationRow from "./admin/PostModerationRow"
+import ErrorState from "../components/ui/ErrorState"
+import Loading from "../components/ui/Loading"
 import {
   IconDocument,
-  IconRefresh,
 } from '../components/ui/Icons'
 import s from "./Admin.module.css"
 
@@ -131,7 +132,7 @@ export default function PostsTab() {
         if (!isMounted) return
         setPosts([])
         setTotal(0)
-        setError(err?.message ?? 'Failed to load posts')
+        setError(err)
         setLoadedKey(currentKey)
       })
 
@@ -237,21 +238,14 @@ export default function PostsTab() {
         showSearchType={true}
       />
 
-      {isLoading && (
-        <div className={s.feedState}>
-          <div className={s.spinner} />
-          <span>Loading posts…</span>
-        </div>
-      )}
+      {isLoading && <Loading message="Loading posts…" />}
 
       {!isLoading && error && (
-        <div className={s.feedState}>
-          <p className={s.errorTitle}>Error</p>
-          <p className={s.errorMsg}>{error}</p>
-          <button className={s.retryBtn} onClick={() => setRetryCount((c) => c + 1)}>
-            <IconRefresh size={14} /> Retry
-          </button>
-        </div>
+        <ErrorState
+          error={error}
+          message="Failed to load posts."
+          onRetry={() => setRetryCount((c) => c + 1)}
+        />
       )}
 
       {!isLoading && !error && posts.length === 0 && (

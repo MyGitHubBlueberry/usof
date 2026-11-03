@@ -7,6 +7,8 @@ import { FlashProvider } from '../context/FlashProvider'
 import PostCard from '../components/posts/PostCard'
 import FeedControls from '../components/posts/FeedControls'
 import Pagination from '../components/ui/Pagination'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
 import { IconChevron } from '../components/ui/Icons'
 import s from './Home.module.css'
 
@@ -32,7 +34,7 @@ export default function Home() {
   const [posts, setPosts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loadedKey, setLoadedKey] = useState(null)
-  const [error, setError] = useState(null) // null | 'rate_limit' | 'generic'
+  const [error, setError] = useState(null)
   const [retryCount, setRetryCount] = useState(0)
   const [hasNewPosts, setHasNewPosts] = useState(false)
 
@@ -66,8 +68,7 @@ export default function Home() {
         if (!isMounted) return
         setPosts([])
         setTotalPages(1)
-        const errStatus = err?.status ?? err?.response?.status ?? err?.raw?.response?.status
-        setError(errStatus === 429 ? 'rate_limit' : 'generic')
+        setError(err)
         setLoadedKey(currentKey)
       })
 
@@ -143,39 +144,16 @@ export default function Home() {
 
   function renderFeedBody() {
     if (isLoading) {
-      return (
-        <div className={s.feedState}>
-          <div className={s.spinner} aria-hidden="true" />
-          <span className={s.loadingText}>Loading posts…</span>
-        </div>
-      )
+      return <Loading message="Loading posts…" />
     }
 
-    if (error === 'rate_limit') {
+    if (error) {
       return (
-        <div className={s.feedState}>
-          <p className={s.errorTitle}>Too many requests</p>
-          <p className={s.errorMsg}>
-            The server is rate-limiting your requests. Wait a moment, then try again.
-          </p>
-          <button type="button" className={s.retryBtn} onClick={handleRetry}>
-            Retry
-          </button>
-        </div>
-      )
-    }
-
-    if (error === 'generic') {
-      return (
-        <div className={s.feedState}>
-          <p className={s.errorTitle}>Something went wrong</p>
-          <p className={s.errorMsg}>
-            Could not load posts. Check your connection and try again.
-          </p>
-          <button type="button" className={s.retryBtn} onClick={handleRetry}>
-            Retry
-          </button>
-        </div>
+        <ErrorState
+          error={error}
+          message="Could not load posts. Check your connection and try again."
+          onRetry={handleRetry}
+        />
       )
     }
 

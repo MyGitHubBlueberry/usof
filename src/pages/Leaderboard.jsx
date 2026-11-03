@@ -3,7 +3,9 @@ import { leaderboardService } from '../services/leaderboard.service'
 import TabBar from '../components/ui/TabBar'
 import Pagination from '../components/ui/Pagination'
 import LeaderboardList from '../components/leaderboard/LeaderboardList'
-import { IconTrophy, IconArrowUp, IconRefresh } from '../components/ui/Icons'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
+import { IconTrophy, IconArrowUp } from '../components/ui/Icons'
 import NavButtons from '../components/ui/NavButtons'
 import s from './Leaderboard.module.css'
 
@@ -19,7 +21,7 @@ export default function Leaderboard() {
   const [page, setPage] = useState(1)
   const [users, setUsers] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState(null)
   const [retryCount, setRetryCount] = useState(0)
 
   const requestKey = `${activeTab}:${page}:${retryCount}`
@@ -35,12 +37,12 @@ export default function Leaderboard() {
         if (!isMounted) return
         setUsers(res.data?.data ?? [])
         setTotalPages(res.data?.pagination?.totalPages ?? 1)
-        setError(false)
+        setError(null)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!isMounted) return
         setUsers([])
-        setError(true)
+        setError(err)
       })
       .finally(() => {
         if (isMounted) setResolvedKey(requestKey)
@@ -58,23 +60,16 @@ export default function Leaderboard() {
 
   function renderBody() {
     if (loading) {
-      return (
-        <div className={s.feedState}>
-          <div className={s.spinner} />
-          <span>Loading leaderboard…</span>
-        </div>
-      )
+      return <Loading message="Loading leaderboard…" />
     }
 
     if (error) {
       return (
-        <div className={s.feedState}>
-          <p className={s.errorTitle}>Error</p>
-          <p className={s.errorMsg}>Could not load the leaderboard.</p>
-          <button className={s.retryBtn} onClick={() => setRetryCount((c) => c + 1)}>
-            <IconRefresh size={14} /> Retry
-          </button>
-        </div>
+        <ErrorState
+          error={error}
+          message="Could not load the leaderboard."
+          onRetry={() => setRetryCount((c) => c + 1)}
+        />
       )
     }
 

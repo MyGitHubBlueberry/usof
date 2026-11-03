@@ -9,9 +9,12 @@ import { SelectDropdown } from '../components/ui/SelectDropdown'
 import UserTableRow from './admin/UserTableRow'
 import AddUserModal from './admin/AddUserModal'
 import BanUserModal from './admin/BanUserModal'
+import ErrorState from '../components/ui/ErrorState'
+import Loading from '../components/ui/Loading'
+import { validateLogin, validatePassword, validateConfirmedPassword } from '../utils/validators'
 import s from './Admin.module.css'
 
-import { IconUser, IconRefresh, IconPlus } from '../components/ui/Icons'
+import { IconUser, IconPlus } from '../components/ui/Icons'
 
 const USERS_PER_PAGE = 10
 
@@ -39,24 +42,21 @@ const USER_ORDER_OPTIONS = [
   { value: 'desc', label: 'Descending (Z–A)' },
 ]
 
-const MIN_PASSWORD = 8
-
 function validateNewUser(form) {
   const e = {}
-  if (!form.login.trim()) e.login = 'Login is required'
-  else if (form.login.trim().length < 3) e.login = 'At least 3 characters'
-  else if (!/^[a-zA-Z0-9_]+$/.test(form.login)) e.login = 'Letters, numbers and _ only'
+  const loginError = validateLogin(form.login)
+  if (loginError) e.login = loginError
 
   if (!form.full_name.trim()) e.full_name = 'Full name is required'
 
   if (!form.email.trim()) e.email = 'Email is required'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email address'
 
-  if (!form.password) e.password = 'Password is required'
-  else if (form.password.length < MIN_PASSWORD) e.password = `At least ${MIN_PASSWORD} characters`
+  const passwordError = validatePassword(form.password)
+  if (passwordError) e.password = passwordError
 
-  if (!form.confirmed_password) e.confirmed_password = 'Please confirm the password'
-  else if (form.password !== form.confirmed_password) e.confirmed_password = 'Passwords do not match'
+  const confirmedPasswordError = validateConfirmedPassword(form.password, form.confirmed_password)
+  if (confirmedPasswordError) e.confirmed_password = confirmedPasswordError
 
   return e
 }
@@ -141,7 +141,7 @@ export default function UsersTab() {
         if (!isMounted) return
         setUsers([])
         setTotal(0)
-        setError(err?.message ?? 'Failed to load users')
+        setError(err)
         setLoadedKey(currentKey)
       })
 
@@ -495,21 +495,14 @@ export default function UsersTab() {
         />
       )}
 
-      {isLoading && (
-        <div className={s.feedState}>
-          <div className={s.spinner} />
-          <span>Loading users…</span>
-        </div>
-      )}
+      {isLoading && <Loading message="Loading users…" />}
 
       {!isLoading && error && (
-        <div className={s.feedState}>
-          <p className={s.errorTitle}>Error</p>
-          <p className={s.errorMsg}>{error}</p>
-          <button className={s.retryBtn} onClick={() => setRetryCount((c) => c + 1)}>
-            <IconRefresh size={14} /> Retry
-          </button>
-        </div>
+        <ErrorState
+          error={error}
+          message="Failed to load users."
+          onRetry={() => setRetryCount((c) => c + 1)}
+        />
       )}
 
       {!isLoading && !error && users.length === 0 && (
